@@ -1,0 +1,13 @@
+.idea
+*.log
+*.pid
+*.scssc
+*.pyc
+*.bak
+*.DS_Store
+databases/*
+errors/*
+sessions
+uploads/*
+cache/*
+parameters_8800.py
