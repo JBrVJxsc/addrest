@@ -1,0 +1,45 @@
+/* line 1, ../sass/_main.scss */
+body {
+  background: #FFE071 url("../images/bg.jpg") no-repeat;
+}
+
+/* line 5, ../sass/_main.scss */
+.navbar {
+  background-color: transparent;
+}
+
+/* line 9, ../sass/_main.scss */
+.navbar-default .navbar-brand {
+  color: #F39C12;
+}
+
+/* line 13, ../sass/_main.scss */
+.navbar-default {
+  font-weight: bold;
+}
+
+/* line 17, ../sass/_main.scss */
+.navbar-default .navbar-brand:hover {
+  color: #F39C12;
+}
+
+/* line 21, ../sass/_main.scss */
+.panel {
+  border-style: none;
+}
+
+/* line 25, ../sass/_main.scss */
+.panel-primary .panel-heading {
+  background-color: #F39C12;
+  border-color: #F39C12;
+}
+
+/* line 30, ../sass/_main.scss */
+#login {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 30%;
+  width: 50%;
+  margin: -15% 0 0 -25%;
+}
