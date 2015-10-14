@@ -1,0 +1,37 @@
+body {
+  background: $background url("../images/bg.jpg") no-repeat;
+}
+
+.navbar {
+  background-color: transparent;
+}
+
+.navbar-default .navbar-brand {
+  color: $title;
+}
+
+.navbar-default {
+  font-weight: bold;
+}
+
+.navbar-default .navbar-brand:hover {
+  color: $title;
+}
+
+.panel {
+  border-style: none;
+}
+
+.panel-primary .panel-heading {
+  background-color: $title;
+  border-color: $title;
+}
+
+#login {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 30%;
+    width: 50%;
+    margin: -15% 0 0 -25%;
+}
