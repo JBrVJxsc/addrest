@@ -5,14 +5,14 @@ html {
 }
 
 /* line 10, ../sass/_main.scss */
-.btn {
-  margin-left: 6px;
-  margin-right: 6px;
-}
-
-/* line 15, ../sass/_main.scss */
 .navbar {
   background-color: transparent;
+}
+
+/* line 14, ../sass/_main.scss */
+.navbar .btn {
+  margin-left: 6px;
+  margin-right: 6px;
 }
 
 /* line 19, ../sass/_main.scss */

@@ -7,13 +7,13 @@ html {
   height: 2000px;
 }
 
-.btn {
-  margin-left: 6px;
-  margin-right: 6px;
-}
-
 .navbar {
   background-color: transparent;
+}
+
+.navbar .btn {
+  margin-left: 6px;
+  margin-right: 6px;
 }
 
 .navbar-default .navbar-brand {
