@@ -5,37 +5,43 @@ html {
 }
 
 /* line 10, ../sass/_main.scss */
+.btn {
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+/* line 15, ../sass/_main.scss */
 .navbar {
   background-color: transparent;
 }
 
-/* line 14, ../sass/_main.scss */
+/* line 19, ../sass/_main.scss */
 .navbar-default .navbar-brand {
   color: #F39C12;
 }
 
-/* line 18, ../sass/_main.scss */
+/* line 23, ../sass/_main.scss */
 .navbar-default {
   font-weight: bold;
 }
 
-/* line 22, ../sass/_main.scss */
+/* line 27, ../sass/_main.scss */
 .navbar-default .navbar-brand:hover {
   color: #F39C12;
 }
 
-/* line 26, ../sass/_main.scss */
+/* line 31, ../sass/_main.scss */
 .panel {
   border-style: none;
 }
 
-/* line 30, ../sass/_main.scss */
+/* line 35, ../sass/_main.scss */
 .panel-primary .panel-heading {
   background-color: #F39C12;
   border-color: #F39C12;
 }
 
-/* line 35, ../sass/_main.scss */
+/* line 40, ../sass/_main.scss */
 .ModalPanel {
   width: 65%;
   margin: 0 auto;
