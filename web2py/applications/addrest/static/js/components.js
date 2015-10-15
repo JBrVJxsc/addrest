@@ -2,7 +2,7 @@
  * Created by xuzhang on 10/8/15.
  */
 
-var MainBody = React.createClass({
+var Index = React.createClass({
     getButtons: function () {
         return [
             {
@@ -28,6 +28,7 @@ var MainBody = React.createClass({
 				<Modal ref="login" type="WaveModal" content={<Login />}/>
 				<Modal ref="signup" type="WaveModal" content={<Signup />}/>
 				<Navbar ref="navbar" buttons={this.getButtons()} />
+                <IndexBackground />
 			</div>
 		);
 	}
@@ -67,6 +68,16 @@ var NavbarButton = React.createClass({
     render: function () {
         return (
             <button type="button" className="btn btn-warning" onClick={this.props.onClick}>{this.props.children}</button>
+        );
+    }
+});
+
+var IndexBackground = React.createClass({
+    render: function () {
+        return (
+            <div className="IndexBackground">
+                <img src="/addrest/static/images/background-index.jpg" className="img-responsive" alt="Responsive image" />
+            </div>
         );
     }
 });
@@ -134,4 +145,30 @@ var Modal = React.createClass({
 			<Dialog ref="dialog">{this.props.content}</Dialog>
 		)
 	}
+});
+
+var Dashboard = React.createClass({
+    getButtons: function () {
+        return [
+            {
+                onClick: function () {
+
+                }.bind(this),
+                text: "What?"
+            },
+            {
+                onClick: function () {
+                    console.log("You've logged out.");
+                }.bind(this),
+                text: "Log Out"
+            }
+        ];
+    },
+    render: function () {
+        return (
+			<div>
+				<Navbar ref="navbar" buttons={this.getButtons()} />
+			</div>
+        );
+    }
 });

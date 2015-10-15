@@ -3,8 +3,7 @@
 }
 
 html {
-  background: $background url("../images/background-index.jpg") no-repeat;
-  height: 2000px;
+  background: $background;
 }
 
 .navbar {
@@ -40,4 +39,8 @@ html {
 .ModalPanel {
   width: 65%;
   margin: 0 auto;
+}
+
+.IndexBackground {
+  background: $background;
 }
