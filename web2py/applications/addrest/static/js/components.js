@@ -4,7 +4,7 @@
 
 var MainBody = React.createClass({
     componentDidMount: function() {
-
+        
     },
     render: function() {
         return (
