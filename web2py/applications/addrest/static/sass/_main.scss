@@ -7,6 +7,11 @@ html {
   height: 2000px;
 }
 
+.btn {
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
 .navbar {
   background-color: transparent;
 }
@@ -35,7 +40,4 @@ html {
 .ModalPanel {
   width: 65%;
   margin: 0 auto;
-}
-
-.no-spell-check {
 }

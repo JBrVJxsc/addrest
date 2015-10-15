@@ -3,114 +3,135 @@
  */
 
 var MainBody = React.createClass({
-    componentDidMount: function() {
-
+    getButtons: function () {
+        return [
+            {
+                onClick: function () {
+                    this.refs.signup.toggle();
+                }.bind(this),
+                text: "Sign up"
+            },
+            {
+                onClick: function () {
+                    this.refs.login.toggle();
+                }.bind(this),
+                text: "Log In"
+            }
+        ];
     },
-    render: function() {
-        return (
-            <div>
-                <Navbar ref="navbar" />
-            </div>
-        );
-    }
+	componentDidMount: function() {
+
+	},
+	render: function() {
+		return (
+			<div>
+				<Modal ref="login" type="WaveModal" content={<Login />}/>
+				<Modal ref="signup" type="WaveModal" content={<Signup />}/>
+				<Navbar ref="navbar" buttons={this.getButtons()} />
+			</div>
+		);
+	}
 });
 
 var Navbar = React.createClass({
-    handleSignUpOnClick: function() {
-        this.refs.signup.toggle();
+    getButtons: function () {
+        var buttonList = [];
+        var buttons = this.props.buttons;
+        for (var i in buttons) {
+            var button = buttons[i];
+            buttonList.push(<NavbarButton onClick={button.onClick}>{button.text}</NavbarButton>);
+        }
+        return buttonList;
     },
-    handleLogInOnClick: function() {
-        this.refs.login.toggle();
-    },
-    render: function() {
-        return (
-            <div>
-                <Modal ref="login" type="WaveModal" content={<Login />}/>
-                <Modal ref="signup" type="WaveModal" content={<Signup />}/>
+	render: function() {
+		return (
+			<div>
                 <nav className="navbar navbar-default navbar-fixed-top">
-                  <div className="container-fluid">
-                    <div className="navbar-header">
-                      <div className="navbar-brand">Addrest</div>
+                    <div className="container-fluid">
+                        <div className="navbar-header">
+                            <div className="navbar-brand">Addrest</div>
+                        </div>
+                        <div className="collapse navbar-collapse">
+                            <div className="navbar-form navbar-right">
+                                {this.getButtons()}
+                            </div>
+                        </div>
                     </div>
-                    <div className="collapse navbar-collapse">
-                      <div className="navbar-form navbar-right">
-                        <button type="button" className="btn btn-warning" onClick={this.handleSignUpOnClick}>Sign up</button>
-                          <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                        <button type="button" className="btn btn-warning" onClick={this.handleLogInOnClick}>Log In</button>
-                      </div>
-                    </div>
-                  </div>
                 </nav>
-            </div>
+			</div>
+		);
+	}
+});
+
+var NavbarButton = React.createClass({
+    render: function () {
+        return (
+            <button type="button" className="btn btn-warning" onClick={this.props.onClick}>{this.props.children}</button>
         );
     }
 });
 
-var Panel = React.createClass({
-    render: function() {
-        return (
-            <div className="ModalPanel">
-                <div className="panel panel-primary">
-                  <div className="panel-heading">
-                    <h3 className="panel-title">{this.props.title}</h3>
-                  </div>
-                  <div className="panel-body">
-                      {this.props.children}
-                  </div>
-                </div>
-            </div>
-        );
-    }
+var ModalPanel = React.createClass({
+	render: function() {
+		return (
+			<div className="ModalPanel">
+				<div className="panel panel-primary">
+                    <div className="panel-heading">
+                        <h3 className="panel-title">{this.props.title}</h3>
+                    </div>
+                    <div className="panel-body">{this.props.children}</div>
+				</div>
+			</div>
+		);
+	}
+});
+
+var UserInfoForm = React.createClass({
+	render: function () {
+		return (
+			<form className="form col-md-12 center-block">
+				<div className="form-group">
+					<input type="text" spellCheck="false" className="form-control" placeholder="Email" />
+				</div>
+				<div className="form-group">
+					<input type="password" className="form-control" placeholder="Password" />
+				</div>
+				<div className="form-group">
+					<button className="btn btn-warning btn-block">{this.props.button}</button>
+				</div>
+			</form>
+		);
+	}
 });
 
 var Login = React.createClass({
-    render: function() {
-        return (
-            <Panel title="Log In">
-              <form className="form col-md-12 center-block">
-                <div className="form-group">
-                  <input type="text" spellCheck="false" className="form-control" placeholder="Email" />
-                </div>
-                <div className="form-group">
-                  <input type="password" className="form-control" placeholder="Password" />
-                </div>
-                <div className="form-group">
-                  <button className="btn btn-warning btn-block">Log In</button>
-                </div>
-              </form>
-            </Panel>
-        );
-    }
+	render: function() {
+		return (
+			<ModalPanel title="Log In">
+                <UserInfoForm button="Log In" />
+			</ModalPanel>
+		);
+	}
 });
 
 var Signup = React.createClass({
-    render: function() {
-        return (
-            <Panel title="Sign up">
-              <form className="form col-md-12 center-block">
-                <div className="form-group">
-                  <input type="text" spellCheck="false" className="form-control" placeholder="Email" />
-                </div>
-                <div className="form-group">
-                  <input type="password" className="form-control" placeholder="Password" />
-                </div>
-                <div className="form-group">
-                  <button className="btn btn-warning btn-block">Sign up</button>
-                </div>
-              </form>
-            </Panel>
-        );
-    }
+	render: function() {
+		return (
+			<ModalPanel title="Sign up">
+                <UserInfoForm button="Sign up" />
+			</ModalPanel>
+		);
+	}
 });
 
 var Modal = React.createClass({
-    toggle: function() {
-        this.refs.dialog.toggle();
-    },
-    render: function() {
-        var Dialog = Boron[this.props.type];
-        return (
-            <Dialog ref="dialog">{this.props.content}</Dialog>
-        )
-    }
+	toggle: function() {
+		this.refs.dialog.toggle();
+	},
+	render: function() {
+		var Dialog = Boron[this.props.type];
+		return (
+			<Dialog ref="dialog">{this.props.content}</Dialog>
+		)
+	}
 });
