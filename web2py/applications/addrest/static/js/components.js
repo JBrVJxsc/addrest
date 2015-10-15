@@ -17,16 +17,16 @@ var MainBody = React.createClass({
 
 var Navbar = React.createClass({
     handleSignUpOnClick: function() {
-
+        this.refs.signup.toggle();
     },
     handleLogInOnClick: function() {
         this.refs.login.toggle();
-        console.log(this.refs.login);
     },
     render: function() {
         return (
             <div>
-                <Modal ref="login" type="FadeModal" content={<Panel />}/>
+                <Modal ref="login" type="WaveModal" content={<Login />}/>
+                <Modal ref="signup" type="WaveModal" content={<Signup />}/>
                 <nav className="navbar navbar-default navbar-fixed-top">
                   <div className="container-fluid">
                     <div className="navbar-header">
@@ -52,10 +52,10 @@ var Panel = React.createClass({
             <div className="ModalPanel">
                 <div className="panel panel-primary">
                   <div className="panel-heading">
-                    <h3 className="panel-title">Log In</h3>
+                    <h3 className="panel-title">{this.props.title}</h3>
                   </div>
                   <div className="panel-body">
-                    Panel content
+                      {this.props.children}
                   </div>
                 </div>
             </div>
@@ -66,14 +66,39 @@ var Panel = React.createClass({
 var Login = React.createClass({
     render: function() {
         return (
-                <div className="panel panel-primary">
-                  <div className="panel-heading">
-                    <h3 className="panel-title">Log In</h3>
-                  </div>
-                  <div className="panel-body">
-                    Panel content
-                  </div>
+            <Panel title="Log In">
+              <form className="form col-md-12 center-block">
+                <div className="form-group">
+                  <input type="text" className="form-control" placeholder="Email" />
                 </div>
+                <div className="form-group">
+                  <input type="password" className="form-control" placeholder="Password" />
+                </div>
+                <div className="form-group">
+                  <button className="btn btn-warning btn-block">Log In</button>
+                </div>
+              </form>
+            </Panel>
+        );
+    }
+});
+
+var Signup = React.createClass({
+    render: function() {
+        return (
+            <Panel title="Sign up">
+              <form className="form col-md-12 center-block">
+                <div className="form-group">
+                  <input type="text" className="form-control" placeholder="Email" />
+                </div>
+                <div className="form-group">
+                  <input type="password" className="form-control" placeholder="Password" />
+                </div>
+                <div className="form-group">
+                  <button className="btn btn-warning btn-block">Sign up</button>
+                </div>
+              </form>
+            </Panel>
         );
     }
 });
