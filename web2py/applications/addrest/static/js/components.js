@@ -4,7 +4,7 @@
 
 var MainBody = React.createClass({
     componentDidMount: function() {
-        
+
     },
     render: function() {
         return (
@@ -69,7 +69,7 @@ var Login = React.createClass({
             <Panel title="Log In">
               <form className="form col-md-12 center-block">
                 <div className="form-group">
-                  <input type="text" className="form-control" placeholder="Email" />
+                  <input type="text" spellCheck="false" className="form-control" placeholder="Email" />
                 </div>
                 <div className="form-group">
                   <input type="password" className="form-control" placeholder="Password" />
@@ -89,7 +89,7 @@ var Signup = React.createClass({
             <Panel title="Sign up">
               <form className="form col-md-12 center-block">
                 <div className="form-group">
-                  <input type="text" className="form-control" placeholder="Email" />
+                  <input type="text" spellCheck="false" className="form-control" placeholder="Email" />
                 </div>
                 <div className="form-group">
                   <input type="password" className="form-control" placeholder="Password" />
