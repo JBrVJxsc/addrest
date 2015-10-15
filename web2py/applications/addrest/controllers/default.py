@@ -58,3 +58,5 @@ def call():
     return service()
 
 
+def dashboard():
+    return dict()
