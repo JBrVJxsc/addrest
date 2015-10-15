@@ -9,7 +9,7 @@ var MainBody = React.createClass({
     render: function() {
         return (
             <div>
-                <Navbar />
+                <Navbar ref="navbar" />
             </div>
         );
     }
@@ -21,11 +21,12 @@ var Navbar = React.createClass({
     },
     handleLogInOnClick: function() {
         this.refs.login.toggle();
+        console.log(this.refs.login);
     },
     render: function() {
         return (
             <div>
-                <Modal ref="login" type="ScaleModal" content={<Login />}/>
+                <Modal ref="login" type="FadeModal" content={<Panel />}/>
                 <nav className="navbar navbar-default navbar-fixed-top">
                   <div className="container-fluid">
                     <div className="navbar-header">
@@ -45,10 +46,10 @@ var Navbar = React.createClass({
     }
 });
 
-var Login = React.createClass({
+var Panel = React.createClass({
     render: function() {
         return (
-            <div id="login">
+            <div className="ModalPanel">
                 <div className="panel panel-primary">
                   <div className="panel-heading">
                     <h3 className="panel-title">Log In</h3>
@@ -58,6 +59,21 @@ var Login = React.createClass({
                   </div>
                 </div>
             </div>
+        );
+    }
+});
+
+var Login = React.createClass({
+    render: function() {
+        return (
+                <div className="panel panel-primary">
+                  <div className="panel-heading">
+                    <h3 className="panel-title">Log In</h3>
+                  </div>
+                  <div className="panel-body">
+                    Panel content
+                  </div>
+                </div>
         );
     }
 });
