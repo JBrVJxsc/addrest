@@ -82,10 +82,10 @@ var IndexBackground = React.createClass({
     }
 });
 
-var ModalPanel = React.createClass({
+var UserInfoModal = React.createClass({
 	render: function() {
 		return (
-			<div className="ModalPanel">
+			<div className="UserInfoModal">
 				<div className="panel panel-primary">
                     <div className="panel-heading">
                         <h3 className="panel-title">{this.props.title}</h3>
@@ -118,9 +118,9 @@ var UserInfoForm = React.createClass({
 var Login = React.createClass({
 	render: function() {
 		return (
-			<ModalPanel title="Log In">
+			<UserInfoModal title="Log In">
                 <UserInfoForm button="Log In" />
-			</ModalPanel>
+			</UserInfoModal>
 		);
 	}
 });
@@ -128,9 +128,9 @@ var Login = React.createClass({
 var Signup = React.createClass({
 	render: function() {
 		return (
-			<ModalPanel title="Sign up">
+			<UserInfoModal title="Sign up">
                 <UserInfoForm button="Sign up" />
-			</ModalPanel>
+			</UserInfoModal>
 		);
 	}
 });

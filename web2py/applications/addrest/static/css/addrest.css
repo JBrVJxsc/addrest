@@ -42,12 +42,18 @@ html {
 }
 
 /* line 40, ../sass/_main.scss */
-.ModalPanel {
-  width: 65%;
-  margin: 0 auto;
+.form-control:focus {
+  border-color: #F39C12;
 }
 
-/* line 45, ../sass/_main.scss */
+/* line 44, ../sass/_main.scss */
+.UserInfoModal .panel {
+  position: relative;
+  width: 325px;
+  right: 162.5px;
+}
+
+/* line 50, ../sass/_main.scss */
 .IndexBackground {
   background: #FFE071;
 }

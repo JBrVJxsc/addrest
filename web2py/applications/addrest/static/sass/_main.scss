@@ -37,9 +37,14 @@ html {
   border-color: $title;
 }
 
-.ModalPanel {
-  width: 65%;
-  margin: 0 auto;
+.form-control:focus {
+  border-color: $title;
+}
+
+.UserInfoModal .panel {
+  position: relative;
+  width: $userInfoModalWidth;
+  right: $userInfoModalWidth / 2;
 }
 
 .IndexBackground {
