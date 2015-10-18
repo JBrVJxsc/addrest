@@ -1,5 +1,5 @@
 /* line 5, ../sass/_main.scss */
-html {
+body {
   background: #FFE071;
 }
 
@@ -54,6 +54,46 @@ html {
 }
 
 /* line 50, ../sass/_main.scss */
-.IndexBackground {
-  background: #FFE071;
+.AddressListPanel {
+  position: relative;
+  top: 80px;
+  margin: 0 auto;
+  width: 60%;
+}
+
+/* line 57, ../sass/_main.scss */
+.glyphicon-search {
+  color: #ACB6C0;
+}
+
+/* line 61, ../sass/_main.scss */
+.inner-addon {
+  position: relative;
+}
+
+/* line 65, ../sass/_main.scss */
+.inner-addon .glyphicon {
+  position: absolute;
+  padding: 10px;
+  pointer-events: none;
+}
+
+/* line 71, ../sass/_main.scss */
+.left-addon .glyphicon {
+  left: 0;
+}
+
+/* line 75, ../sass/_main.scss */
+.right-addon .glyphicon {
+  right: 0;
+}
+
+/* line 79, ../sass/_main.scss */
+.left-addon input {
+  padding-left: 30px;
+}
+
+/* line 83, ../sass/_main.scss */
+.right-addon input {
+  padding-right: 30px;
 }

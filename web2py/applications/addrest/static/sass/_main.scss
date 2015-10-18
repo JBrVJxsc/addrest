@@ -2,12 +2,12 @@
   //border: 1px dashed;
 }
 
-html {
-  background: $background;
+body {
+  background: $PageBackground;
 }
 
 .navbar {
-  background-color: #FFEA9B;
+  background-color: $TitleBackground;
 }
 
 .navbar .btn {
@@ -17,7 +17,7 @@ html {
 }
 
 .navbar-default .navbar-brand {
-  color: $title;
+  color: $Warning;
 }
 
 .navbar-default {
@@ -25,7 +25,7 @@ html {
 }
 
 .navbar-default .navbar-brand:hover {
-  color: $title;
+  color: $Warning;
 }
 
 .panel {
@@ -33,12 +33,12 @@ html {
 }
 
 .panel-primary .panel-heading {
-  background-color: $title;
-  border-color: $title;
+  background-color: $Warning;
+  border-color: $Warning;
 }
 
 .form-control:focus {
-  border-color: $title;
+  border-color: $Warning;
 }
 
 .UserInfoModal .panel {
@@ -47,6 +47,39 @@ html {
   right: $userInfoModalWidth / 2;
 }
 
-.IndexBackground {
-  background: $background;
+.AddressListPanel {
+  position: relative;
+  top: 80px;
+  margin: 0 auto;
+  width: 60%;
+}
+
+.glyphicon-search {
+  color: #ACB6C0;
+}
+
+.inner-addon {
+  position: relative;
+}
+
+.inner-addon .glyphicon {
+  position: absolute;
+  padding: 10px;
+  pointer-events: none;
+}
+
+.left-addon .glyphicon {
+  left: 0;
+}
+
+.right-addon .glyphicon {
+  right: 0;
+}
+
+.left-addon input {
+  padding-left: 30px;
+}
+
+.right-addon input {
+  padding-right: 30px;
 }

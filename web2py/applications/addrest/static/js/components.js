@@ -4,20 +4,23 @@
 
 var Index = React.createClass({
     getButtons: function () {
-        return [
-            {
-                onClick: function () {
-                    this.refs.signup.toggle();
-                }.bind(this),
-                text: "Sign up"
-            },
-            {
-                onClick: function () {
-                    this.refs.login.toggle();
-                }.bind(this),
-                text: "Log In"
-            }
-        ];
+        return {
+            left: null,
+            right: [
+                {
+                    onClick: function () {
+                        this.refs.signup.toggle();
+                    }.bind(this),
+                    text: "Sign up"
+                },
+                {
+                    onClick: function () {
+                        this.refs.login.toggle();
+                    }.bind(this),
+                    text: "Log In"
+                }
+            ]
+        };
     },
 	componentDidMount: function() {
 
@@ -35,9 +38,8 @@ var Index = React.createClass({
 });
 
 var Navbar = React.createClass({
-    getButtons: function () {
+    getButtons: function (buttons) {
         var buttonList = [];
-        var buttons = this.props.buttons;
         for (var i in buttons) {
             var button = buttons[i];
             buttonList.push(<NavbarButton onClick={button.onClick}>{button.text}</NavbarButton>);
@@ -53,8 +55,11 @@ var Navbar = React.createClass({
                             <div className="navbar-brand">Addrest</div>
                         </div>
                         <div className="collapse navbar-collapse">
+                            <div className="navbar-form navbar-left">
+                                {this.getButtons(this.props.buttons.left)}
+                            </div>
                             <div className="navbar-form navbar-right">
-                                {this.getButtons()}
+                                {this.getButtons(this.props.buttons.right)}
                             </div>
                         </div>
                     </div>
@@ -75,7 +80,7 @@ var NavbarButton = React.createClass({
 var IndexBackground = React.createClass({
     render: function () {
         return (
-            <div className="IndexBackground">
+            <div>
                 <img src="/addrest/static/images/background-index.jpg" className="img-responsive" alt="Responsive image" />
             </div>
         );
@@ -149,26 +154,210 @@ var Modal = React.createClass({
 
 var Dashboard = React.createClass({
     getButtons: function () {
-        return [
-            {
-                onClick: function () {
-
-                }.bind(this),
-                text: "What?"
-            },
-            {
-                onClick: function () {
-                    console.log("You've logged out.");
-                }.bind(this),
-                text: "Log Out"
-            }
-        ];
+        return {
+            left: [
+                {
+                    onClick: function () {
+                        this.refs.signup.toggle();
+                    }.bind(this),
+                    text: "Create"
+                }
+            ],
+            right: [
+                {
+                    onClick: function () {
+                        this.refs.login.toggle();
+                    }.bind(this),
+                    text: "Log out"
+                }
+            ]
+        };
     },
     render: function () {
         return (
 			<div>
 				<Navbar ref="navbar" buttons={this.getButtons()} />
+                <AddressListPanel />
 			</div>
+        );
+    }
+});
+
+var AddressListPanel = React.createClass({
+    render: function () {
+        return (
+			<div className="AddressListPanel">
+				<div className="panel panel-primary">
+                    <div className="panel-heading">
+                        <AddressListToolbar />
+                    </div>
+                    <div className="panel-body">
+                        <AddressList />
+                    </div>
+				</div>
+			</div>
+        );
+    }
+});
+
+var AddressListToolbar = React.createClass({
+    render: function () {
+        return (
+            <div>
+                <div className="inner-addon left-addon">
+                    <i className="glyphicon glyphicon-search"></i>
+                    <input type="text" spellCheck="false" className="form-control input-sm" placeholder="Search Addresses" />
+                </div>
+            </div>
+        );
+    }
+});
+
+var AddressList = React.createClass({
+    render: function () {
+        return (
+            <div className="AddressList">
+                <table className="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        );
+    }
+});
+
+var Address = React.createClass({
+    render: function () {
+        return (
+            <div></div>
         );
     }
 });
