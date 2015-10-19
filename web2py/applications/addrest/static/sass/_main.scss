@@ -2,12 +2,12 @@
   //border: 1px dashed;
 }
 
-html {
-  background: $background;
+body {
+  background: $PageBackground;
 }
 
 .navbar {
-  background-color: #FFEA9B;
+  background-color: $TitleBackground;
 }
 
 .navbar .btn {
@@ -17,7 +17,7 @@ html {
 }
 
 .navbar-default .navbar-brand {
-  color: $title;
+  color: $Warning;
 }
 
 .navbar-default {
@@ -25,23 +25,99 @@ html {
 }
 
 .navbar-default .navbar-brand:hover {
-  color: $title;
+  color: $Warning;
 }
 
 .panel {
   border-style: none;
 }
 
-.panel-primary .panel-heading {
-  background-color: $title;
-  border-color: $title;
+.form-control:focus {
+  border-color: $Warning;
 }
 
-.ModalPanel {
-  width: 65%;
+.glyphicon-search {
+  color: #ACB6C0;
+}
+
+.inner-addon {
+  position: relative;
+}
+
+.inner-addon .glyphicon {
+  position: absolute;
+  padding: 10px;
+  pointer-events: none;
+}
+
+.left-addon .glyphicon {
+  left: 0;
+}
+
+.right-addon .glyphicon {
+  right: 0;
+}
+
+.left-addon input {
+  padding-left: 30px;
+}
+
+.right-addon input {
+  padding-right: 30px;
+}
+
+.box-shadow--2dp {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12)
+}
+.box-shadow--3dp {
+  box-shadow: 0 3px 4px 0 rgba(0, 0, 0, .14), 0 3px 3px -2px rgba(0, 0, 0, .2), 0 1px 8px 0 rgba(0, 0, 0, .12)
+}
+.box-shadow--4dp {
+  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, .14), 0 1px 10px 0 rgba(0, 0, 0, .12), 0 2px 4px -1px rgba(0, 0, 0, .2)
+}
+.box-shadow--6dp {
+  box-shadow: 0 6px 10px 0 rgba(0, 0, 0, .14), 0 1px 18px 0 rgba(0, 0, 0, .12), 0 3px 5px -1px rgba(0, 0, 0, .2)
+}
+.box-shadow--8dp {
+  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12), 0 5px 5px -3px rgba(0, 0, 0, .2)
+}
+.box-shadow--16dp {
+  box-shadow: 0 16px 24px 2px rgba(0, 0, 0, .14), 0 6px 30px 5px rgba(0, 0, 0, .12), 0 8px 10px -5px rgba(0, 0, 0, .2)
+}
+
+.AddressListPanel > .panel-primary > .panel-heading {
+  background-color: $Warning;
+  border-color: $Warning;
+}
+
+.UserInfoModal > .panel-primary > .panel-heading {
+  background-color: $Warning;
+  border-color: $Warning;
+}
+
+.Address > .panel-primary > .panel-heading {
+  background-color: white;
+  border-color: #EFEFEF;
+}
+
+.UserInfoModal .panel {
+  position: relative;
+  width: $userInfoModalWidth;
+  right: $userInfoModalWidth / 2;
+}
+
+.AddressListPanel {
+  position: relative;
+  top: 80px;
+  width: 60%;
   margin: 0 auto;
 }
 
-.IndexBackground {
-  background: $background;
+.AddressListPanel > .panel > .panel-body {
+  background-color: $TitleBackground;
+}
+
+.Address {
+  width: 90%;
+  margin: 5px auto;
 }
