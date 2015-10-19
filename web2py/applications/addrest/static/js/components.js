@@ -186,7 +186,7 @@ var Dashboard = React.createClass({
 var AddressListPanel = React.createClass({
     render: function () {
         return (
-			<div className="AddressListPanel">
+			<div className="AddressListPanel box-shadow--3dp">
 				<div className="panel panel-primary">
                     <div className="panel-heading">
                         <AddressListToolbar />
@@ -204,10 +204,18 @@ var AddressListToolbar = React.createClass({
     render: function () {
         return (
             <div>
-                <div className="inner-addon left-addon">
-                    <i className="glyphicon glyphicon-search"></i>
-                    <input type="text" spellCheck="false" className="form-control input-sm" placeholder="Search Addresses" />
-                </div>
+                <SearchTextBox />
+            </div>
+        );
+    }
+});
+
+var SearchTextBox = React.createClass({
+    render: function () {
+        return (
+            <div className="inner-addon left-addon">
+                <i className="glyphicon glyphicon-search"></i>
+                <input type="text" spellCheck="false" className="form-control input-sm" placeholder="Search Addresses" />
             </div>
         );
     }
@@ -216,139 +224,17 @@ var AddressListToolbar = React.createClass({
 var AddressList = React.createClass({
     render: function () {
         return (
-            <div className="AddressList">
-                <table className="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div>
+                <Address />
+                <Address />
+                <Address />
+                <Address />
+                <Address />
+                <Address />
+                <Address />
+                <Address />
+                <Address />
+                <Address />
             </div>
         );
     }
@@ -357,7 +243,38 @@ var AddressList = React.createClass({
 var Address = React.createClass({
     render: function () {
         return (
-            <div></div>
+            <div className="Address box-shadow--2dp">
+				<div className="panel panel-primary">
+                    <div className="panel-heading">
+                        <AddressToolbar />
+                    </div>
+                    <div className="panel-body">
+                        Address Body
+                    </div>
+				</div>
+            </div>
         );
     }
 });
+
+var AddressToolbar = React.createClass({
+    render: function () {
+        return (
+            <div>
+
+            </div>
+        );
+    }
+});
+
+//var Switch = React.createClass({
+//    componentDidMount: function () {
+//        console.log(this);
+//        console.log(this.getDOMNode());
+//    },
+//    render: function () {
+//        return (
+//            <input type="checkbox" name="my-checkbox" checked />
+//        );
+//    }
+//});
