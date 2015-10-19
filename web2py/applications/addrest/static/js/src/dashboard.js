@@ -77,7 +77,7 @@ var AddressList = React.createClass({
     render: function () {
         return (
             <div>
-                <Address>Address 1</Address>
+                <Address><Switch /></Address>
                 <Address>Address 2</Address>
                 <Address>Address 3</Address>
                 <Address>Address 4</Address>
@@ -108,7 +108,7 @@ var AddressToolbar = React.createClass({
     render: function () {
         return (
             <div>
-
+                <Switch size="mini" />
             </div>
         );
     }
