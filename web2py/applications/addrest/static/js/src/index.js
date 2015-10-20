@@ -69,10 +69,10 @@ var UserInfoForm = React.createClass({
 		return (
 			<form className="form center-block">
 				<div className="form-group">
-					<Input>Email</Input>
+					<Input placeholder="Email"></Input>
 				</div>
 				<div className="form-group">
-                    <Input type="password">Password</Input>
+                    <Input placeholder="Password" type="password"></Input>
 				</div>
 				<div className="form-group">
 					<button className="btn btn-warning btn-block">{this.props.button}</button>
@@ -104,5 +104,5 @@ var Signup = React.createClass({
 
 ReactDOM.render(
     <Index />,
-    document.getElementById('body')
+    document.getElementById("body")
 );

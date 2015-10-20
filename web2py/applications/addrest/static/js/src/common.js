@@ -6,7 +6,7 @@ var Navbar = React.createClass({
         var buttonList = [];
         for (var i in buttons) {
             var button = buttons[i];
-            buttonList.push(<NavbarButton onClick={button.onClick}>{button.text}</NavbarButton>);
+            buttonList.push(<NavbarButton key={i} onClick={button.onClick}>{button.text}</NavbarButton>);
         }
         return buttonList;
     },
@@ -54,6 +54,16 @@ var Modal = React.createClass({
 });
 
 var Input = React.createClass({
+    handleOnChange: function (e) {
+        if (this.props.onChange) {
+            this.props.onChange(e.target.value);
+        }
+    },
+    componentDidMount: function() {
+        if (this.props.children) {
+            this.refs.input.value = this.props.children;
+        }
+    },
     render: function () {
         var className = "form-control";
         if (this.props.size) {
@@ -66,7 +76,7 @@ var Input = React.createClass({
             type = this.props.type;
         }
         return (
-          <input type={type} spellCheck="false" autoComplete="false" className={className} placeholder={this.props.children} />
+          <input ref="input" type={type} spellCheck="false" autoComplete="false" className={className} placeholder={this.props.placeholder} onChange={this.handleOnChange} />
         );
     }
 });

@@ -156,15 +156,15 @@ body {
 /* line 126, ../sass/_main.scss */
 .AddressEditModal .panel {
   position: relative;
-  width: 500px;
-  right: 250px;
+  width: 400px;
+  right: 200px;
 }
 
 /* line 132, ../sass/_main.scss */
 .AddressListPanel {
   position: relative;
   top: 80px;
-  width: 60%;
+  width: 55%;
   margin: 0 auto;
 }
 

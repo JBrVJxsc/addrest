@@ -20253,7 +20253,7 @@ var Navbar = React.createClass({
             var button = buttons[i];
             buttonList.push(React.createElement(
                 NavbarButton,
-                { onClick: button.onClick },
+                { key: i, onClick: button.onClick },
                 button.text
             ));
         }
@@ -20329,6 +20329,16 @@ var Modal = React.createClass({
 var Input = React.createClass({
     displayName: 'Input',
 
+    handleOnChange: function handleOnChange(e) {
+        if (this.props.onChange) {
+            this.props.onChange(e.target.value);
+        }
+    },
+    componentDidMount: function componentDidMount() {
+        if (this.props.children) {
+            this.refs.input.value = this.props.children;
+        }
+    },
     render: function render() {
         var className = "form-control";
         if (this.props.size) {
@@ -20340,7 +20350,7 @@ var Input = React.createClass({
         if (this.props.type) {
             type = this.props.type;
         }
-        return React.createElement('input', { type: type, spellCheck: 'false', autoComplete: 'false', className: className, placeholder: this.props.children });
+        return React.createElement('input', { ref: 'input', type: type, spellCheck: 'false', autoComplete: 'false', className: className, placeholder: this.props.placeholder, onChange: this.handleOnChange });
     }
 });
 
@@ -20362,6 +20372,51 @@ var Input = require('./common').Input;
 var Dashboard = React.createClass({
     displayName: 'Dashboard',
 
+    getInitialState: function getInitialState() {
+        return {
+            addresses: [{
+                show: true,
+                id: 0,
+                first_name: "Xu 1",
+                last_name: "ZHANG",
+                company_name: "Zenefits",
+                area_code: "831",
+                primary_phone: "2950944",
+                street_address: "708 Koshland Way",
+                apt: "P",
+                city: "Santa Cruz",
+                state: "CA",
+                zip_code: "95060"
+            }, {
+                show: true,
+                id: 1,
+                first_name: "Xu 2",
+                last_name: "ZHANG",
+                company_name: "Zenefits",
+                area_code: "831",
+                primary_phone: "2950944",
+                street_address: "708 Koshland Way",
+                apt: "P",
+                city: "Santa Cruz",
+                state: "CA",
+                zip_code: "95060"
+            }, {
+                show: true,
+                id: 2,
+                first_name: "Xu 3",
+                last_name: "ZHANG",
+                company_name: "Zenefits",
+                area_code: "831",
+                primary_phone: "2950944",
+                street_address: "708 Koshland Way",
+                apt: "P",
+                city: "Santa Cruz",
+                state: "CA",
+                zip_code: "95060"
+            }],
+            editing: null
+        };
+    },
     getButtons: function getButtons() {
         return {
             left: [{
@@ -20378,14 +20433,28 @@ var Dashboard = React.createClass({
             }]
         };
     },
+    getEventHandlers: function getEventHandlers() {
+        return {
+            handleSearch: (function (e) {
+                console.log(e);
+            }).bind(this),
+            handleEdit: (function (e) {
+                this.setState({
+                    editing: e
+                });
+                this.refs.edit.toggle();
+                console.log(e);
+            }).bind(this)
+        };
+    },
     render: function render() {
         return React.createElement(
             'div',
             null,
             React.createElement(Modal, { ref: 'create', type: 'WaveModal', content: React.createElement(Create, null) }),
-            React.createElement(Modal, { ref: 'edit', type: 'WaveModal', content: React.createElement(Edit, null) }),
+            React.createElement(Modal, { ref: 'edit', type: 'WaveModal', content: React.createElement(Edit, { address: this.state.editing }) }),
             React.createElement(Navbar, { ref: 'navbar', buttons: this.getButtons() }),
-            React.createElement(AddressListPanel, null)
+            React.createElement(AddressListPanel, { addresses: this.state.addresses, eventHandlers: this.getEventHandlers() })
         );
     }
 });
@@ -20396,19 +20465,23 @@ var AddressListPanel = React.createClass({
     render: function render() {
         return React.createElement(
             'div',
-            { className: 'AddressListPanel box-shadow--3dp' },
+            null,
             React.createElement(
                 'div',
-                { className: 'panel panel-primary' },
+                { className: 'AddressListPanel box-shadow--3dp' },
                 React.createElement(
                     'div',
-                    { className: 'panel-heading' },
-                    React.createElement(AddressListToolbar, null)
-                ),
-                React.createElement(
-                    'div',
-                    { className: 'panel-body' },
-                    React.createElement(AddressList, null)
+                    { className: 'panel panel-primary' },
+                    React.createElement(
+                        'div',
+                        { className: 'panel-heading' },
+                        React.createElement(AddressListToolbar, { onSearch: this.props.eventHandlers.handleSearch })
+                    ),
+                    React.createElement(
+                        'div',
+                        { className: 'panel-body' },
+                        React.createElement(AddressList, { addresses: this.props.addresses, onEdit: this.props.eventHandlers.handleEdit })
+                    )
                 )
             )
         );
@@ -20418,11 +20491,16 @@ var AddressListPanel = React.createClass({
 var AddressListToolbar = React.createClass({
     displayName: 'AddressListToolbar',
 
+    handleOnChange: function handleOnChange(e) {
+        this.props.onSearch({
+            keyword: e
+        });
+    },
     render: function render() {
         return React.createElement(
             'div',
             null,
-            React.createElement(SearchTextBox, null)
+            React.createElement(SearchTextBox, { onChange: this.handleOnChange })
         );
     }
 });
@@ -20435,7 +20513,7 @@ var SearchTextBox = React.createClass({
             'div',
             { className: 'inner-addon left-addon' },
             React.createElement('i', { className: 'glyphicon glyphicon-search' }),
-            React.createElement('input', { type: 'text', spellCheck: 'false', className: 'form-control input-sm', placeholder: 'Search Addresses' })
+            React.createElement(Input, { placeholder: 'Search Addresses', onChange: this.props.onChange })
         );
     }
 });
@@ -20443,35 +20521,21 @@ var SearchTextBox = React.createClass({
 var AddressList = React.createClass({
     displayName: 'AddressList',
 
+    getAddresses: function getAddresses() {
+        var rows = [];
+        var addresses = this.props.addresses;
+        for (var i in addresses) {
+            if (addresses[i].show) {
+                rows.push(React.createElement(Address, { key: i, address: addresses[i], onEdit: this.props.onEdit }));
+            }
+        }
+        return rows;
+    },
     render: function render() {
         return React.createElement(
             'div',
             null,
-            React.createElement(
-                Address,
-                null,
-                'Address 1'
-            ),
-            React.createElement(
-                Address,
-                null,
-                'Address 2'
-            ),
-            React.createElement(
-                Address,
-                null,
-                'Address 3'
-            ),
-            React.createElement(
-                Address,
-                null,
-                'Address 4'
-            ),
-            React.createElement(
-                Address,
-                null,
-                'Address 5'
-            )
+            this.getAddresses()
         );
     }
 });
@@ -20489,12 +20553,12 @@ var Address = React.createClass({
                 React.createElement(
                     'div',
                     { className: 'panel-heading' },
-                    React.createElement(AddressToolbar, null)
+                    React.createElement(AddressToolbar, { address: this.props.address, onEdit: this.props.onEdit })
                 ),
                 React.createElement(
                     'div',
                     { className: 'panel-body' },
-                    this.props.children
+                    this.props.address.toString()
                 )
             )
         );
@@ -20504,20 +20568,23 @@ var Address = React.createClass({
 var AddressToolbar = React.createClass({
     displayName: 'AddressToolbar',
 
-    handleOnClick: function handleOnClick() {},
+    handleOnClick: function handleOnClick() {
+        this.props.onEdit(this.props.address);
+    },
+    handleOnSwitch: function handleOnSwitch() {},
     render: function render() {
         return React.createElement(
             'div',
             null,
             React.createElement(
                 'button',
-                { type: 'button', className: 'btn btn-warning btn-xs' },
+                { type: 'button', className: 'btn btn-warning btn-xs', onClick: this.handleOnClick },
                 'Edit'
             ),
             React.createElement(
                 'div',
                 { className: 'pull-right' },
-                React.createElement(Switch, { state: true })
+                React.createElement(Switch, { address: this.props.address, state: true, onSwitch: this.handleOnSwitch })
             )
         );
     }
@@ -20530,12 +20597,12 @@ var Switch = React.createClass({
         if (e.target.innerText == "On") {
             console.log("On");
             if (!this.props.state) {
-                this.props.onClick(true);
+                this.props.onSwitch(true);
             }
         } else if (e.target.innerText == "Off") {
             console.log("Off");
             if (!this.props.state) {
-                this.props.onClick(false);
+                this.props.onSwitch(false);
             }
         } else {
             console.log(e);
@@ -20571,7 +20638,43 @@ var Switch = React.createClass({
 var AddressEditModal = React.createClass({
     displayName: 'AddressEditModal',
 
+    getButtons: function getButtons() {
+        if (this.props['delete']) {
+            return React.createElement(
+                'div',
+                { className: 'row' },
+                React.createElement(
+                    'div',
+                    { className: 'col-xs-6 RightExtend' },
+                    React.createElement(
+                        'button',
+                        { className: 'btn btn-danger btn-block' },
+                        'Delete'
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'col-xs-6 LeftExtend' },
+                    React.createElement(
+                        'button',
+                        { className: 'btn btn-warning btn-block' },
+                        'Save'
+                    )
+                )
+            );
+        } else {
+            return React.createElement(
+                'button',
+                { className: 'btn btn-warning btn-block' },
+                'Save'
+            );
+        }
+    },
     render: function render() {
+        var address = {};
+        if (this.props.address) {
+            address = this.props.address;
+        }
         return React.createElement(
             'div',
             { className: 'AddressEditModal' },
@@ -20604,8 +20707,8 @@ var AddressEditModal = React.createClass({
                                     { className: 'col-xs-6 RightExtend' },
                                     React.createElement(
                                         Input,
-                                        null,
-                                        'First Name'
+                                        { placeholder: 'First Name' },
+                                        address.first_name
                                     )
                                 ),
                                 React.createElement(
@@ -20613,8 +20716,8 @@ var AddressEditModal = React.createClass({
                                     { className: 'col-xs-6 LeftExtend' },
                                     React.createElement(
                                         Input,
-                                        null,
-                                        'Last Name'
+                                        { placeholder: 'Last Name' },
+                                        address.last_name
                                     )
                                 )
                             )
@@ -20624,8 +20727,8 @@ var AddressEditModal = React.createClass({
                             { className: 'form-group' },
                             React.createElement(
                                 Input,
-                                null,
-                                'Company Name (optional)'
+                                { placeholder: 'Company Name (optional)' },
+                                address.company_name
                             )
                         ),
                         React.createElement(
@@ -20639,8 +20742,8 @@ var AddressEditModal = React.createClass({
                                     { className: 'col-xs-6 RightExtend' },
                                     React.createElement(
                                         Input,
-                                        null,
-                                        'Area Code'
+                                        { placeholder: 'Area Code' },
+                                        address.area_code
                                     )
                                 ),
                                 React.createElement(
@@ -20648,8 +20751,8 @@ var AddressEditModal = React.createClass({
                                     { className: 'col-xs-6 LeftExtend' },
                                     React.createElement(
                                         Input,
-                                        null,
-                                        'Primary Phone'
+                                        { placeholder: 'Primary Phone' },
+                                        address.primary_phone
                                     )
                                 )
                             )
@@ -20659,8 +20762,8 @@ var AddressEditModal = React.createClass({
                             { className: 'form-group' },
                             React.createElement(
                                 Input,
-                                null,
-                                'Street Address'
+                                { placeholder: 'Street Address' },
+                                address.street_address
                             )
                         ),
                         React.createElement(
@@ -20668,8 +20771,8 @@ var AddressEditModal = React.createClass({
                             { className: 'form-group' },
                             React.createElement(
                                 Input,
-                                null,
-                                'Apt, Suite, Bldg. (optional)'
+                                { placeholder: 'Apt, Suite, Bldg. (optional)' },
+                                address.apt
                             )
                         ),
                         React.createElement(
@@ -20683,8 +20786,8 @@ var AddressEditModal = React.createClass({
                                     { className: 'col-xs-4 RightExtend' },
                                     React.createElement(
                                         Input,
-                                        null,
-                                        'City'
+                                        { placeholder: 'City' },
+                                        address.city
                                     )
                                 ),
                                 React.createElement(
@@ -20692,8 +20795,8 @@ var AddressEditModal = React.createClass({
                                     { className: 'col-xs-4 Extend' },
                                     React.createElement(
                                         Input,
-                                        null,
-                                        'State'
+                                        { placeholder: 'State' },
+                                        address.state
                                     )
                                 ),
                                 React.createElement(
@@ -20701,8 +20804,8 @@ var AddressEditModal = React.createClass({
                                     { className: 'col-xs-4 LeftExtend' },
                                     React.createElement(
                                         Input,
-                                        null,
-                                        'ZIP Code'
+                                        { placeholder: 'ZIP Code' },
+                                        address.zip_code
                                     )
                                 )
                             )
@@ -20710,28 +20813,7 @@ var AddressEditModal = React.createClass({
                         React.createElement(
                             'div',
                             { className: 'form-group' },
-                            React.createElement(
-                                'div',
-                                { className: 'row' },
-                                React.createElement(
-                                    'div',
-                                    { className: 'col-xs-6' },
-                                    React.createElement(
-                                        'button',
-                                        { className: 'btn btn-warning btn-block' },
-                                        'Cancel'
-                                    )
-                                ),
-                                React.createElement(
-                                    'div',
-                                    { className: 'col-xs-6' },
-                                    React.createElement(
-                                        'button',
-                                        { className: 'btn btn-warning btn-block' },
-                                        'Save'
-                                    )
-                                )
-                            )
+                            this.getButtons()
                         )
                     )
                 )
@@ -20752,11 +20834,11 @@ var Edit = React.createClass({
     displayName: 'Edit',
 
     render: function render() {
-        return React.createElement(AddressEditModal, { title: 'Edit' });
+        return React.createElement(AddressEditModal, { title: 'Edit', address: this.props.address, 'delete': true });
     }
 });
 
-ReactDOM.render(React.createElement(Dashboard, null), document.getElementById('body'));
+ReactDOM.render(React.createElement(Dashboard, null), document.getElementById("body"));
 
 },{"./common":173,"react":172,"react-dom":15}],175:[function(require,module,exports){
 // shim for using process in browser

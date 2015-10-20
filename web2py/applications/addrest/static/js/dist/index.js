@@ -20253,7 +20253,7 @@ var Navbar = React.createClass({
             var button = buttons[i];
             buttonList.push(React.createElement(
                 NavbarButton,
-                { onClick: button.onClick },
+                { key: i, onClick: button.onClick },
                 button.text
             ));
         }
@@ -20329,6 +20329,16 @@ var Modal = React.createClass({
 var Input = React.createClass({
     displayName: 'Input',
 
+    handleOnChange: function handleOnChange(e) {
+        if (this.props.onChange) {
+            this.props.onChange(e.target.value);
+        }
+    },
+    componentDidMount: function componentDidMount() {
+        if (this.props.children) {
+            this.refs.input.value = this.props.children;
+        }
+    },
     render: function render() {
         var className = "form-control";
         if (this.props.size) {
@@ -20340,7 +20350,7 @@ var Input = React.createClass({
         if (this.props.type) {
             type = this.props.type;
         }
-        return React.createElement('input', { type: type, spellCheck: 'false', autoComplete: 'false', className: className, placeholder: this.props.children });
+        return React.createElement('input', { ref: 'input', type: type, spellCheck: 'false', autoComplete: 'false', className: className, placeholder: this.props.placeholder, onChange: this.handleOnChange });
     }
 });
 
@@ -20442,20 +20452,12 @@ var UserInfoForm = React.createClass({
 			React.createElement(
 				'div',
 				{ className: 'form-group' },
-				React.createElement(
-					Input,
-					null,
-					'Email'
-				)
+				React.createElement(Input, { placeholder: 'Email' })
 			),
 			React.createElement(
 				'div',
 				{ className: 'form-group' },
-				React.createElement(
-					Input,
-					{ type: 'password' },
-					'Password'
-				)
+				React.createElement(Input, { placeholder: 'Password', type: 'password' })
 			),
 			React.createElement(
 				'div',
@@ -20494,7 +20496,7 @@ var Signup = React.createClass({
 	}
 });
 
-ReactDOM.render(React.createElement(Index, null), document.getElementById('body'));
+ReactDOM.render(React.createElement(Index, null), document.getElementById("body"));
 
 },{"./common":173,"react":172,"react-dom":15}],175:[function(require,module,exports){
 // shim for using process in browser
