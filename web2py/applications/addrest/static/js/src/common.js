@@ -1,4 +1,5 @@
 var React = require('react');
+var Boron = require('boron');
 
 var Navbar = React.createClass({
     getButtons: function (buttons) {
@@ -40,6 +41,38 @@ var NavbarButton = React.createClass({
     }
 });
 
+var Modal = React.createClass({
+	toggle: function() {
+		this.refs.dialog.toggle();
+	},
+	render: function() {
+		var Dialog = Boron[this.props.type];
+		return (
+			<Dialog ref="dialog">{this.props.content}</Dialog>
+		)
+	}
+});
+
+var Input = React.createClass({
+    render: function () {
+        var className = "form-control";
+        if (this.props.size) {
+            className += " " + this.props.size;
+        } else {
+            className += " input-sm";
+        }
+        var type = "text";
+        if (this.props.type) {
+            type = this.props.type;
+        }
+        return (
+          <input type={type} spellCheck="false" autoComplete="false" className={className} placeholder={this.props.children} />
+        );
+    }
+});
+
 module.exports = {
-    Navbar: Navbar
+    Navbar: Navbar,
+    Modal: Modal,
+    Input: Input
 };

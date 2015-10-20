@@ -20239,12 +20239,13 @@ module.exports = warning;
 module.exports = require('./lib/React');
 
 },{"./lib/React":39}],173:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var React = require('react');
+var Boron = require('boron');
 
 var Navbar = React.createClass({
-    displayName: "Navbar",
+    displayName: 'Navbar',
 
     getButtons: function getButtons(buttons) {
         var buttonList = [];
@@ -20260,34 +20261,34 @@ var Navbar = React.createClass({
     },
     render: function render() {
         return React.createElement(
-            "div",
+            'div',
             null,
             React.createElement(
-                "nav",
-                { className: "navbar navbar-default navbar-fixed-top" },
+                'nav',
+                { className: 'navbar navbar-default navbar-fixed-top' },
                 React.createElement(
-                    "div",
-                    { className: "container-fluid" },
+                    'div',
+                    { className: 'container-fluid' },
                     React.createElement(
-                        "div",
-                        { className: "navbar-header" },
+                        'div',
+                        { className: 'navbar-header' },
                         React.createElement(
-                            "div",
-                            { className: "navbar-brand" },
-                            "Addrest"
+                            'div',
+                            { className: 'navbar-brand' },
+                            'Addrest'
                         )
                     ),
                     React.createElement(
-                        "div",
-                        { className: "collapse navbar-collapse" },
+                        'div',
+                        { className: 'collapse navbar-collapse' },
                         React.createElement(
-                            "div",
-                            { className: "navbar-form navbar-left" },
+                            'div',
+                            { className: 'navbar-form navbar-left' },
                             this.getButtons(this.props.buttons.left)
                         ),
                         React.createElement(
-                            "div",
-                            { className: "navbar-form navbar-right" },
+                            'div',
+                            { className: 'navbar-form navbar-right' },
                             this.getButtons(this.props.buttons.right)
                         )
                     )
@@ -20298,28 +20299,65 @@ var Navbar = React.createClass({
 });
 
 var NavbarButton = React.createClass({
-    displayName: "NavbarButton",
+    displayName: 'NavbarButton',
 
     render: function render() {
         return React.createElement(
-            "button",
-            { type: "button", className: "btn btn-warning", onClick: this.props.onClick },
+            'button',
+            { type: 'button', className: 'btn btn-warning', onClick: this.props.onClick },
             this.props.children
         );
     }
 });
 
+var Modal = React.createClass({
+    displayName: 'Modal',
+
+    toggle: function toggle() {
+        this.refs.dialog.toggle();
+    },
+    render: function render() {
+        var Dialog = Boron[this.props.type];
+        return React.createElement(
+            Dialog,
+            { ref: 'dialog' },
+            this.props.content
+        );
+    }
+});
+
+var Input = React.createClass({
+    displayName: 'Input',
+
+    render: function render() {
+        var className = "form-control";
+        if (this.props.size) {
+            className += " " + this.props.size;
+        } else {
+            className += " input-sm";
+        }
+        var type = "text";
+        if (this.props.type) {
+            type = this.props.type;
+        }
+        return React.createElement('input', { type: type, spellCheck: 'false', autoComplete: 'false', className: className, placeholder: this.props.children });
+    }
+});
+
 module.exports = {
-    Navbar: Navbar
+    Navbar: Navbar,
+    Modal: Modal,
+    Input: Input
 };
 
-},{"react":172}],174:[function(require,module,exports){
+},{"boron":1,"react":172}],174:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
 var ReactDOM = require('react-dom');
-var Boron = require('boron');
 var Navbar = require('./common').Navbar;
+var Modal = require('./common').Modal;
+var Input = require('./common').Input;
 
 var Index = React.createClass({
 	displayName: 'Index',
@@ -20400,16 +20438,24 @@ var UserInfoForm = React.createClass({
 	render: function render() {
 		return React.createElement(
 			'form',
-			{ className: 'form col-md-12 center-block' },
+			{ className: 'form center-block' },
 			React.createElement(
 				'div',
 				{ className: 'form-group' },
-				React.createElement('input', { type: 'text', spellCheck: 'false', className: 'form-control', placeholder: 'Email' })
+				React.createElement(
+					Input,
+					null,
+					'Email'
+				)
 			),
 			React.createElement(
 				'div',
 				{ className: 'form-group' },
-				React.createElement('input', { type: 'password', className: 'form-control', placeholder: 'Password' })
+				React.createElement(
+					Input,
+					{ type: 'password' },
+					'Password'
+				)
 			),
 			React.createElement(
 				'div',
@@ -20448,25 +20494,9 @@ var Signup = React.createClass({
 	}
 });
 
-var Modal = React.createClass({
-	displayName: 'Modal',
+ReactDOM.render(React.createElement(Index, null), document.getElementById('body'));
 
-	toggle: function toggle() {
-		this.refs.dialog.toggle();
-	},
-	render: function render() {
-		var Dialog = Boron[this.props.type];
-		return React.createElement(
-			Dialog,
-			{ ref: 'dialog' },
-			this.props.content
-		);
-	}
-});
-
-ReactDOM.render(React.createElement(Index, null), document.body);
-
-},{"./common":173,"boron":1,"react":172,"react-dom":15}],175:[function(require,module,exports){
+},{"./common":173,"react":172,"react-dom":15}],175:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};

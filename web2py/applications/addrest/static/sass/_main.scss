@@ -85,6 +85,23 @@ body {
   box-shadow: 0 16px 24px 2px rgba(0, 0, 0, .14), 0 6px 30px 5px rgba(0, 0, 0, .12), 0 8px 10px -5px rgba(0, 0, 0, .2)
 }
 
+.btn-group .active {
+  box-shadow: none;
+}
+
+.RightExtend {
+  padding-right: 5px;
+}
+
+.LeftExtend {
+  padding-left: 5px;
+}
+
+.Extend {
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
 .AddressListPanel > .panel-primary > .panel-heading {
   background-color: $Warning;
   border-color: $Warning;
@@ -95,15 +112,21 @@ body {
   border-color: $Warning;
 }
 
-.Address > .panel-primary > .panel-heading {
-  background-color: white;
-  border-color: #EFEFEF;
-}
-
 .UserInfoModal .panel {
   position: relative;
   width: $userInfoModalWidth;
   right: $userInfoModalWidth / 2;
+}
+
+.AddressEditModal > .panel-primary > .panel-heading {
+  background-color: $Warning;
+  border-color: $Warning;
+}
+
+.AddressEditModal .panel {
+  position: relative;
+  width: $addressEditModal;
+  right: $addressEditModal / 2;
 }
 
 .AddressListPanel {
@@ -115,6 +138,11 @@ body {
 
 .AddressListPanel > .panel > .panel-body {
   background-color: $TitleBackground;
+}
+
+.Address > .panel-primary > .panel-heading {
+  background-color: white;
+  border-color: #EFEFEF;
 }
 
 .Address {
