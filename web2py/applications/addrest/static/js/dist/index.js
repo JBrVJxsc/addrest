@@ -20326,6 +20326,51 @@ var Modal = React.createClass({
     }
 });
 
+var Switch = React.createClass({
+    displayName: 'Switch',
+
+    handleOnClick: function handleOnClick(e) {
+        if (e.target.innerText == "On") {
+            console.log("On");
+            if (!this.props.state) {
+                this.props.onSwitch(true);
+            }
+        } else if (e.target.innerText == "Off") {
+            console.log("Off");
+            if (!this.props.state) {
+                this.props.onSwitch(false);
+            }
+        } else {
+            console.log(e);
+        }
+    },
+    render: function render() {
+        var onClassName = "btn btn-warning btn-xs";
+        var offClassName = "btn btn-warning btn-xs";
+        if (this.props.state) {
+            onClassName += " active";
+        } else {
+            offClassName += " active";
+        }
+        return React.createElement(
+            'div',
+            { className: 'btn-group', 'data-toggle': 'buttons' },
+            React.createElement(
+                'label',
+                { className: onClassName, onClick: this.handleOnClick },
+                React.createElement('input', { type: 'radio', autoComplete: 'off' }),
+                ' On'
+            ),
+            React.createElement(
+                'label',
+                { className: offClassName, onClick: this.handleOnClick },
+                React.createElement('input', { type: 'radio', autoComplete: 'off' }),
+                ' Off'
+            )
+        );
+    }
+});
+
 var Input = React.createClass({
     displayName: 'Input',
 
@@ -20357,7 +20402,8 @@ var Input = React.createClass({
 module.exports = {
     Navbar: Navbar,
     Modal: Modal,
-    Input: Input
+    Input: Input,
+    Switch: Switch
 };
 
 },{"boron":1,"react":172}],174:[function(require,module,exports){

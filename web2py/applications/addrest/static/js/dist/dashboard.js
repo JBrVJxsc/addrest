@@ -20326,6 +20326,51 @@ var Modal = React.createClass({
     }
 });
 
+var Switch = React.createClass({
+    displayName: 'Switch',
+
+    handleOnClick: function handleOnClick(e) {
+        if (e.target.innerText == "On") {
+            console.log("On");
+            if (!this.props.state) {
+                this.props.onSwitch(true);
+            }
+        } else if (e.target.innerText == "Off") {
+            console.log("Off");
+            if (!this.props.state) {
+                this.props.onSwitch(false);
+            }
+        } else {
+            console.log(e);
+        }
+    },
+    render: function render() {
+        var onClassName = "btn btn-warning btn-xs";
+        var offClassName = "btn btn-warning btn-xs";
+        if (this.props.state) {
+            onClassName += " active";
+        } else {
+            offClassName += " active";
+        }
+        return React.createElement(
+            'div',
+            { className: 'btn-group', 'data-toggle': 'buttons' },
+            React.createElement(
+                'label',
+                { className: onClassName, onClick: this.handleOnClick },
+                React.createElement('input', { type: 'radio', autoComplete: 'off' }),
+                ' On'
+            ),
+            React.createElement(
+                'label',
+                { className: offClassName, onClick: this.handleOnClick },
+                React.createElement('input', { type: 'radio', autoComplete: 'off' }),
+                ' Off'
+            )
+        );
+    }
+});
+
 var Input = React.createClass({
     displayName: 'Input',
 
@@ -20357,7 +20402,8 @@ var Input = React.createClass({
 module.exports = {
     Navbar: Navbar,
     Modal: Modal,
-    Input: Input
+    Input: Input,
+    Switch: Switch
 };
 
 },{"boron":1,"react":172}],174:[function(require,module,exports){
@@ -20368,6 +20414,7 @@ var ReactDOM = require('react-dom');
 var Navbar = require('./common').Navbar;
 var Modal = require('./common').Modal;
 var Input = require('./common').Input;
+var Switch = require('./common').Switch;
 
 var Dashboard = React.createClass({
     displayName: 'Dashboard',
@@ -20379,40 +20426,40 @@ var Dashboard = React.createClass({
                 id: 0,
                 first_name: "Xu 1",
                 last_name: "ZHANG",
-                company_name: "Zenefits",
-                area_code: "831",
-                primary_phone: "2950944",
-                street_address: "708 Koshland Way",
+                company: "Zenefits",
+                area: "831",
+                phone: "2950944",
+                street: "708 Koshland Way",
                 apt: "P",
                 city: "Santa Cruz",
                 state: "CA",
-                zip_code: "95060"
+                zip: "95060"
             }, {
                 show: true,
                 id: 1,
                 first_name: "Xu 2",
                 last_name: "ZHANG",
-                company_name: "Zenefits",
-                area_code: "831",
-                primary_phone: "2950944",
-                street_address: "708 Koshland Way",
+                company: "Zenefits",
+                area: "831",
+                phone: "2950944",
+                street: "708 Koshland Way",
                 apt: "P",
                 city: "Santa Cruz",
                 state: "CA",
-                zip_code: "95060"
+                zip: "95060"
             }, {
                 show: true,
                 id: 2,
                 first_name: "Xu 3",
                 last_name: "ZHANG",
-                company_name: "Zenefits",
-                area_code: "831",
-                primary_phone: "2950944",
-                street_address: "708 Koshland Way",
+                company: "Zenefits",
+                area: "831",
+                phone: "2950944",
+                street: "708 Koshland Way",
                 apt: "P",
                 city: "Santa Cruz",
                 state: "CA",
-                zip_code: "95060"
+                zip: "95060"
             }],
             editing: null
         };
@@ -20590,51 +20637,6 @@ var AddressToolbar = React.createClass({
     }
 });
 
-var Switch = React.createClass({
-    displayName: 'Switch',
-
-    handleOnClick: function handleOnClick(e) {
-        if (e.target.innerText == "On") {
-            console.log("On");
-            if (!this.props.state) {
-                this.props.onSwitch(true);
-            }
-        } else if (e.target.innerText == "Off") {
-            console.log("Off");
-            if (!this.props.state) {
-                this.props.onSwitch(false);
-            }
-        } else {
-            console.log(e);
-        }
-    },
-    render: function render() {
-        var onClassName = "btn btn-warning btn-xs";
-        var offClassName = "btn btn-warning btn-xs";
-        if (this.props.state) {
-            onClassName += " active";
-        } else {
-            offClassName += " active";
-        }
-        return React.createElement(
-            'div',
-            { className: 'btn-group', 'data-toggle': 'buttons' },
-            React.createElement(
-                'label',
-                { className: onClassName, onClick: this.handleOnClick },
-                React.createElement('input', { type: 'radio', autoComplete: 'off' }),
-                ' On'
-            ),
-            React.createElement(
-                'label',
-                { className: offClassName, onClick: this.handleOnClick },
-                React.createElement('input', { type: 'radio', autoComplete: 'off' }),
-                ' Off'
-            )
-        );
-    }
-});
-
 var AddressEditModal = React.createClass({
     displayName: 'AddressEditModal',
 
@@ -20685,9 +20687,13 @@ var AddressEditModal = React.createClass({
                     'div',
                     { className: 'panel-heading' },
                     React.createElement(
-                        'h3',
-                        { className: 'panel-title' },
-                        this.props.title
+                        'div',
+                        null,
+                        React.createElement(
+                            'h3',
+                            { className: 'panel-title' },
+                            this.props.title
+                        )
                     )
                 ),
                 React.createElement(
@@ -20728,7 +20734,7 @@ var AddressEditModal = React.createClass({
                             React.createElement(
                                 Input,
                                 { placeholder: 'Company Name (optional)' },
-                                address.company_name
+                                address.company
                             )
                         ),
                         React.createElement(
@@ -20743,7 +20749,7 @@ var AddressEditModal = React.createClass({
                                     React.createElement(
                                         Input,
                                         { placeholder: 'Area Code' },
-                                        address.area_code
+                                        address.area
                                     )
                                 ),
                                 React.createElement(
@@ -20752,7 +20758,7 @@ var AddressEditModal = React.createClass({
                                     React.createElement(
                                         Input,
                                         { placeholder: 'Primary Phone' },
-                                        address.primary_phone
+                                        address.phone
                                     )
                                 )
                             )
@@ -20763,7 +20769,7 @@ var AddressEditModal = React.createClass({
                             React.createElement(
                                 Input,
                                 { placeholder: 'Street Address' },
-                                address.street_address
+                                address.street
                             )
                         ),
                         React.createElement(
@@ -20805,7 +20811,7 @@ var AddressEditModal = React.createClass({
                                     React.createElement(
                                         Input,
                                         { placeholder: 'ZIP Code' },
-                                        address.zip_code
+                                        address.zip
                                     )
                                 )
                             )

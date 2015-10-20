@@ -3,6 +3,7 @@ var ReactDOM = require('react-dom');
 var Navbar = require('./common').Navbar;
 var Modal = require('./common').Modal;
 var Input = require('./common').Input;
+var Switch = require('./common').Switch;
 
 var Dashboard = React.createClass({
     getInitialState: function () {
@@ -13,42 +14,42 @@ var Dashboard = React.createClass({
                     id: 0,
                     first_name: "Xu 1",
                     last_name: "ZHANG",
-                    company_name: "Zenefits",
-                    area_code: "831",
-                    primary_phone: "2950944",
-                    street_address: "708 Koshland Way",
+                    company: "Zenefits",
+                    area: "831",
+                    phone: "2950944",
+                    street: "708 Koshland Way",
                     apt: "P",
                     city: "Santa Cruz",
                     state: "CA",
-                    zip_code: "95060"
+                    zip: "95060"
                 },
                 {
                     show: true,
                     id: 1,
                     first_name: "Xu 2",
                     last_name: "ZHANG",
-                    company_name: "Zenefits",
-                    area_code: "831",
-                    primary_phone: "2950944",
-                    street_address: "708 Koshland Way",
+                    company: "Zenefits",
+                    area: "831",
+                    phone: "2950944",
+                    street: "708 Koshland Way",
                     apt: "P",
                     city: "Santa Cruz",
                     state: "CA",
-                    zip_code: "95060"
+                    zip: "95060"
                 },
                 {
                     show: true,
                     id: 2,
                     first_name: "Xu 3",
                     last_name: "ZHANG",
-                    company_name: "Zenefits",
-                    area_code: "831",
-                    primary_phone: "2950944",
-                    street_address: "708 Koshland Way",
+                    company: "Zenefits",
+                    area: "831",
+                    phone: "2950944",
+                    street: "708 Koshland Way",
                     apt: "P",
                     city: "Santa Cruz",
                     state: "CA",
-                    zip_code: "95060"
+                    zip: "95060"
                 }
             ],
             editing: null
@@ -201,43 +202,6 @@ var AddressToolbar = React.createClass({
     }
 });
 
-var Switch = React.createClass({
-    handleOnClick: function(e) {
-        if (e.target.innerText == "On") {
-            console.log("On");
-            if (!this.props.state) {
-                this.props.onSwitch(true);
-            }
-        } else if (e.target.innerText == "Off") {
-            console.log("Off");
-            if (!this.props.state) {
-                this.props.onSwitch(false);
-            }
-        } else {
-            console.log(e);
-        }
-    },
-    render: function() {
-        var onClassName = "btn btn-warning btn-xs";
-        var offClassName = "btn btn-warning btn-xs";
-        if (this.props.state) {
-            onClassName += " active";
-        } else {
-            offClassName += " active";
-        }
-        return (
-            <div className="btn-group" data-toggle="buttons">
-                <label className={onClassName} onClick={this.handleOnClick}>
-                    <input type="radio" autoComplete="off" /> On
-                </label>
-                <label className={offClassName} onClick={this.handleOnClick}>
-                    <input type="radio" autoComplete="off" /> Off
-                </label>
-            </div>
-        );
-    }
-});
-
 var AddressEditModal = React.createClass({
     getButtons: function () {
         if (this.props.delete) {
@@ -266,7 +230,9 @@ var AddressEditModal = React.createClass({
 			<div className="AddressEditModal">
 				<div className="panel panel-primary">
                     <div className="panel-heading">
-                        <h3 className="panel-title">{this.props.title}</h3>
+                        <div>
+                            <h3 className="panel-title">{this.props.title}</h3>
+                        </div>
                     </div>
                     <div className="panel-body">
                         <form className="form center-block">
@@ -281,20 +247,20 @@ var AddressEditModal = React.createClass({
                                 </div>
                             </div>
                             <div className="form-group">
-                                <Input placeholder="Company Name (optional)">{address.company_name}</Input>
+                                <Input placeholder="Company Name (optional)">{address.company}</Input>
                             </div>
                             <div className="form-group">
                                 <div className="row">
                                     <div className="col-xs-6 RightExtend">
-                                        <Input placeholder="Area Code">{address.area_code}</Input>
+                                        <Input placeholder="Area Code">{address.area}</Input>
                                     </div>
                                     <div className="col-xs-6 LeftExtend">
-                                        <Input placeholder="Primary Phone">{address.primary_phone}</Input>
+                                        <Input placeholder="Primary Phone">{address.phone}</Input>
                                     </div>
                                 </div>
                             </div>
                             <div className="form-group">
-                                <Input placeholder="Street Address">{address.street_address}</Input>
+                                <Input placeholder="Street Address">{address.street}</Input>
                             </div>
                             <div className="form-group">
                                 <Input placeholder="Apt, Suite, Bldg. (optional)">{address.apt}</Input>
@@ -308,7 +274,7 @@ var AddressEditModal = React.createClass({
                                         <Input placeholder="State">{address.state}</Input>
                                     </div>
                                     <div className="col-xs-4 LeftExtend">
-                                        <Input placeholder="ZIP Code">{address.zip_code}</Input>
+                                        <Input placeholder="ZIP Code">{address.zip}</Input>
                                     </div>
                                 </div>
                             </div>
