@@ -52,7 +52,8 @@ var Dashboard = React.createClass({
                     zip: "95060"
                 }
             ],
-            editing: null
+            editing: null,
+            keyword: ""
         };
     },
     getButtons: function () {
@@ -78,24 +79,55 @@ var Dashboard = React.createClass({
     getEventHandlers: function() {
         return {
             handleSearch: function(e) {
-                console.log(e);
+                this.setState(e);
             }.bind(this),
             handleEdit: function(e) {
                 this.setState({
                     editing: e
                 });
                 this.refs.edit.toggle();
-                console.log(e);
             }.bind(this)
         };
+    },
+    handleOnSave: function (e) {
+
+    },
+    handleOnDelete: function (e) {
+
+    },
+    getAddresses: function() {
+        var addresses = this.state.addresses;
+        for (var i in addresses) {
+            var address = addresses[i];
+            address.show = false;
+
+            if (this.state.keyword.trim() !== "") {
+                var content = address.first_name + " ";
+                content += address.last_name + " ";
+                content += address.company + " ";
+                content += address.area + " ";
+                content += address.phone + " ";
+                content += address.street + " ";
+                content += address.apt + " ";
+                content += address.city + " ";
+                content += address.state + " ";
+                content += address.zip + " ";
+                if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
+                    continue;
+                }
+            }
+
+            address.show = true;
+        }
+        return addresses;
     },
     render: function () {
         return (
 			<div>
-				<Modal ref="create" type="WaveModal" content={<Create />} />
-                <Modal ref="edit" type="WaveModal" content={<Edit address={this.state.editing} />} />
+				<Modal ref="create" type="WaveModal" content={<Create onSave={this.handleOnSave} />} />
+                <Modal ref="edit" type="WaveModal" content={<Edit onSave={this.handleOnSave} onDelete={this.handleOnDelete} address={this.state.editing} />} />
 				<Navbar ref="navbar" buttons={this.getButtons()} />
-                <AddressListPanel addresses={this.state.addresses} eventHandlers={this.getEventHandlers()} />
+                <AddressListPanel addresses={this.getAddresses()} eventHandlers={this.getEventHandlers()} />
 			</div>
         );
     }
@@ -175,7 +207,7 @@ var Address = React.createClass({
                         <AddressToolbar address={this.props.address} onEdit={this.props.onEdit} />
                     </div>
                     <div className="panel-body">
-                        {this.props.address.toString()}
+                        {this.props.address.first_name + " " + this.props.address.last_name}
                     </div>
 				</div>
             </div>
@@ -203,21 +235,30 @@ var AddressToolbar = React.createClass({
 });
 
 var AddressEditModal = React.createClass({
+    handleOnSave: function () {
+        this.props.onSave(this.getAddress());
+    },
+    handleOnDelete: function () {
+        this.props.onDelete(this.props.address);
+    },
+    getAddress: function () {
+        return null;
+    },
     getButtons: function () {
         if (this.props.delete) {
             return (
                 <div className="row">
                     <div className="col-xs-6 RightExtend">
-                        <button className="btn btn-danger btn-block">Delete</button>
+                        <button className="btn btn-danger btn-block" onClick={this.props.handleOnDelete}>Delete</button>
                     </div>
                     <div className="col-xs-6 LeftExtend">
-                        <button className="btn btn-warning btn-block">Save</button>
+                        <button className="btn btn-warning btn-block" onClick={this.props.handleOnSave}>Save</button>
                     </div>
                 </div>
             );
         } else {
             return (
-                <button className="btn btn-warning btn-block">Save</button>
+                <button className="btn btn-warning btn-block" onClick={this.props.handleOnSave}>Save</button>
             );
         }
     },

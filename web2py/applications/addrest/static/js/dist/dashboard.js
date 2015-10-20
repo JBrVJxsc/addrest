@@ -20461,7 +20461,8 @@ var Dashboard = React.createClass({
                 state: "CA",
                 zip: "95060"
             }],
-            editing: null
+            editing: null,
+            keyword: ""
         };
     },
     getButtons: function getButtons() {
@@ -20483,25 +20484,52 @@ var Dashboard = React.createClass({
     getEventHandlers: function getEventHandlers() {
         return {
             handleSearch: (function (e) {
-                console.log(e);
+                this.setState(e);
             }).bind(this),
             handleEdit: (function (e) {
                 this.setState({
                     editing: e
                 });
                 this.refs.edit.toggle();
-                console.log(e);
             }).bind(this)
         };
+    },
+    handleOnSave: function handleOnSave(e) {},
+    handleOnDelete: function handleOnDelete(e) {},
+    getAddresses: function getAddresses() {
+        var addresses = this.state.addresses;
+        for (var i in addresses) {
+            var address = addresses[i];
+            address.show = false;
+
+            if (this.state.keyword.trim() !== "") {
+                var content = address.first_name + " ";
+                content += address.last_name + " ";
+                content += address.company + " ";
+                content += address.area + " ";
+                content += address.phone + " ";
+                content += address.street + " ";
+                content += address.apt + " ";
+                content += address.city + " ";
+                content += address.state + " ";
+                content += address.zip + " ";
+                if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
+                    continue;
+                }
+            }
+
+            address.show = true;
+        }
+        return addresses;
     },
     render: function render() {
         return React.createElement(
             'div',
             null,
-            React.createElement(Modal, { ref: 'create', type: 'WaveModal', content: React.createElement(Create, null) }),
-            React.createElement(Modal, { ref: 'edit', type: 'WaveModal', content: React.createElement(Edit, { address: this.state.editing }) }),
+            React.createElement(Modal, { ref: 'create', type: 'WaveModal', content: React.createElement(Create, { onSave: this.handleOnSave }) }),
+            React.createElement(Modal, { ref: 'edit', type: 'WaveModal', content: React.createElement(Edit, { onSave: this.handleOnSave, onDelete: this.handleOnDelete, address: this.state.editing }) }),
             React.createElement(Navbar, { ref: 'navbar', buttons: this.getButtons() }),
-            React.createElement(AddressListPanel, { addresses: this.state.addresses, eventHandlers: this.getEventHandlers() })
+            React.createElement(AddressListPanel, { addresses: this.getAddresses(), eventHandlers: this.getEventHandlers() })
         );
     }
 });
@@ -20605,7 +20633,7 @@ var Address = React.createClass({
                 React.createElement(
                     'div',
                     { className: 'panel-body' },
-                    this.props.address.toString()
+                    this.props.address.first_name + " " + this.props.address.last_name
                 )
             )
         );
@@ -20640,6 +20668,15 @@ var AddressToolbar = React.createClass({
 var AddressEditModal = React.createClass({
     displayName: 'AddressEditModal',
 
+    handleOnSave: function handleOnSave() {
+        this.props.onSave(this.getAddress());
+    },
+    handleOnDelete: function handleOnDelete() {
+        this.props.onDelete(this.props.address);
+    },
+    getAddress: function getAddress() {
+        return null;
+    },
     getButtons: function getButtons() {
         if (this.props['delete']) {
             return React.createElement(
@@ -20650,7 +20687,7 @@ var AddressEditModal = React.createClass({
                     { className: 'col-xs-6 RightExtend' },
                     React.createElement(
                         'button',
-                        { className: 'btn btn-danger btn-block' },
+                        { className: 'btn btn-danger btn-block', onClick: this.props.handleOnDelete },
                         'Delete'
                     )
                 ),
@@ -20659,7 +20696,7 @@ var AddressEditModal = React.createClass({
                     { className: 'col-xs-6 LeftExtend' },
                     React.createElement(
                         'button',
-                        { className: 'btn btn-warning btn-block' },
+                        { className: 'btn btn-warning btn-block', onClick: this.props.handleOnSave },
                         'Save'
                     )
                 )
@@ -20667,7 +20704,7 @@ var AddressEditModal = React.createClass({
         } else {
             return React.createElement(
                 'button',
-                { className: 'btn btn-warning btn-block' },
+                { className: 'btn btn-warning btn-block', onClick: this.props.handleOnSave },
                 'Save'
             );
         }
