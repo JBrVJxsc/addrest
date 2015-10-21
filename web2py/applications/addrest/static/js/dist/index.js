@@ -20498,12 +20498,12 @@ var UserInfoForm = React.createClass({
 			React.createElement(
 				'div',
 				{ className: 'form-group' },
-				React.createElement(Input, { placeholder: 'Email' })
+				React.createElement(Input, { placeholder: 'Email', size: 'input-md' })
 			),
 			React.createElement(
 				'div',
 				{ className: 'form-group' },
-				React.createElement(Input, { placeholder: 'Password', type: 'password' })
+				React.createElement(Input, { placeholder: 'Password', type: 'password', size: 'input-md' })
 			),
 			React.createElement(
 				'div',

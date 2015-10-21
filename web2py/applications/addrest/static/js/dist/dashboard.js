@@ -20623,6 +20623,18 @@ var AddressList = React.createClass({
 var Address = React.createClass({
     displayName: 'Address',
 
+    getCompany: function getCompany() {
+        var company = this.props.address.company;
+        if (company) {
+            return React.createElement(
+                'div',
+                null,
+                React.createElement('hr', { className: 'Separator' }),
+                company
+            );
+        }
+        return null;
+    },
     render: function render() {
         var address = this.props.address;
         var company = "";
@@ -20644,23 +20656,20 @@ var Address = React.createClass({
                     'div',
                     { className: 'panel-body' },
                     React.createElement(
-                        'div',
-                        { className: 'AddressBody' },
+                        'b',
+                        null,
+                        address.first_name + " " + address.last_name,
                         React.createElement(
-                            'b',
-                            null,
-                            address.first_name + " " + address.last_name,
-                            React.createElement(
-                                'span',
-                                { className: 'pull-right' },
-                                address.area + address.phone
-                            )
-                        ),
-                        React.createElement('hr', { className: 'Separator' }),
-                        company + address.street + ", " + address.apt,
-                        React.createElement('hr', { className: 'Separator' }),
-                        address.city + ", " + address.state + ", " + address.zip
-                    )
+                            'span',
+                            { className: 'pull-right' },
+                            address.area + address.phone
+                        )
+                    ),
+                    this.getCompany(),
+                    React.createElement('hr', { className: 'Separator' }),
+                    address.street + ", " + address.apt,
+                    React.createElement('hr', { className: 'Separator' }),
+                    address.city + ", " + address.state + ", " + address.zip
                 )
             )
         );

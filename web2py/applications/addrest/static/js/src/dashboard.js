@@ -205,6 +205,18 @@ var AddressList = React.createClass({
 });
 
 var Address = React.createClass({
+    getCompany: function () {
+        var company = this.props.address.company;
+        if (company) {
+            return (
+                <div>
+                    <hr className="Separator" />
+                    {company}
+                </div>
+            );
+        }
+        return null;
+    },
     render: function () {
         var address = this.props.address;
         var company = "";
@@ -218,16 +230,15 @@ var Address = React.createClass({
                         <AddressToolbar address={this.props.address} onEdit={this.props.onEdit} />
                     </div>
                     <div className="panel-body">
-                        <div className="AddressBody">
-                            <b>
-                                {address.first_name + " " + address.last_name}
-                                <span className="pull-right">{address.area + address.phone}</span>
-                            </b>
-                            <hr className="Separator" />
-                            {company + address.street + ", " + address.apt}
-                            <hr className="Separator" />
-                            {address.city + ", " + address.state + ", " + address.zip}
-                        </div>
+                        <b>
+                            {address.first_name + " " + address.last_name}
+                            <span className="pull-right">{address.area + address.phone}</span>
+                        </b>
+                        {this.getCompany()}
+                        <hr className="Separator" />
+                        {address.street + ", " + address.apt}
+                        <hr className="Separator" />
+                        {address.city + ", " + address.state + ", " + address.zip}
                     </div>
 				</div>
             </div>
