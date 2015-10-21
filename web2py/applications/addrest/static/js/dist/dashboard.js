@@ -20424,42 +20424,42 @@ var Dashboard = React.createClass({
             addresses: [{
                 show: true,
                 id: 0,
-                first_name: "Xu 1",
+                first_name: "Xu",
                 last_name: "ZHANG",
-                company: "Zenefits",
+                company: "",
                 area: "831",
                 phone: "2950944",
-                street: "708 Koshland Way",
-                apt: "P",
+                street: "700 Koshland Way",
+                apt: "A",
                 city: "Santa Cruz",
                 state: "CA",
                 zip: "95060"
             }, {
                 show: true,
                 id: 1,
-                first_name: "Xu 2",
-                last_name: "ZHANG",
+                first_name: "Han",
+                last_name: "Bai",
                 company: "Zenefits",
                 area: "831",
                 phone: "2950944",
-                street: "708 Koshland Way",
-                apt: "P",
+                street: "701 Koshland Way",
+                apt: "B",
                 city: "Santa Cruz",
                 state: "CA",
-                zip: "95060"
+                zip: "95061"
             }, {
                 show: true,
                 id: 2,
-                first_name: "Xu 3",
-                last_name: "ZHANG",
+                first_name: "Yue",
+                last_name: "Tian",
                 company: "Zenefits",
                 area: "831",
                 phone: "2950944",
-                street: "708 Koshland Way",
-                apt: "P",
+                street: "702 Koshland Way",
+                apt: "C",
                 city: "Santa Cruz",
                 state: "CA",
-                zip: "95060"
+                zip: "95062"
             }],
             editing: null,
             keyword: ""
@@ -20472,6 +20472,11 @@ var Dashboard = React.createClass({
                     this.refs.create.toggle();
                 }).bind(this),
                 text: "Create"
+            }, {
+                onClick: (function () {
+                    console.log("Settings.");
+                }).bind(this),
+                text: "Settings"
             }],
             right: [{
                 onClick: (function () {
@@ -20619,6 +20624,11 @@ var Address = React.createClass({
     displayName: 'Address',
 
     render: function render() {
+        var address = this.props.address;
+        var company = "";
+        if (address.company) {
+            company = address.company + ", ";
+        }
         return React.createElement(
             'div',
             { className: 'Address box-shadow--2dp' },
@@ -20633,7 +20643,24 @@ var Address = React.createClass({
                 React.createElement(
                     'div',
                     { className: 'panel-body' },
-                    this.props.address.first_name + " " + this.props.address.last_name
+                    React.createElement(
+                        'div',
+                        { className: 'AddressBody' },
+                        React.createElement(
+                            'b',
+                            null,
+                            address.first_name + " " + address.last_name,
+                            React.createElement(
+                                'span',
+                                { className: 'pull-right' },
+                                address.area + address.phone
+                            )
+                        ),
+                        React.createElement('hr', { className: 'Separator' }),
+                        company + address.street + ", " + address.apt,
+                        React.createElement('hr', { className: 'Separator' }),
+                        address.city + ", " + address.state + ", " + address.zip
+                    )
                 )
             )
         );

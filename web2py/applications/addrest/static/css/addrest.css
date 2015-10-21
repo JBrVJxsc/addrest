@@ -164,7 +164,7 @@ body {
 .AddressListPanel {
   position: relative;
   top: 80px;
-  width: 55%;
+  width: 50%;
   margin: 0 auto;
 }
 
@@ -175,12 +175,18 @@ body {
 
 /* line 143, ../sass/_main.scss */
 .Address > .panel-primary > .panel-heading {
-  background-color: white;
-  border-color: #EFEFEF;
+  background-color: #FFE071;
+  border-color: #FFE071;
 }
 
 /* line 148, ../sass/_main.scss */
+.Separator {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+/* line 153, ../sass/_main.scss */
 .Address {
-  width: 90%;
+  width: 80%;
   margin: 5px auto;
 }
