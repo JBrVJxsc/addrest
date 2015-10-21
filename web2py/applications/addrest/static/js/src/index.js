@@ -1,7 +1,8 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
-var Boron = require('boron');
 var Navbar = require('./common').Navbar;
+var Modal = require('./common').Modal;
+var Input = require('./common').Input;
 
 var Index = React.createClass({
     getButtons: function () {
@@ -66,12 +67,12 @@ var UserInfoModal = React.createClass({
 var UserInfoForm = React.createClass({
 	render: function () {
 		return (
-			<form className="form col-md-12 center-block">
+			<form className="form center-block">
 				<div className="form-group">
-					<input type="text" spellCheck="false" className="form-control" placeholder="Email" />
+					<Input placeholder="Email" size="input-md"></Input>
 				</div>
 				<div className="form-group">
-					<input type="password" className="form-control" placeholder="Password" />
+                    <Input placeholder="Password" type="password" size="input-md"></Input>
 				</div>
 				<div className="form-group">
 					<button className="btn btn-warning btn-block">{this.props.button}</button>
@@ -101,19 +102,7 @@ var Signup = React.createClass({
 	}
 });
 
-var Modal = React.createClass({
-	toggle: function() {
-		this.refs.dialog.toggle();
-	},
-	render: function() {
-		var Dialog = Boron[this.props.type];
-		return (
-			<Dialog ref="dialog">{this.props.content}</Dialog>
-		)
-	}
-});
-
 ReactDOM.render(
     <Index />,
-    document.body
+    document.getElementById("body")
 );

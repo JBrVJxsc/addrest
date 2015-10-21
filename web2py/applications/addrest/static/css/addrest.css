@@ -108,45 +108,85 @@ body {
 }
 
 /* line 88, ../sass/_main.scss */
+.btn-group .active {
+  box-shadow: none;
+}
+
+/* line 92, ../sass/_main.scss */
+.RightExtend {
+  padding-right: 5px;
+}
+
+/* line 96, ../sass/_main.scss */
+.LeftExtend {
+  padding-left: 5px;
+}
+
+/* line 100, ../sass/_main.scss */
+.Extend {
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+/* line 105, ../sass/_main.scss */
 .AddressListPanel > .panel-primary > .panel-heading {
   background-color: #F39C12;
   border-color: #F39C12;
 }
 
-/* line 93, ../sass/_main.scss */
+/* line 110, ../sass/_main.scss */
 .UserInfoModal > .panel-primary > .panel-heading {
   background-color: #F39C12;
   border-color: #F39C12;
 }
 
-/* line 98, ../sass/_main.scss */
-.Address > .panel-primary > .panel-heading {
-  background-color: white;
-  border-color: #EFEFEF;
-}
-
-/* line 103, ../sass/_main.scss */
+/* line 115, ../sass/_main.scss */
 .UserInfoModal .panel {
   position: relative;
   width: 325px;
   right: 162.5px;
 }
 
-/* line 109, ../sass/_main.scss */
+/* line 121, ../sass/_main.scss */
+.AddressEditModal > .panel-primary > .panel-heading {
+  background-color: #F39C12;
+  border-color: #F39C12;
+}
+
+/* line 126, ../sass/_main.scss */
+.AddressEditModal .panel {
+  position: relative;
+  width: 400px;
+  right: 200px;
+}
+
+/* line 132, ../sass/_main.scss */
 .AddressListPanel {
   position: relative;
   top: 80px;
-  width: 60%;
+  width: 50%;
   margin: 0 auto;
 }
 
-/* line 116, ../sass/_main.scss */
+/* line 139, ../sass/_main.scss */
 .AddressListPanel > .panel > .panel-body {
   background-color: #FFEA9B;
 }
 
-/* line 120, ../sass/_main.scss */
+/* line 143, ../sass/_main.scss */
+.Address > .panel-primary > .panel-heading {
+  background-color: #FFE071;
+  border-color: #FFE071;
+}
+
+/* line 148, ../sass/_main.scss */
+.Separator {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+/* line 153, ../sass/_main.scss */
 .Address {
-  width: 90%;
+  width: 80%;
   margin: 5px auto;
 }
