@@ -130,8 +130,12 @@ var Dashboard = React.createClass({
     render: function () {
         return (
 			<div>
-				<Modal ref="create" type="WaveModal" content={<Create onSave={this.handleOnSave} />} />
-                <Modal ref="edit" type="WaveModal" content={<Edit onSave={this.handleOnSave} onDelete={this.handleOnDelete} address={this.state.editing} />} />
+				<Modal ref="create" type="WaveModal">
+                    <Create onSave={this.handleOnSave} />
+                </Modal>
+                <Modal ref="edit" type="WaveModal" >
+                    <Edit onSave={this.handleOnSave} onDelete={this.handleOnDelete} address={this.state.editing} />
+                </Modal>
 				<Navbar ref="navbar" buttons={this.getButtons()} />
                 <AddressListPanel addresses={this.getAddresses()} eventHandlers={this.getEventHandlers()} />
 			</div>

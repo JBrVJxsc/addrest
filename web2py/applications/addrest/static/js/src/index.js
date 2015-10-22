@@ -30,8 +30,12 @@ var Index = React.createClass({
 	render: function() {
 		return (
 			<div>
-				<Modal ref="login" type="WaveModal" content={<Login />}/>
-				<Modal ref="signup" type="WaveModal" content={<Signup />}/>
+				<Modal ref="login" type="WaveModal">
+                    <Login />
+                </Modal>
+				<Modal ref="signup" type="WaveModal">
+                    <Signup />
+                </Modal>
 				<Navbar ref="navbar" buttons={this.getButtons()} />
                 <IndexBackground />
 			</div>

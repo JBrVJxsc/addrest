@@ -48,7 +48,7 @@ var Modal = React.createClass({
 	render: function() {
 		var Dialog = Boron[this.props.type];
 		return (
-			<Dialog ref="dialog">{this.props.content}</Dialog>
+			<Dialog ref="dialog">{this.props.children}</Dialog>
 		)
 	}
 });

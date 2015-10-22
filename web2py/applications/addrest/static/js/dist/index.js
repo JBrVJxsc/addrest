@@ -20321,7 +20321,7 @@ var Modal = React.createClass({
         return React.createElement(
             Dialog,
             { ref: 'dialog' },
-            this.props.content
+            this.props.children
         );
     }
 });
@@ -20439,8 +20439,16 @@ var Index = React.createClass({
 		return React.createElement(
 			'div',
 			null,
-			React.createElement(Modal, { ref: 'login', type: 'WaveModal', content: React.createElement(Login, null) }),
-			React.createElement(Modal, { ref: 'signup', type: 'WaveModal', content: React.createElement(Signup, null) }),
+			React.createElement(
+				Modal,
+				{ ref: 'login', type: 'WaveModal' },
+				React.createElement(Login, null)
+			),
+			React.createElement(
+				Modal,
+				{ ref: 'signup', type: 'WaveModal' },
+				React.createElement(Signup, null)
+			),
 			React.createElement(Navbar, { ref: 'navbar', buttons: this.getButtons() }),
 			React.createElement(IndexBackground, null)
 		);

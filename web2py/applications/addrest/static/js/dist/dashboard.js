@@ -20321,7 +20321,7 @@ var Modal = React.createClass({
         return React.createElement(
             Dialog,
             { ref: 'dialog' },
-            this.props.content
+            this.props.children
         );
     }
 });
@@ -20531,8 +20531,16 @@ var Dashboard = React.createClass({
         return React.createElement(
             'div',
             null,
-            React.createElement(Modal, { ref: 'create', type: 'WaveModal', content: React.createElement(Create, { onSave: this.handleOnSave }) }),
-            React.createElement(Modal, { ref: 'edit', type: 'WaveModal', content: React.createElement(Edit, { onSave: this.handleOnSave, onDelete: this.handleOnDelete, address: this.state.editing }) }),
+            React.createElement(
+                Modal,
+                { ref: 'create', type: 'WaveModal' },
+                React.createElement(Create, { onSave: this.handleOnSave })
+            ),
+            React.createElement(
+                Modal,
+                { ref: 'edit', type: 'WaveModal' },
+                React.createElement(Edit, { onSave: this.handleOnSave, onDelete: this.handleOnDelete, address: this.state.editing })
+            ),
             React.createElement(Navbar, { ref: 'navbar', buttons: this.getButtons() }),
             React.createElement(AddressListPanel, { addresses: this.getAddresses(), eventHandlers: this.getEventHandlers() })
         );
