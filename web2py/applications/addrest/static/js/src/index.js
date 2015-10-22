@@ -5,18 +5,18 @@ var Modal = require('./common').Modal;
 var Input = require('./common').Input;
 
 var Index = React.createClass({
-    getButtons: function () {
+    getButtons: function() {
         return {
             left: null,
             right: [
                 {
-                    onClick: function () {
+                    onClick: function() {
                         this.refs.signup.toggle();
                     }.bind(this),
                     text: "Sign up"
                 },
                 {
-                    onClick: function () {
+                    onClick: function() {
                         this.refs.login.toggle();
                     }.bind(this),
                     text: "Log In"
@@ -44,7 +44,7 @@ var Index = React.createClass({
 });
 
 var IndexBackground = React.createClass({
-    render: function () {
+    render: function() {
         return (
             <div>
                 <img src="/addrest/static/images/background-index.jpg" className="img-responsive" alt="Responsive image" />
@@ -69,7 +69,7 @@ var UserInfoModal = React.createClass({
 });
 
 var UserInfoForm = React.createClass({
-	render: function () {
+	render: function() {
 		return (
 			<form className="form center-block">
 				<div className="form-group">

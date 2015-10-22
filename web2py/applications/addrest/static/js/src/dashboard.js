@@ -6,7 +6,7 @@ var Input = require('./common').Input;
 var Switch = require('./common').Switch;
 
 var Dashboard = React.createClass({
-    getInitialState: function () {
+    getInitialState: function() {
         return {
             addresses: [
                 {
@@ -56,17 +56,17 @@ var Dashboard = React.createClass({
             keyword: ""
         };
     },
-    getButtons: function () {
+    getButtons: function() {
         return {
             left: [
                 {
-                    onClick: function () {
+                    onClick: function() {
                         this.refs.create.toggle();
                     }.bind(this),
                     text: "Create"
                 },
                 {
-                    onClick: function () {
+                    onClick: function() {
                         console.log("Settings.");
                     }.bind(this),
                     text: "Settings"
@@ -74,7 +74,7 @@ var Dashboard = React.createClass({
             ],
             right: [
                 {
-                    onClick: function () {
+                    onClick: function() {
                         console.log("Logging out.");
                     }.bind(this),
                     text: "Log out"
@@ -95,10 +95,10 @@ var Dashboard = React.createClass({
             }.bind(this)
         };
     },
-    handleOnSave: function (e) {
+    handleOnSave: function(e) {
 
     },
-    handleOnDelete: function (e) {
+    handleOnDelete: function(e) {
 
     },
     getAddresses: function() {
@@ -127,7 +127,7 @@ var Dashboard = React.createClass({
         }
         return addresses;
     },
-    render: function () {
+    render: function() {
         return (
 			<div>
 				<Modal ref="create" type="WaveModal">
@@ -144,7 +144,7 @@ var Dashboard = React.createClass({
 });
 
 var AddressListPanel = React.createClass({
-    render: function () {
+    render: function() {
         return (
             <div>
                 <div className="AddressListPanel box-shadow--3dp">
@@ -163,12 +163,12 @@ var AddressListPanel = React.createClass({
 });
 
 var AddressListToolbar = React.createClass({
-    handleOnChange: function (e) {
+    handleOnChange: function(e) {
         this.props.onSearch({
             keyword: e
         });
     },
-    render: function () {
+    render: function() {
         return (
             <div>
                 <SearchTextBox onChange={this.handleOnChange}/>
@@ -178,7 +178,7 @@ var AddressListToolbar = React.createClass({
 });
 
 var SearchTextBox = React.createClass({
-    render: function () {
+    render: function() {
         return (
             <div className="inner-addon left-addon">
                 <i className="glyphicon glyphicon-search"></i>
@@ -189,7 +189,7 @@ var SearchTextBox = React.createClass({
 });
 
 var AddressList = React.createClass({
-    getAddresses: function () {
+    getAddresses: function() {
         var rows = [];
         var addresses = this.props.addresses;
         for (var i in addresses) {
@@ -199,7 +199,7 @@ var AddressList = React.createClass({
         }
         return rows;
     },
-    render: function () {
+    render: function() {
         return (
             <div>
                 {this.getAddresses()}
@@ -209,7 +209,7 @@ var AddressList = React.createClass({
 });
 
 var Address = React.createClass({
-    getCompany: function () {
+    getCompany: function() {
         var company = this.props.address.company;
         if (company) {
             return (
@@ -221,7 +221,7 @@ var Address = React.createClass({
         }
         return null;
     },
-    render: function () {
+    render: function() {
         var address = this.props.address;
         var company = "";
         if (address.company) {
@@ -251,13 +251,13 @@ var Address = React.createClass({
 });
 
 var AddressToolbar = React.createClass({
-    handleOnClick: function () {
+    handleOnClick: function() {
         this.props.onEdit(this.props.address);
     },
-    handleOnSwitch: function () {
+    handleOnSwitch: function() {
 
     },
-    render: function () {
+    render: function() {
         return (
             <div>
                 <button type="button" className="btn btn-warning btn-xs" onClick={this.handleOnClick}>Edit</button>
@@ -270,16 +270,16 @@ var AddressToolbar = React.createClass({
 });
 
 var AddressEditModal = React.createClass({
-    handleOnSave: function () {
+    handleOnSave: function() {
         this.props.onSave(this.getAddress());
     },
-    handleOnDelete: function () {
+    handleOnDelete: function() {
         this.props.onDelete(this.props.address);
     },
-    getAddress: function () {
+    getAddress: function() {
         return null;
     },
-    getButtons: function () {
+    getButtons: function() {
         if (this.props.delete) {
             return (
                 <div className="row">
@@ -366,7 +366,7 @@ var AddressEditModal = React.createClass({
 });
 
 var Create = React.createClass({
-    render: function () {
+    render: function() {
         return (
             <AddressEditModal title="Create" />
         );
@@ -374,7 +374,7 @@ var Create = React.createClass({
 });
 
 var Edit = React.createClass({
-    render: function () {
+    render: function() {
         return (
             <AddressEditModal title="Edit" address={this.props.address} delete={true} />
         );

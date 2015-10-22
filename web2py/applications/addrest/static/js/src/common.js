@@ -2,7 +2,7 @@ var React = require('react');
 var Boron = require('boron');
 
 var Navbar = React.createClass({
-    getButtons: function (buttons) {
+    getButtons: function(buttons) {
         var buttonList = [];
         for (var i in buttons) {
             var button = buttons[i];
@@ -34,7 +34,7 @@ var Navbar = React.createClass({
 });
 
 var NavbarButton = React.createClass({
-    render: function () {
+    render: function() {
         return (
             <button type="button" className="btn btn-warning" onClick={this.props.onClick}>{this.props.children}</button>
         );
@@ -91,7 +91,7 @@ var Switch = React.createClass({
 });
 
 var Input = React.createClass({
-    handleOnChange: function (e) {
+    handleOnChange: function(e) {
         if (this.props.onChange) {
             this.props.onChange(e.target.value);
         }
@@ -101,7 +101,7 @@ var Input = React.createClass({
             this.refs.input.value = this.props.children;
         }
     },
-    render: function () {
+    render: function() {
         var className = "form-control";
         if (this.props.size) {
             className += " " + this.props.size;
