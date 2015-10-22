@@ -60,3 +60,19 @@ def call():
 
 def dashboard():
     return dict()
+
+
+def login():
+    u = Auth(db=db).login_bare(request.vars.email, request.vars.password)
+    return locals()
+
+
+def signup():
+    u = Auth(db=db).register_bare(**request.vars)
+    return locals()
+
+
+def boards():
+    print 'asking for boards.'
+    is_logged_in = auth.is_logged_in()
+    return locals()

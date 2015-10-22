@@ -5,6 +5,21 @@ var Modal = require('./common').Modal;
 var Input = require('./common').Input;
 
 var Index = React.createClass({
+    handleOnLogin: function (email, password) {
+        console.log(email + ", " + password);
+    },
+    handleOnSignup: function (email, password) {
+        console.log(email + ", " + password);
+    },
+    login: function (email, password) {
+        
+    },
+    signup: function (email, password) {
+
+    },
+    logout: function () {
+        
+    },
     getButtons: function () {
         return {
             left: null,
@@ -30,20 +45,80 @@ var Index = React.createClass({
 	render: function() {
 		return (
 			<div>
-				<Modal ref="login" type="WaveModal" content={<Login />}/>
-				<Modal ref="signup" type="WaveModal" content={<Signup />}/>
+				<Modal ref="login" type="WaveModal" content={<Login onLogin={this.handleOnLogin} />}/>
+				<Modal ref="signup" type="WaveModal" content={<Signup onSignup={this.handleOnSignup} />}/>
 				<Navbar ref="navbar" buttons={this.getButtons()} />
-                <IndexBackground />
+                <BoardListPanel url="boards.json" />
 			</div>
 		);
 	}
 });
 
-var IndexBackground = React.createClass({
+var BoardListPanel = React.createClass({
+    getInitialState: function () {
+        return {
+            boards: {
+                is_logged_in: true
+            }
+        };
+    },
+    getBoards: function () {
+        
+    },
+    componentDidMount: function () {
+        $.ajax({
+            type: 'POST',
+            url: this.props.url,
+            success: function(data) {
+                if (this.isMounted()) {
+                    console.log('Ajax done.');
+                    console.log(data);
+                    this.setState({
+                        boards: data
+                    });
+                }
+            }.bind(this)
+        });
+    },
+    render: function () {
+        return (
+            <div className="BoardListPanel">
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <div>{this.state.boards.is_logged_in.toString()}</div>
+                haha
+                <br />
+            </div>
+        );
+    }
+});
+
+var BoardList = React.createClass({
     render: function () {
         return (
             <div>
-                <img src="/addrest/static/images/background-index.jpg" className="img-responsive" alt="Responsive image" />
+
+            </div>
+        );
+    }
+});
+
+var Board = React.createClass({
+    render: function () {
+        return (
+            <div>
+
             </div>
         );
     }
@@ -65,19 +140,24 @@ var UserInfoModal = React.createClass({
 });
 
 var UserInfoForm = React.createClass({
+    handleOnClick: function () {
+        var email = ReactDOM.findDOMNode(this.refs.email).value;
+        var password = ReactDOM.findDOMNode(this.refs.password).value;
+        this.props.onClick(email, password);
+    },
 	render: function () {
 		return (
-			<form className="form center-block">
+			<div className="form center-block">
 				<div className="form-group">
-					<Input placeholder="Email" size="input-md"></Input>
+					<Input ref="email" placeholder="Email" size="input-md"></Input>
 				</div>
 				<div className="form-group">
-                    <Input placeholder="Password" type="password" size="input-md"></Input>
+                    <Input ref="password" placeholder="Password" type="password" size="input-md"></Input>
 				</div>
 				<div className="form-group">
-					<button className="btn btn-warning btn-block">{this.props.button}</button>
+					<button className="btn btn-warning btn-block" onClick={this.handleOnClick}>{this.props.button}</button>
 				</div>
-			</form>
+			</div>
 		);
 	}
 });
@@ -86,7 +166,7 @@ var Login = React.createClass({
 	render: function() {
 		return (
 			<UserInfoModal title="Log In">
-                <UserInfoForm button="Log In" />
+                <UserInfoForm button="Log In" onClick={this.props.onLogin} />
 			</UserInfoModal>
 		);
 	}
@@ -96,7 +176,7 @@ var Signup = React.createClass({
 	render: function() {
 		return (
 			<UserInfoModal title="Sign up">
-                <UserInfoForm button="Sign up" />
+                <UserInfoForm button="Sign up" onClick={this.props.onSignup} />
 			</UserInfoModal>
 		);
 	}

@@ -190,3 +190,11 @@ body {
   width: 80%;
   margin: 5px auto;
 }
+
+/* line 158, ../sass/_main.scss */
+.BoardListPanel {
+  position: relative;
+  top: 80px;
+  width: 95%;
+  margin: 0 auto;
+}

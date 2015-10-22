@@ -20416,130 +20416,202 @@ var Modal = require('./common').Modal;
 var Input = require('./common').Input;
 
 var Index = React.createClass({
-	displayName: 'Index',
+    displayName: 'Index',
 
-	getButtons: function getButtons() {
-		return {
-			left: null,
-			right: [{
-				onClick: (function () {
-					this.refs.signup.toggle();
-				}).bind(this),
-				text: "Sign up"
-			}, {
-				onClick: (function () {
-					this.refs.login.toggle();
-				}).bind(this),
-				text: "Log In"
-			}]
-		};
-	},
-	componentDidMount: function componentDidMount() {},
-	render: function render() {
-		return React.createElement(
-			'div',
-			null,
-			React.createElement(Modal, { ref: 'login', type: 'WaveModal', content: React.createElement(Login, null) }),
-			React.createElement(Modal, { ref: 'signup', type: 'WaveModal', content: React.createElement(Signup, null) }),
-			React.createElement(Navbar, { ref: 'navbar', buttons: this.getButtons() }),
-			React.createElement(IndexBackground, null)
-		);
-	}
+    handleOnLogin: function handleOnLogin(email, password) {
+        console.log(email + ", " + password);
+    },
+    handleOnSignup: function handleOnSignup(email, password) {
+        console.log(email + ", " + password);
+    },
+    login: function login(email, password) {},
+    signup: function signup(email, password) {},
+    logout: function logout() {},
+    getButtons: function getButtons() {
+        return {
+            left: null,
+            right: [{
+                onClick: (function () {
+                    this.refs.signup.toggle();
+                }).bind(this),
+                text: "Sign up"
+            }, {
+                onClick: (function () {
+                    this.refs.login.toggle();
+                }).bind(this),
+                text: "Log In"
+            }]
+        };
+    },
+    componentDidMount: function componentDidMount() {},
+    render: function render() {
+        return React.createElement(
+            'div',
+            null,
+            React.createElement(Modal, { ref: 'login', type: 'WaveModal', content: React.createElement(Login, { onLogin: this.handleOnLogin }) }),
+            React.createElement(Modal, { ref: 'signup', type: 'WaveModal', content: React.createElement(Signup, { onSignup: this.handleOnSignup }) }),
+            React.createElement(Navbar, { ref: 'navbar', buttons: this.getButtons() }),
+            React.createElement(BoardListPanel, { url: 'boards.json' })
+        );
+    }
 });
 
-var IndexBackground = React.createClass({
-	displayName: 'IndexBackground',
+var BoardListPanel = React.createClass({
+    displayName: 'BoardListPanel',
 
-	render: function render() {
-		return React.createElement(
-			'div',
-			null,
-			React.createElement('img', { src: '/addrest/static/images/background-index.jpg', className: 'img-responsive', alt: 'Responsive image' })
-		);
-	}
+    getInitialState: function getInitialState() {
+        return {
+            boards: {
+                is_logged_in: true
+            }
+        };
+    },
+    getBoards: function getBoards() {},
+    componentDidMount: function componentDidMount() {
+        $.ajax({
+            type: 'POST',
+            url: this.props.url,
+            success: (function (data) {
+                if (this.isMounted()) {
+                    console.log('Ajax done.');
+                    console.log(data);
+                    this.setState({
+                        boards: data
+                    });
+                }
+            }).bind(this)
+        });
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'BoardListPanel' },
+            React.createElement('br', null),
+            React.createElement('br', null),
+            React.createElement('br', null),
+            React.createElement('br', null),
+            React.createElement('br', null),
+            React.createElement('br', null),
+            React.createElement('br', null),
+            React.createElement('br', null),
+            React.createElement('br', null),
+            React.createElement('br', null),
+            React.createElement('br', null),
+            React.createElement('br', null),
+            React.createElement('br', null),
+            React.createElement(
+                'div',
+                null,
+                this.state.boards.is_logged_in.toString()
+            ),
+            'haha',
+            React.createElement('br', null)
+        );
+    }
+});
+
+var BoardList = React.createClass({
+    displayName: 'BoardList',
+
+    render: function render() {
+        return React.createElement('div', null);
+    }
+});
+
+var Board = React.createClass({
+    displayName: 'Board',
+
+    render: function render() {
+        return React.createElement('div', null);
+    }
 });
 
 var UserInfoModal = React.createClass({
-	displayName: 'UserInfoModal',
+    displayName: 'UserInfoModal',
 
-	render: function render() {
-		return React.createElement(
-			'div',
-			{ className: 'UserInfoModal' },
-			React.createElement(
-				'div',
-				{ className: 'panel panel-primary' },
-				React.createElement(
-					'div',
-					{ className: 'panel-heading' },
-					React.createElement(
-						'h3',
-						{ className: 'panel-title' },
-						this.props.title
-					)
-				),
-				React.createElement(
-					'div',
-					{ className: 'panel-body' },
-					this.props.children
-				)
-			)
-		);
-	}
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'UserInfoModal' },
+            React.createElement(
+                'div',
+                { className: 'panel panel-primary' },
+                React.createElement(
+                    'div',
+                    { className: 'panel-heading' },
+                    React.createElement(
+                        'h3',
+                        { className: 'panel-title' },
+                        this.props.title
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'panel-body' },
+                    this.props.children
+                )
+            )
+        );
+    }
 });
 
 var UserInfoForm = React.createClass({
-	displayName: 'UserInfoForm',
+    displayName: 'UserInfoForm',
 
-	render: function render() {
-		return React.createElement(
-			'form',
-			{ className: 'form center-block' },
-			React.createElement(
-				'div',
-				{ className: 'form-group' },
-				React.createElement(Input, { placeholder: 'Email', size: 'input-md' })
-			),
-			React.createElement(
-				'div',
-				{ className: 'form-group' },
-				React.createElement(Input, { placeholder: 'Password', type: 'password', size: 'input-md' })
-			),
-			React.createElement(
-				'div',
-				{ className: 'form-group' },
-				React.createElement(
-					'button',
-					{ className: 'btn btn-warning btn-block' },
-					this.props.button
-				)
-			)
-		);
-	}
+    handleOnClick: function handleOnClick() {
+        var email = ReactDOM.findDOMNode(this.refs.email).value;
+        var password = ReactDOM.findDOMNode(this.refs.password).value;
+        this.props.onClick(email, password);
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'form center-block' },
+            React.createElement(
+                'div',
+                { className: 'form-group' },
+                React.createElement(Input, { ref: 'email', placeholder: 'Email', size: 'input-md' })
+            ),
+            React.createElement(
+                'div',
+                { className: 'form-group' },
+                React.createElement(Input, { ref: 'password', placeholder: 'Password', type: 'password', size: 'input-md' })
+            ),
+            React.createElement(
+                'div',
+                { className: 'form-group' },
+                React.createElement(
+                    'button',
+                    { className: 'btn btn-warning btn-block', onClick: this.handleOnClick },
+                    this.props.button
+                )
+            )
+        );
+    }
 });
 
 var Login = React.createClass({
-	displayName: 'Login',
+    displayName: 'Login',
 
-	render: function render() {
-		return React.createElement(
-			UserInfoModal,
-			{ title: 'Log In' },
-			React.createElement(UserInfoForm, { button: 'Log In' })
-		);
-	}
+    render: function render() {
+        return React.createElement(
+            UserInfoModal,
+            { title: 'Log In' },
+            React.createElement(UserInfoForm, { button: 'Log In', onClick: this.props.onLogin })
+        );
+    }
 });
 
 var Signup = React.createClass({
-	displayName: 'Signup',
+    displayName: 'Signup',
 
-	render: function render() {
-		return React.createElement(
-			UserInfoModal,
-			{ title: 'Sign up' },
-			React.createElement(UserInfoForm, { button: 'Sign up' })
-		);
-	}
+    render: function render() {
+        return React.createElement(
+            UserInfoModal,
+            { title: 'Sign up' },
+            React.createElement(UserInfoForm, { button: 'Sign up', onClick: this.props.onSignup })
+        );
+    }
 });
 
 ReactDOM.render(React.createElement(Index, null), document.getElementById("body"));
