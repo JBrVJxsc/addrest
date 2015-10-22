@@ -7,6 +7,7 @@
 ## - user is required for authentication and authorization
 ## - download is for downloading files uploaded in the db (does streaming)
 #########################################################################
+import time
 
 def index():
     """
@@ -71,6 +72,7 @@ def signup():
     print "vars:", request.vars
     print "args:", request.args
     result = Auth(db=db).register_bare(**request.vars)
+    # time.sleep(3)
     return locals()
 
 

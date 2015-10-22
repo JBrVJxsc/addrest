@@ -35512,39 +35512,39 @@ var Input = React.createClass({
 var DismissibleAlert = React.createClass({
     displayName: 'DismissibleAlert',
 
-    getInitialState: function getInitialState() {
-        return {
-            visible: true
-        };
-    },
-    handleOnDismiss: function handleOnDismiss() {
-        this.setState({
-            visible: false
-        });
-        this.props.onDismiss();
-    },
-    render: function render() {
-        if (this.state.visible) {
+    getTitle: function getTitle() {
+        if (this.props.title) {
             return React.createElement(
-                Alert,
-                { bsStyle: 'danger', onDismiss: this.handleOnDismiss },
-                React.createElement(
-                    'h4',
-                    null,
-                    this.props.title
-                ),
-                React.createElement(
-                    'p',
-                    null,
-                    this.props.message
-                )
+                'h4',
+                null,
+                this.props.title
             );
         }
-        return null;
+    },
+    render: function render() {
+        console.log("Alert is rendering.");
+        return React.createElement(
+            Alert,
+            { bsStyle: 'danger', onDismiss: this.props.onDismiss },
+            this.getTitle(),
+            React.createElement(
+                'p',
+                null,
+                this.props.message
+            )
+        );
     }
 });
 
+var Utils = {
+    validateEmail: function validateEmail(email) {
+        var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+        return re.test(email);
+    }
+};
+
 module.exports = {
+    Utils: Utils,
     Navbar: Navbar,
     Modal: Modal,
     Input: Input,
@@ -35557,6 +35557,7 @@ module.exports = {
 
 var React = require('react');
 var ReactDOM = require('react-dom');
+var Utils = require('./common').Utils;
 var Navbar = require('./common').Navbar;
 var Modal = require('./common').Modal;
 var Input = require('./common').Input;
@@ -35573,11 +35574,46 @@ var Index = React.createClass({
         };
     },
     handleOnLogin: function handleOnLogin(email, password) {
-        console.log(email + ", " + password);
+        // Check email.
+        if (!Utils.validateEmail(email)) {
+            this.setErrors({
+                signup: {
+                    message: "Please enter a valid email address."
+                }
+            });
+            return;
+        }
+
+        this.login(email, password);
     },
     handleOnSignup: function handleOnSignup(email, password) {
-        console.log(email + ", " + password);
+        // Clear old errors first.
+        this.clearErrors();
+
+        // Check email.
+        if (!Utils.validateEmail(email)) {
+            this.setErrors({
+                signup: {
+                    message: "Please enter a valid email address."
+                }
+            });
+            return;
+        }
+
+        // Check password.
+        if (password.length < 4) {
+            this.setErrors({
+                signup: {
+                    message: "Password is too short."
+                }
+            });
+            return;
+        }
+
         this.signup(email, password);
+    },
+    handleOnAlertDismiss: function handleOnAlertDismiss() {
+        this.clearErrors();
     },
     login: function login(email, password) {},
     signup: function signup(email, password) {
@@ -35587,10 +35623,17 @@ var Index = React.createClass({
         };
 
         var callback = (function (data) {
-            console.log(data);
-            this.setState({
-                boards: data
-            });
+            if (data.result === false) {
+                this.setErrors({
+                    signup: {
+                        message: "Email address has been used."
+                    }
+                });
+            } else {
+                this.setState({
+                    boards: data
+                });
+            }
         }).bind(this);
 
         $.ajax({
@@ -35601,23 +35644,7 @@ var Index = React.createClass({
         });
     },
     logout: function logout() {},
-    getButtons: function getButtons() {
-        return {
-            left: null,
-            right: [{
-                onClick: (function () {
-                    this.refs.signup.toggle();
-                }).bind(this),
-                text: "Sign up"
-            }, {
-                onClick: (function () {
-                    this.refs.login.toggle();
-                }).bind(this),
-                text: "Log In"
-            }]
-        };
-    },
-    componentDidMount: function componentDidMount() {
+    getBoards: function getBoards() {
         $.ajax({
             type: 'POST',
             url: this.props.APIs.boards,
@@ -35630,6 +35657,37 @@ var Index = React.createClass({
             }).bind(this)
         });
     },
+    setErrors: function setErrors(errors) {
+        this.setState({
+            errors: errors
+        });
+    },
+    clearErrors: function clearErrors() {
+        console.log("Alert is clearing.");
+        this.setState({
+            errors: {}
+        });
+    },
+    getButtons: function getButtons() {
+        return {
+            left: null,
+            right: [{
+                onClick: (function () {
+                    this.clearErrors();
+                    this.refs.signup.toggle();
+                }).bind(this),
+                text: "Sign up"
+            }, {
+                onClick: (function () {
+                    this.refs.login.toggle();
+                }).bind(this),
+                text: "Log In"
+            }]
+        };
+    },
+    componentDidMount: function componentDidMount() {
+        this.getBoards();
+    },
     render: function render() {
         return React.createElement(
             'div',
@@ -35637,12 +35695,12 @@ var Index = React.createClass({
             React.createElement(
                 Modal,
                 { ref: 'login', type: 'WaveModal' },
-                React.createElement(Login, { error: this.state.errors.login, onLogin: this.handleOnLogin })
+                React.createElement(Login, { error: this.state.errors.login, onLogin: this.handleOnLogin, onAlertDismiss: this.handleOnAlertDismiss })
             ),
             React.createElement(
                 Modal,
                 { ref: 'signup', type: 'WaveModal' },
-                React.createElement(Signup, { error: this.state.errors.signup, onSignup: this.handleOnSignup })
+                React.createElement(Signup, { error: this.state.errors.signup, onSignup: this.handleOnSignup, onAlertDismiss: this.handleOnAlertDismiss })
             ),
             React.createElement(Navbar, { ref: 'navbar', buttons: this.getButtons() }),
             React.createElement(BoardListPanel, { boards: this.state.boards })
@@ -35713,6 +35771,11 @@ var UserInfoModal = React.createClass({
 var UserInfoForm = React.createClass({
     displayName: 'UserInfoForm',
 
+    getError: function getError() {
+        if (this.props.error) {
+            return React.createElement(Alert, { bsStyle: 'danger', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
+        }
+    },
     handleOnClick: function handleOnClick() {
         var email = ReactDOM.findDOMNode(this.refs.email).value;
         var password = ReactDOM.findDOMNode(this.refs.password).value;
@@ -35722,16 +35785,7 @@ var UserInfoForm = React.createClass({
         return React.createElement(
             'div',
             { className: 'form center-block' },
-            React.createElement(
-                Alert,
-                { bsStyle: 'danger', onDismiss: true },
-                React.createElement(
-                    'strong',
-                    null,
-                    'Holy guacamole!'
-                ),
-                ' Best check yo self, you\'re not looking too good.'
-            ),
+            this.getError(),
             React.createElement(
                 'div',
                 { className: 'form-group' },
@@ -35762,7 +35816,7 @@ var Login = React.createClass({
         return React.createElement(
             UserInfoModal,
             { title: 'Log In' },
-            React.createElement(UserInfoForm, { button: 'Log In', onClick: this.props.onLogin })
+            React.createElement(UserInfoForm, { button: 'Log In', error: this.props.error, onClick: this.props.onLogin, onAlertDismiss: this.props.onAlertDismiss })
         );
     }
 });
@@ -35774,7 +35828,7 @@ var Signup = React.createClass({
         return React.createElement(
             UserInfoModal,
             { title: 'Sign up' },
-            React.createElement(UserInfoForm, { button: 'Sign up', onClick: this.props.onSignup })
+            React.createElement(UserInfoForm, { button: 'Sign up', error: this.props.error, onClick: this.props.onSignup, onAlertDismiss: this.props.onAlertDismiss })
         );
     }
 });

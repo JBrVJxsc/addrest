@@ -35512,39 +35512,39 @@ var Input = React.createClass({
 var DismissibleAlert = React.createClass({
     displayName: 'DismissibleAlert',
 
-    getInitialState: function getInitialState() {
-        return {
-            visible: true
-        };
-    },
-    handleOnDismiss: function handleOnDismiss() {
-        this.setState({
-            visible: false
-        });
-        this.props.onDismiss();
-    },
-    render: function render() {
-        if (this.state.visible) {
+    getTitle: function getTitle() {
+        if (this.props.title) {
             return React.createElement(
-                Alert,
-                { bsStyle: 'danger', onDismiss: this.handleOnDismiss },
-                React.createElement(
-                    'h4',
-                    null,
-                    this.props.title
-                ),
-                React.createElement(
-                    'p',
-                    null,
-                    this.props.message
-                )
+                'h4',
+                null,
+                this.props.title
             );
         }
-        return null;
+    },
+    render: function render() {
+        console.log("Alert is rendering.");
+        return React.createElement(
+            Alert,
+            { bsStyle: 'danger', onDismiss: this.props.onDismiss },
+            this.getTitle(),
+            React.createElement(
+                'p',
+                null,
+                this.props.message
+            )
+        );
     }
 });
 
+var Utils = {
+    validateEmail: function validateEmail(email) {
+        var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+        return re.test(email);
+    }
+};
+
 module.exports = {
+    Utils: Utils,
     Navbar: Navbar,
     Modal: Modal,
     Input: Input,

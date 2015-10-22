@@ -1,5 +1,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
+var Utils = require('./common').Utils;
 var Navbar = require('./common').Navbar;
 var Modal = require('./common').Modal;
 var Input = require('./common').Input;
@@ -14,11 +15,46 @@ var Index = React.createClass({
         };
     },
     handleOnLogin: function(email, password) {
-        console.log(email + ", " + password);
+        // Check email.
+        if (!Utils.validateEmail(email)) {
+            this.setErrors({
+                signup: {
+                    message: "Please enter a valid email address."
+                }
+            });
+            return;
+        }
+
+        this.login(email, password);
     },
     handleOnSignup: function(email, password) {
-        console.log(email + ", " + password);
+        // Clear old errors first.
+        this.clearErrors();
+
+        // Check email.
+        if (!Utils.validateEmail(email)) {
+            this.setErrors({
+                signup: {
+                    message: "Please enter a valid email address."
+                }
+            });
+            return;
+        }
+
+        // Check password.
+        if (password.length < 4) {
+            this.setErrors({
+                signup: {
+                    message: "Password is too short."
+                }
+            });
+            return;
+        }
+
         this.signup(email, password);
+    },
+    handleOnAlertDismiss: function() {
+        this.clearErrors();
     },
     login: function(email, password) {
         
@@ -30,10 +66,17 @@ var Index = React.createClass({
         };
 
         var callback = function(data) {
-            console.log(data);
-            this.setState({
-                boards: data
-            });
+            if (data.result === false) {
+                this.setErrors({
+                    signup: {
+                        message: "Email address has been used."
+                    }
+                });
+            } else {
+                this.setState({
+                    boards: data
+                });
+            }
         }.bind(this);
 
         $.ajax({
@@ -46,12 +89,37 @@ var Index = React.createClass({
     logout: function() {
         
     },
+    getBoards: function() {
+        $.ajax({
+            type: 'POST',
+            url: this.props.APIs.boards,
+            success: function(data) {
+                if (this.isMounted()) {
+                    this.setState({
+                        boards: data
+                    });
+                }
+            }.bind(this)
+        });
+    },
+    setErrors: function(errors) {
+        this.setState({
+            errors: errors
+        });
+    },
+    clearErrors: function() {
+        console.log("Alert is clearing.");
+        this.setState({
+            errors: {}
+        });
+    },
     getButtons: function() {
         return {
             left: null,
             right: [
                 {
                     onClick: function() {
+                        this.clearErrors();
                         this.refs.signup.toggle();
                     }.bind(this),
                     text: "Sign up"
@@ -66,26 +134,16 @@ var Index = React.createClass({
         };
     },
 	componentDidMount: function() {
-        $.ajax({
-            type: 'POST',
-            url: this.props.APIs.boards,
-            success: function(data) {
-                if (this.isMounted()) {
-                    this.setState({
-                        boards: data
-                    });
-                }
-            }.bind(this)
-        });
+        this.getBoards();
 	},
 	render: function() {
 		return (
 			<div>
 				<Modal ref="login" type="WaveModal">
-                    <Login error={this.state.errors.login} onLogin={this.handleOnLogin} />
+                    <Login error={this.state.errors.login} onLogin={this.handleOnLogin} onAlertDismiss={this.handleOnAlertDismiss} />
                 </Modal>
 				<Modal ref="signup" type="WaveModal">
-                    <Signup error={this.state.errors.signup} onSignup={this.handleOnSignup} />
+                    <Signup error={this.state.errors.signup} onSignup={this.handleOnSignup} onAlertDismiss={this.handleOnAlertDismiss} />
                 </Modal>
 				<Navbar ref="navbar" buttons={this.getButtons()} />
                 <BoardListPanel boards={this.state.boards} />
@@ -143,6 +201,13 @@ var UserInfoModal = React.createClass({
 });
 
 var UserInfoForm = React.createClass({
+    getError: function() {
+        if (this.props.error) {
+            return (
+                <Alert bsStyle="danger" onDismiss={this.props.onAlertDismiss} title={this.props.error.title} message={this.props.error.message} />
+            );
+        }
+    },
     handleOnClick: function() {
         var email = ReactDOM.findDOMNode(this.refs.email).value;
         var password = ReactDOM.findDOMNode(this.refs.password).value;
@@ -151,9 +216,7 @@ var UserInfoForm = React.createClass({
 	render: function() {
 		return (
 			<div className="form center-block">
-                <Alert bsStyle="danger" onDismiss={true}>
-                    <strong>Holy guacamole!</strong> Best check yo self, you're not looking too good.
-                </Alert>
+                {this.getError()}
 				<div className="form-group">
 					<Input ref="email" placeholder="Email" size="input-md"></Input>
 				</div>
@@ -172,7 +235,7 @@ var Login = React.createClass({
 	render: function() {
 		return (
 			<UserInfoModal title="Log In">
-                <UserInfoForm button="Log In" onClick={this.props.onLogin} />
+                <UserInfoForm button="Log In" error={this.props.error} onClick={this.props.onLogin} onAlertDismiss={this.props.onAlertDismiss} />
 			</UserInfoModal>
 		);
 	}
@@ -182,7 +245,7 @@ var Signup = React.createClass({
 	render: function() {
 		return (
 			<UserInfoModal title="Sign up">
-                <UserInfoForm button="Sign up" onClick={this.props.onSignup} />
+                <UserInfoForm button="Sign up" error={this.props.error} onClick={this.props.onSignup} onAlertDismiss={this.props.onAlertDismiss} />
 			</UserInfoModal>
 		);
 	}

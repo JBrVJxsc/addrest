@@ -120,32 +120,33 @@ var Input = React.createClass({
 });
 
 var DismissibleAlert = React.createClass({
-    getInitialState: function() {
-        return {
-            visible: true
-        };
-    },
-    handleOnDismiss: function() {
-        this.setState(
-            {
-                visible: false
-            }
-        );
-        this.props.onDismiss();
+    getTitle: function() {
+        if (this.props.title) {
+            return (
+                <h4>{this.props.title}</h4>
+            );
+        }
     },
     render: function() {
-        if (this.state.visible) {
-            return (
-            <Alert bsStyle="danger" onDismiss={this.handleOnDismiss}>
-                <h4>{this.props.title}</h4>
+        console.log("Alert is rendering.");
+        return (
+            <Alert bsStyle="danger" onDismiss={this.props.onDismiss}>
+                {this.getTitle()}
                 <p>{this.props.message}</p>
-            </Alert>);
-        }
-        return null;
+            </Alert>
+        );
     }
 });
 
+var Utils = {
+    validateEmail: function(email) {
+        var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+        return re.test(email);
+    }
+};
+
 module.exports = {
+    Utils: Utils,
     Navbar: Navbar,
     Modal: Modal,
     Input: Input,
