@@ -63,12 +63,14 @@ def dashboard():
 
 
 def login():
-    u = Auth(db=db).login_bare(request.vars.email, request.vars.password)
+    result = Auth(db=db).login_bare(request.vars.email, request.vars.password)
     return locals()
 
 
 def signup():
-    u = Auth(db=db).register_bare(**request.vars)
+    print "vars:", request.vars
+    print "args:", request.args
+    result = Auth(db=db).register_bare(**request.vars)
     return locals()
 
 

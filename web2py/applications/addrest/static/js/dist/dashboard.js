@@ -20321,7 +20321,7 @@ var Modal = React.createClass({
         return React.createElement(
             Dialog,
             { ref: 'dialog' },
-            this.props.content
+            this.props.children
         );
     }
 });

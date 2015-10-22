@@ -20321,7 +20321,7 @@ var Modal = React.createClass({
         return React.createElement(
             Dialog,
             { ref: 'dialog' },
-            this.props.content
+            this.props.children
         );
     }
 });
@@ -20418,14 +20418,41 @@ var Input = require('./common').Input;
 var Index = React.createClass({
     displayName: 'Index',
 
+    getInitialState: function getInitialState() {
+        return {
+            user: null,
+            boards: [],
+            errors: {}
+        };
+    },
     handleOnLogin: function handleOnLogin(email, password) {
         console.log(email + ", " + password);
     },
     handleOnSignup: function handleOnSignup(email, password) {
         console.log(email + ", " + password);
+        this.signup(email, password);
     },
     login: function login(email, password) {},
-    signup: function signup(email, password) {},
+    signup: function signup(email, password) {
+        var data = {
+            email: email,
+            password: password
+        };
+
+        var callback = (function (data) {
+            console.log(data);
+            this.setState({
+                boards: data
+            });
+        }).bind(this);
+
+        $.ajax({
+            type: 'POST',
+            url: this.props.APIs.signup,
+            data: data,
+            success: callback
+        });
+    },
     logout: function logout() {},
     getButtons: function getButtons() {
         return {
@@ -20443,38 +20470,12 @@ var Index = React.createClass({
             }]
         };
     },
-    componentDidMount: function componentDidMount() {},
-    render: function render() {
-        return React.createElement(
-            'div',
-            null,
-            React.createElement(Modal, { ref: 'login', type: 'WaveModal', content: React.createElement(Login, { onLogin: this.handleOnLogin }) }),
-            React.createElement(Modal, { ref: 'signup', type: 'WaveModal', content: React.createElement(Signup, { onSignup: this.handleOnSignup }) }),
-            React.createElement(Navbar, { ref: 'navbar', buttons: this.getButtons() }),
-            React.createElement(BoardListPanel, { url: 'boards.json' })
-        );
-    }
-});
-
-var BoardListPanel = React.createClass({
-    displayName: 'BoardListPanel',
-
-    getInitialState: function getInitialState() {
-        return {
-            boards: {
-                is_logged_in: true
-            }
-        };
-    },
-    getBoards: function getBoards() {},
     componentDidMount: function componentDidMount() {
         $.ajax({
             type: 'POST',
-            url: this.props.url,
+            url: this.props.APIs.boards,
             success: (function (data) {
                 if (this.isMounted()) {
-                    console.log('Ajax done.');
-                    console.log(data);
                     this.setState({
                         boards: data
                     });
@@ -20485,26 +20486,33 @@ var BoardListPanel = React.createClass({
     render: function render() {
         return React.createElement(
             'div',
+            null,
+            React.createElement(
+                Modal,
+                { ref: 'login', type: 'WaveModal' },
+                React.createElement(Login, { error: this.state.errors.login, onLogin: this.handleOnLogin })
+            ),
+            React.createElement(
+                Modal,
+                { ref: 'signup', type: 'WaveModal' },
+                React.createElement(Signup, { error: this.state.errors.signup, onSignup: this.handleOnSignup })
+            ),
+            React.createElement(Navbar, { ref: 'navbar', buttons: this.getButtons() }),
+            React.createElement(BoardListPanel, { boards: this.state.boards })
+        );
+    }
+});
+
+var BoardListPanel = React.createClass({
+    displayName: 'BoardListPanel',
+
+    render: function render() {
+        return React.createElement(
+            'div',
             { className: 'BoardListPanel' },
             React.createElement('br', null),
             React.createElement('br', null),
             React.createElement('br', null),
-            React.createElement('br', null),
-            React.createElement('br', null),
-            React.createElement('br', null),
-            React.createElement('br', null),
-            React.createElement('br', null),
-            React.createElement('br', null),
-            React.createElement('br', null),
-            React.createElement('br', null),
-            React.createElement('br', null),
-            React.createElement('br', null),
-            React.createElement(
-                'div',
-                null,
-                this.state.boards.is_logged_in.toString()
-            ),
-            'haha',
             React.createElement('br', null)
         );
     }
@@ -20614,7 +20622,13 @@ var Signup = React.createClass({
     }
 });
 
-ReactDOM.render(React.createElement(Index, null), document.getElementById("body"));
+var APIs = {
+    login: "login.json",
+    signup: "signup.json",
+    boards: "boards.json"
+};
+
+ReactDOM.render(React.createElement(Index, { APIs: APIs }), document.getElementById("body"));
 
 },{"./common":173,"react":172,"react-dom":15}],175:[function(require,module,exports){
 // shim for using process in browser

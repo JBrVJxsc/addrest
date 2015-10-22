@@ -5,17 +5,42 @@ var Modal = require('./common').Modal;
 var Input = require('./common').Input;
 
 var Index = React.createClass({
+    getInitialState: function () {
+        return {
+            user: null,
+            boards: [],
+            errors: {}
+        };
+    },
     handleOnLogin: function (email, password) {
         console.log(email + ", " + password);
     },
     handleOnSignup: function (email, password) {
         console.log(email + ", " + password);
+        this.signup(email, password);
     },
     login: function (email, password) {
         
     },
     signup: function (email, password) {
+        var data = {
+            email: email,
+            password: password
+        };
 
+        var callback = function(data) {
+            console.log(data);
+            this.setState({
+                boards: data
+            });
+        }.bind(this);
+
+        $.ajax({
+            type: 'POST',
+            url: this.props.APIs.signup,
+            data: data,
+            success: callback
+        });
     },
     logout: function () {
         
@@ -40,64 +65,41 @@ var Index = React.createClass({
         };
     },
 	componentDidMount: function() {
-
-	},
-	render: function() {
-		return (
-			<div>
-				<Modal ref="login" type="WaveModal" content={<Login onLogin={this.handleOnLogin} />}/>
-				<Modal ref="signup" type="WaveModal" content={<Signup onSignup={this.handleOnSignup} />}/>
-				<Navbar ref="navbar" buttons={this.getButtons()} />
-                <BoardListPanel url="boards.json" />
-			</div>
-		);
-	}
-});
-
-var BoardListPanel = React.createClass({
-    getInitialState: function () {
-        return {
-            boards: {
-                is_logged_in: true
-            }
-        };
-    },
-    getBoards: function () {
-        
-    },
-    componentDidMount: function () {
         $.ajax({
             type: 'POST',
-            url: this.props.url,
+            url: this.props.APIs.boards,
             success: function(data) {
                 if (this.isMounted()) {
-                    console.log('Ajax done.');
-                    console.log(data);
                     this.setState({
                         boards: data
                     });
                 }
             }.bind(this)
         });
-    },
+	},
+	render: function() {
+		return (
+			<div>
+				<Modal ref="login" type="WaveModal">
+                    <Login error={this.state.errors.login} onLogin={this.handleOnLogin} />
+                </Modal>
+				<Modal ref="signup" type="WaveModal">
+                    <Signup error={this.state.errors.signup} onSignup={this.handleOnSignup} />
+                </Modal>
+				<Navbar ref="navbar" buttons={this.getButtons()} />
+                <BoardListPanel boards={this.state.boards} />
+			</div>
+		);
+	}
+});
+
+var BoardListPanel = React.createClass({
     render: function () {
         return (
             <div className="BoardListPanel">
                 <br />
                 <br />
                 <br />
-                <br />
-                <br />
-                <br />
-                <br />
-                <br />
-                <br />
-                <br />
-                <br />
-                <br />
-                <br />
-                <div>{this.state.boards.is_logged_in.toString()}</div>
-                haha
                 <br />
             </div>
         );
@@ -182,7 +184,13 @@ var Signup = React.createClass({
 	}
 });
 
+var APIs = {
+    login: "login.json",
+    signup: "signup.json",
+    boards: "boards.json"
+};
+
 ReactDOM.render(
-    <Index />,
+    <Index APIs={APIs} />,
     document.getElementById("body")
 );
