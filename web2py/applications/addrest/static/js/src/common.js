@@ -1,8 +1,9 @@
 var React = require('react');
 var Boron = require('boron');
+var Alert = require('react-bootstrap').Alert;
 
 var Navbar = React.createClass({
-    getButtons: function (buttons) {
+    getButtons: function(buttons) {
         var buttonList = [];
         for (var i in buttons) {
             var button = buttons[i];
@@ -34,7 +35,7 @@ var Navbar = React.createClass({
 });
 
 var NavbarButton = React.createClass({
-    render: function () {
+    render: function() {
         return (
             <button type="button" className="btn btn-warning" onClick={this.props.onClick}>{this.props.children}</button>
         );
@@ -91,7 +92,7 @@ var Switch = React.createClass({
 });
 
 var Input = React.createClass({
-    handleOnChange: function (e) {
+    handleOnChange: function(e) {
         if (this.props.onChange) {
             this.props.onChange(e.target.value);
         }
@@ -101,7 +102,7 @@ var Input = React.createClass({
             this.refs.input.value = this.props.children;
         }
     },
-    render: function () {
+    render: function() {
         var className = "form-control";
         if (this.props.size) {
             className += " " + this.props.size;
@@ -118,9 +119,36 @@ var Input = React.createClass({
     }
 });
 
+var DismissibleAlert = React.createClass({
+    getInitialState: function() {
+        return {
+            visible: true
+        };
+    },
+    handleOnDismiss: function() {
+        this.setState(
+            {
+                visible: false
+            }
+        );
+        this.props.onDismiss();
+    },
+    render: function() {
+        if (this.state.visible) {
+            return (
+            <Alert bsStyle="danger" onDismiss={this.handleOnDismiss}>
+                <h4>{this.props.title}</h4>
+                <p>{this.props.message}</p>
+            </Alert>);
+        }
+        return null;
+    }
+});
+
 module.exports = {
     Navbar: Navbar,
     Modal: Modal,
     Input: Input,
-    Switch: Switch
+    Switch: Switch,
+    Alert: DismissibleAlert
 };

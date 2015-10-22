@@ -3,26 +3,27 @@ var ReactDOM = require('react-dom');
 var Navbar = require('./common').Navbar;
 var Modal = require('./common').Modal;
 var Input = require('./common').Input;
+var Alert = require('./common').Alert;
 
 var Index = React.createClass({
-    getInitialState: function () {
+    getInitialState: function() {
         return {
             user: null,
             boards: [],
             errors: {}
         };
     },
-    handleOnLogin: function (email, password) {
+    handleOnLogin: function(email, password) {
         console.log(email + ", " + password);
     },
-    handleOnSignup: function (email, password) {
+    handleOnSignup: function(email, password) {
         console.log(email + ", " + password);
         this.signup(email, password);
     },
-    login: function (email, password) {
+    login: function(email, password) {
         
     },
-    signup: function (email, password) {
+    signup: function(email, password) {
         var data = {
             email: email,
             password: password
@@ -42,21 +43,21 @@ var Index = React.createClass({
             success: callback
         });
     },
-    logout: function () {
+    logout: function() {
         
     },
-    getButtons: function () {
+    getButtons: function() {
         return {
             left: null,
             right: [
                 {
-                    onClick: function () {
+                    onClick: function() {
                         this.refs.signup.toggle();
                     }.bind(this),
                     text: "Sign up"
                 },
                 {
-                    onClick: function () {
+                    onClick: function() {
                         this.refs.login.toggle();
                     }.bind(this),
                     text: "Log In"
@@ -94,7 +95,7 @@ var Index = React.createClass({
 });
 
 var BoardListPanel = React.createClass({
-    render: function () {
+    render: function() {
         return (
             <div className="BoardListPanel">
                 <br />
@@ -107,7 +108,7 @@ var BoardListPanel = React.createClass({
 });
 
 var BoardList = React.createClass({
-    render: function () {
+    render: function() {
         return (
             <div>
 
@@ -117,7 +118,7 @@ var BoardList = React.createClass({
 });
 
 var Board = React.createClass({
-    render: function () {
+    render: function() {
         return (
             <div>
 
@@ -142,14 +143,17 @@ var UserInfoModal = React.createClass({
 });
 
 var UserInfoForm = React.createClass({
-    handleOnClick: function () {
+    handleOnClick: function() {
         var email = ReactDOM.findDOMNode(this.refs.email).value;
         var password = ReactDOM.findDOMNode(this.refs.password).value;
         this.props.onClick(email, password);
     },
-	render: function () {
+	render: function() {
 		return (
 			<div className="form center-block">
+                <Alert bsStyle="danger" onDismiss={true}>
+                    <strong>Holy guacamole!</strong> Best check yo self, you're not looking too good.
+                </Alert>
 				<div className="form-group">
 					<Input ref="email" placeholder="Email" size="input-md"></Input>
 				</div>
