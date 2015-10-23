@@ -43,7 +43,7 @@ var Navbar = React.createClass({
 var NavbarButton = React.createClass({
     render: function() {
         return (
-            <button type="button" className="btn btn-success" onClick={this.props.onClick}>{this.props.children}</button>
+            <button type="button" className="btn btn-info" onClick={this.props.onClick}>{this.props.children}</button>
         );
     }
 });
@@ -83,8 +83,8 @@ var Switch = React.createClass({
         }
     },
     render: function() {
-        var onClassName = "btn btn-success btn-xs";
-        var offClassName = "btn btn-success btn-xs";
+        var onClassName = "btn btn-info btn-xs";
+        var offClassName = "btn btn-info btn-xs";
         if (this.props.state) {
             onClassName += " active";
         } else {

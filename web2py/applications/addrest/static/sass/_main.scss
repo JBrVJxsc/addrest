@@ -17,7 +17,7 @@ body {
 }
 
 .navbar-default .navbar-brand {
-  color: $Success;
+  color: $Info;
 }
 
 .navbar-default {
@@ -25,7 +25,7 @@ body {
 }
 
 .navbar-default .navbar-brand:hover {
-  color: $Success;
+  color: $Info;
 }
 
 .panel {
@@ -33,7 +33,7 @@ body {
 }
 
 .form-control:focus {
-  border-color: $Success;
+  border-color: $Info;
 }
 
 .glyphicon-search {
@@ -103,13 +103,13 @@ body {
 }
 
 .AddressListPanel > .panel-primary > .panel-heading {
-  background-color: $Success;
-  border-color: $Success;
+  background-color: $Info;
+  border-color: $Info;
 }
 
 .UserInfoModal > .panel-primary > .panel-heading {
-  background-color: $Success;
-  border-color: $Success;
+  background-color: $Info;
+  border-color: $Info;
 }
 
 .UserInfoModal .panel {
@@ -119,8 +119,8 @@ body {
 }
 
 .AddressEditModal > .panel-primary > .panel-heading {
-  background-color: $Success;
-  border-color: $Success;
+  background-color: $Info;
+  border-color: $Info;
 }
 
 .AddressEditModal .panel {
@@ -141,8 +141,8 @@ body {
 }
 
 .Address > .panel-primary > .panel-heading {
-  background-color: #7EDAC8;
-  border-color: #7EDAC8;
+  background-color: #50AFE2;
+  border-color: #50AFE2;
 }
 
 .Separator {

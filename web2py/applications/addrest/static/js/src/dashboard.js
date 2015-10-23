@@ -256,7 +256,7 @@ var AddressToolbar = React.createClass({
     render: function() {
         return (
             <div>
-                <button type="button" className="btn btn-success btn-xs" onClick={this.handleOnClick}>Edit</button>
+                <button type="button" className="btn btn-info btn-xs" onClick={this.handleOnClick}>Edit</button>
                 <div className="pull-right">
                     <Switch address={this.props.address} state={true} onSwitch={this.handleOnSwitch} />
                 </div>
@@ -283,13 +283,13 @@ var AddressEditModal = React.createClass({
                         <button className="btn btn-danger btn-block" onClick={this.props.handleOnDelete}>Delete</button>
                     </div>
                     <div className="col-xs-6 LeftExtend">
-                        <button className="btn btn-success btn-block" onClick={this.props.handleOnSave}>Save</button>
+                        <button className="btn btn-info btn-block" onClick={this.props.handleOnSave}>Save</button>
                     </div>
                 </div>
             );
         } else {
             return (
-                <button className="btn btn-success btn-block" onClick={this.props.handleOnSave}>Save</button>
+                <button className="btn btn-info btn-block" onClick={this.props.handleOnSave}>Save</button>
             );
         }
     },

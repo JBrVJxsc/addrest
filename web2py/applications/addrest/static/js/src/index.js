@@ -319,11 +319,11 @@ var UserInfoForm = React.createClass({
     getButton: function() {
         if (this.props.workInfo.working) {
             return (
-                <button className="btn btn-success btn-block disabled" onClick={this.handleOnClick}>{this.props.workInfo.message}</button>
+                <button className="btn btn-info btn-block disabled" onClick={this.handleOnClick}>{this.props.workInfo.message}</button>
             );
         }
         return (
-            <button className="btn btn-success btn-block" onClick={this.handleOnClick}>{this.props.button}</button>
+            <button className="btn btn-info btn-block" onClick={this.handleOnClick}>{this.props.button}</button>
         );
     },
 	render: function() {

@@ -35420,7 +35420,7 @@ var NavbarButton = React.createClass({
     render: function render() {
         return React.createElement(
             'button',
-            { type: 'button', className: 'btn btn-success', onClick: this.props.onClick },
+            { type: 'button', className: 'btn btn-info', onClick: this.props.onClick },
             this.props.children
         );
     }
@@ -35467,8 +35467,8 @@ var Switch = React.createClass({
         }
     },
     render: function render() {
-        var onClassName = "btn btn-success btn-xs";
-        var offClassName = "btn btn-success btn-xs";
+        var onClassName = "btn btn-info btn-xs";
+        var offClassName = "btn btn-info btn-xs";
         if (this.props.state) {
             onClassName += " active";
         } else {
@@ -35900,13 +35900,13 @@ var UserInfoForm = React.createClass({
         if (this.props.workInfo.working) {
             return React.createElement(
                 'button',
-                { className: 'btn btn-success btn-block disabled', onClick: this.handleOnClick },
+                { className: 'btn btn-info btn-block disabled', onClick: this.handleOnClick },
                 this.props.workInfo.message
             );
         }
         return React.createElement(
             'button',
-            { className: 'btn btn-success btn-block', onClick: this.handleOnClick },
+            { className: 'btn btn-info btn-block', onClick: this.handleOnClick },
             this.props.button
         );
     },
