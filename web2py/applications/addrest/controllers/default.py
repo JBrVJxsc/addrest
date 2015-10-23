@@ -65,6 +65,7 @@ def dashboard():
 
 def login():
     result = Auth(db=db).login_bare(request.vars.email, request.vars.password)
+    # time.sleep(3)
     return locals()
 
 
@@ -76,7 +77,26 @@ def signup():
     return locals()
 
 
+def logout():
+    print "logging out."
+    redirect(URL('default', 'user', args='logout'))
+
+
 def boards():
-    print 'asking for boards.'
-    is_logged_in = auth.is_logged_in()
+    # is_logged_in = auth.is_logged_in()
+    # time.sleep(1)
+    print auth.user
+    result = {
+        'boards': [
+            {
+                'title': "Jobs",
+                'recent': 6
+            },
+            {
+                'title': "Housing",
+                'recent': 12
+            },
+        ],
+        'user': auth.user
+    }
     return locals()

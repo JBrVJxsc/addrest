@@ -3,6 +3,12 @@ var Boron = require('boron');
 var Alert = require('react-bootstrap').Alert;
 
 var Navbar = React.createClass({
+    getTitle: function() {
+        if (this.props.user) {
+            return this.props.user.email;
+        }
+        return this.props.defaultTitle;
+    },
     getButtons: function(buttons) {
         var buttonList = [];
         for (var i in buttons) {
@@ -17,7 +23,7 @@ var Navbar = React.createClass({
                 <nav className="navbar navbar-default navbar-fixed-top">
                     <div className="container-fluid">
                         <div className="navbar-header">
-                            <div className="navbar-brand">Addrest</div>
+                            <div className="navbar-brand">{this.getTitle()}</div>
                         </div>
                         <div className="collapse navbar-collapse">
                             <div className="navbar-form navbar-left">
@@ -45,6 +51,12 @@ var NavbarButton = React.createClass({
 var Modal = React.createClass({
 	toggle: function() {
 		this.refs.dialog.toggle();
+	},
+	show: function() {
+		this.refs.dialog.show();
+	},
+	hide: function() {
+		this.refs.dialog.hide();
 	},
 	render: function() {
 		var Dialog = Boron[this.props.type];
@@ -114,7 +126,7 @@ var Input = React.createClass({
             type = this.props.type;
         }
         return (
-          <input ref="input" type={type} spellCheck="false" autoComplete="false" className={className} placeholder={this.props.placeholder} onChange={this.handleOnChange} />
+          <input ref="input" type={type} spellCheck="false" autoComplete="false" className={className} placeholder={this.props.placeholder} onChange={this.handleOnChange} onKeyDown={this.props.onKeyDown} />
         );
     }
 });

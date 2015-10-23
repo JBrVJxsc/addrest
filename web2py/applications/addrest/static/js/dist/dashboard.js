@@ -35357,6 +35357,12 @@ var Alert = require('react-bootstrap').Alert;
 var Navbar = React.createClass({
     displayName: 'Navbar',
 
+    getTitle: function getTitle() {
+        if (this.props.user) {
+            return this.props.user.email;
+        }
+        return this.props.defaultTitle;
+    },
     getButtons: function getButtons(buttons) {
         var buttonList = [];
         for (var i in buttons) {
@@ -35385,7 +35391,7 @@ var Navbar = React.createClass({
                         React.createElement(
                             'div',
                             { className: 'navbar-brand' },
-                            'Addrest'
+                            this.getTitle()
                         )
                     ),
                     React.createElement(
@@ -35425,6 +35431,12 @@ var Modal = React.createClass({
 
     toggle: function toggle() {
         this.refs.dialog.toggle();
+    },
+    show: function show() {
+        this.refs.dialog.show();
+    },
+    hide: function hide() {
+        this.refs.dialog.hide();
     },
     render: function render() {
         var Dialog = Boron[this.props.type];
@@ -35505,7 +35517,7 @@ var Input = React.createClass({
         if (this.props.type) {
             type = this.props.type;
         }
-        return React.createElement('input', { ref: 'input', type: type, spellCheck: 'false', autoComplete: 'false', className: className, placeholder: this.props.placeholder, onChange: this.handleOnChange });
+        return React.createElement('input', { ref: 'input', type: type, spellCheck: 'false', autoComplete: 'false', className: className, placeholder: this.props.placeholder, onChange: this.handleOnChange, onKeyDown: this.props.onKeyDown });
     }
 });
 

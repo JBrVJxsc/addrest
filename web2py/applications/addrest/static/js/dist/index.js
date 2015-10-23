@@ -35357,6 +35357,12 @@ var Alert = require('react-bootstrap').Alert;
 var Navbar = React.createClass({
     displayName: 'Navbar',
 
+    getTitle: function getTitle() {
+        if (this.props.user) {
+            return this.props.user.email;
+        }
+        return this.props.defaultTitle;
+    },
     getButtons: function getButtons(buttons) {
         var buttonList = [];
         for (var i in buttons) {
@@ -35385,7 +35391,7 @@ var Navbar = React.createClass({
                         React.createElement(
                             'div',
                             { className: 'navbar-brand' },
-                            'Addrest'
+                            this.getTitle()
                         )
                     ),
                     React.createElement(
@@ -35425,6 +35431,12 @@ var Modal = React.createClass({
 
     toggle: function toggle() {
         this.refs.dialog.toggle();
+    },
+    show: function show() {
+        this.refs.dialog.show();
+    },
+    hide: function hide() {
+        this.refs.dialog.hide();
     },
     render: function render() {
         var Dialog = Boron[this.props.type];
@@ -35505,7 +35517,7 @@ var Input = React.createClass({
         if (this.props.type) {
             type = this.props.type;
         }
-        return React.createElement('input', { ref: 'input', type: type, spellCheck: 'false', autoComplete: 'false', className: className, placeholder: this.props.placeholder, onChange: this.handleOnChange });
+        return React.createElement('input', { ref: 'input', type: type, spellCheck: 'false', autoComplete: 'false', className: className, placeholder: this.props.placeholder, onChange: this.handleOnChange, onKeyDown: this.props.onKeyDown });
     }
 });
 
@@ -35570,14 +35582,23 @@ var Index = React.createClass({
         return {
             user: null,
             boards: [],
-            errors: {}
+            errors: {},
+            work_info: {}
         };
     },
+    handleOnAlertDismiss: function handleOnAlertDismiss() {
+        this.clearErrors();
+    },
     handleOnLogin: function handleOnLogin(email, password) {
+        // Clear old errors first.
+        this.clearErrors();
+
+        console.log("handleOnLogin");
+
         // Check email.
         if (!Utils.validateEmail(email)) {
             this.setErrors({
-                signup: {
+                login: {
                     message: "Please enter a valid email address."
                 }
             });
@@ -35612,17 +35633,60 @@ var Index = React.createClass({
 
         this.signup(email, password);
     },
-    handleOnAlertDismiss: function handleOnAlertDismiss() {
-        this.clearErrors();
+    work: function work(working, message) {
+        this.setState({
+            work_info: {
+                working: working,
+                message: message
+            }
+        });
     },
-    login: function login(email, password) {},
-    signup: function signup(email, password) {
+    login: function login(email, password) {
+        this.work(true, "Logging...");
+
         var data = {
             email: email,
             password: password
         };
 
         var callback = (function (data) {
+            console.log(data);
+            this.work(false, "");
+            if (data.result === false) {
+                this.setErrors({
+                    login: {
+                        message: "Email and password do not match."
+                    }
+                });
+            } else {
+                this.refs.signup.hide();
+                this.refs.login.hide();
+                this.getBoards();
+            }
+        }).bind(this);
+
+        var delay = (function () {
+            $.ajax({
+                type: 'POST',
+                url: this.props.APIs.login,
+                data: data,
+                success: callback
+            });
+        }).bind(this);
+
+        setTimeout(delay, 1000);
+    },
+    signup: function signup(email, password) {
+        this.work(true, "Signing...");
+
+        var data = {
+            email: email,
+            password: password
+        };
+
+        var callback = (function (data) {
+            console.log(data);
+            this.work(false, "");
             if (data.result === false) {
                 this.setErrors({
                     signup: {
@@ -35630,18 +35694,20 @@ var Index = React.createClass({
                     }
                 });
             } else {
-                this.setState({
-                    boards: data
-                });
+                this.login(email, password);
             }
         }).bind(this);
 
-        $.ajax({
-            type: 'POST',
-            url: this.props.APIs.signup,
-            data: data,
-            success: callback
-        });
+        var delay = (function () {
+            $.ajax({
+                type: 'POST',
+                url: this.props.APIs.signup,
+                data: data,
+                success: callback
+            });
+        }).bind(this);
+
+        setTimeout(delay, 1000);
     },
     logout: function logout() {},
     getBoards: function getBoards() {
@@ -35649,9 +35715,15 @@ var Index = React.createClass({
             type: 'POST',
             url: this.props.APIs.boards,
             success: (function (data) {
+                console.log("user");
+                console.log(data);
                 if (this.isMounted()) {
+                    console.log("got boards and is mounted");
+                    console.log(data.result.boards);
+                    console.log(data.result.user);
                     this.setState({
-                        boards: data
+                        boards: data.result.boards,
+                        user: data.result.user
                     });
                 }
             }).bind(this)
@@ -35669,21 +35741,42 @@ var Index = React.createClass({
         });
     },
     getButtons: function getButtons() {
-        return {
-            left: null,
-            right: [{
-                onClick: (function () {
-                    this.clearErrors();
-                    this.refs.signup.toggle();
-                }).bind(this),
-                text: "Sign up"
-            }, {
-                onClick: (function () {
-                    this.refs.login.toggle();
-                }).bind(this),
-                text: "Log In"
-            }]
-        };
+        console.log("getButtons...");
+        console.log(this.state.user);
+        if (this.state.user) {
+            return {
+                left: [{
+                    onClick: (function () {
+                        this.clearErrors();
+                        this.refs.create.show();
+                    }).bind(this),
+                    text: "Create"
+                }],
+                right: [{
+                    onClick: (function () {
+                        window.location.href = this.props.APIs.logout;
+                    }).bind(this),
+                    text: "Log out"
+                }]
+            };
+        } else {
+            return {
+                left: null,
+                right: [{
+                    onClick: (function () {
+                        this.clearErrors();
+                        this.refs.signup.show();
+                    }).bind(this),
+                    text: "Sign up"
+                }, {
+                    onClick: (function () {
+                        this.clearErrors();
+                        this.refs.login.show();
+                    }).bind(this),
+                    text: "Log In"
+                }]
+            };
+        }
     },
     componentDidMount: function componentDidMount() {
         this.getBoards();
@@ -35695,14 +35788,19 @@ var Index = React.createClass({
             React.createElement(
                 Modal,
                 { ref: 'login', type: 'WaveModal' },
-                React.createElement(Login, { error: this.state.errors.login, onLogin: this.handleOnLogin, onAlertDismiss: this.handleOnAlertDismiss })
+                React.createElement(Login, { workInfo: this.state.work_info, error: this.state.errors.login, onLogin: this.handleOnLogin, onAlertDismiss: this.handleOnAlertDismiss })
             ),
             React.createElement(
                 Modal,
                 { ref: 'signup', type: 'WaveModal' },
-                React.createElement(Signup, { error: this.state.errors.signup, onSignup: this.handleOnSignup, onAlertDismiss: this.handleOnAlertDismiss })
+                React.createElement(Signup, { workInfo: this.state.work_info, error: this.state.errors.signup, onSignup: this.handleOnSignup, onAlertDismiss: this.handleOnAlertDismiss })
             ),
-            React.createElement(Navbar, { ref: 'navbar', buttons: this.getButtons() }),
+            React.createElement(
+                Modal,
+                { ref: 'create', type: 'WaveModal' },
+                'Create Board!'
+            ),
+            React.createElement(Navbar, { user: this.state.user, defaultTitle: 'Boards', ref: 'navbar', buttons: this.getButtons() }),
             React.createElement(BoardListPanel, { boards: this.state.boards })
         );
     }
@@ -35771,15 +35869,46 @@ var UserInfoModal = React.createClass({
 var UserInfoForm = React.createClass({
     displayName: 'UserInfoForm',
 
+    handleOnKeyDown: function handleOnKeyDown(e) {
+        if (e.keyCode === 13) {
+            var email = ReactDOM.findDOMNode(this.refs.email);
+            var password = ReactDOM.findDOMNode(this.refs.password);
+            if (e.target === email) {
+                password.focus();
+            } else if (e.target === password) {
+                this.submit();
+            }
+        }
+    },
+    handleOnClick: function handleOnClick() {
+        if (this.props.workInfo.working) {
+            return;
+        }
+        this.submit();
+    },
+    submit: function submit() {
+        var email = ReactDOM.findDOMNode(this.refs.email).value;
+        var password = ReactDOM.findDOMNode(this.refs.password).value;
+        this.props.onClick(email, password);
+    },
     getError: function getError() {
         if (this.props.error) {
             return React.createElement(Alert, { bsStyle: 'danger', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
         }
     },
-    handleOnClick: function handleOnClick() {
-        var email = ReactDOM.findDOMNode(this.refs.email).value;
-        var password = ReactDOM.findDOMNode(this.refs.password).value;
-        this.props.onClick(email, password);
+    getButton: function getButton() {
+        if (this.props.workInfo.working) {
+            return React.createElement(
+                'button',
+                { className: 'btn btn-warning btn-block disabled', onClick: this.handleOnClick },
+                this.props.workInfo.message
+            );
+        }
+        return React.createElement(
+            'button',
+            { className: 'btn btn-warning btn-block', onClick: this.handleOnClick },
+            this.props.button
+        );
     },
     render: function render() {
         return React.createElement(
@@ -35789,21 +35918,17 @@ var UserInfoForm = React.createClass({
             React.createElement(
                 'div',
                 { className: 'form-group' },
-                React.createElement(Input, { ref: 'email', placeholder: 'Email', size: 'input-md' })
+                React.createElement(Input, { ref: 'email', placeholder: 'Email', size: 'input-md', onKeyDown: this.handleOnKeyDown })
             ),
             React.createElement(
                 'div',
                 { className: 'form-group' },
-                React.createElement(Input, { ref: 'password', placeholder: 'Password', type: 'password', size: 'input-md' })
+                React.createElement(Input, { ref: 'password', placeholder: 'Password', type: 'password', size: 'input-md', onKeyDown: this.handleOnKeyDown })
             ),
             React.createElement(
                 'div',
                 { className: 'form-group' },
-                React.createElement(
-                    'button',
-                    { className: 'btn btn-warning btn-block', onClick: this.handleOnClick },
-                    this.props.button
-                )
+                this.getButton()
             )
         );
     }
@@ -35816,7 +35941,7 @@ var Login = React.createClass({
         return React.createElement(
             UserInfoModal,
             { title: 'Log In' },
-            React.createElement(UserInfoForm, { button: 'Log In', error: this.props.error, onClick: this.props.onLogin, onAlertDismiss: this.props.onAlertDismiss })
+            React.createElement(UserInfoForm, { workInfo: this.props.workInfo, button: 'Log In', error: this.props.error, onClick: this.props.onLogin, onAlertDismiss: this.props.onAlertDismiss })
         );
     }
 });
@@ -35828,7 +35953,7 @@ var Signup = React.createClass({
         return React.createElement(
             UserInfoModal,
             { title: 'Sign up' },
-            React.createElement(UserInfoForm, { button: 'Sign up', error: this.props.error, onClick: this.props.onSignup, onAlertDismiss: this.props.onAlertDismiss })
+            React.createElement(UserInfoForm, { workInfo: this.props.workInfo, button: 'Sign up', error: this.props.error, onClick: this.props.onSignup, onAlertDismiss: this.props.onAlertDismiss })
         );
     }
 });
@@ -35836,7 +35961,8 @@ var Signup = React.createClass({
 var APIs = {
     login: "login.json",
     signup: "signup.json",
-    boards: "boards.json"
+    boards: "boards.json",
+    logout: "logout"
 };
 
 ReactDOM.render(React.createElement(Index, { APIs: APIs }), document.getElementById("body"));
