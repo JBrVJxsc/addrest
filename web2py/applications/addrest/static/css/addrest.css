@@ -1,11 +1,11 @@
 /* line 5, ../sass/_main.scss */
 body {
-  background: #FFE071;
+  background: #8DC8B2;
 }
 
 /* line 9, ../sass/_main.scss */
 .navbar {
-  background-color: #FFEA9B;
+  background-color: #A4D3C1;
 }
 
 /* line 13, ../sass/_main.scss */
@@ -17,7 +17,7 @@ body {
 
 /* line 19, ../sass/_main.scss */
 .navbar-default .navbar-brand {
-  color: #F39C12;
+  color: #18BC9C;
 }
 
 /* line 23, ../sass/_main.scss */
@@ -27,7 +27,7 @@ body {
 
 /* line 27, ../sass/_main.scss */
 .navbar-default .navbar-brand:hover {
-  color: #F39C12;
+  color: #18BC9C;
 }
 
 /* line 31, ../sass/_main.scss */
@@ -37,7 +37,7 @@ body {
 
 /* line 35, ../sass/_main.scss */
 .form-control:focus {
-  border-color: #F39C12;
+  border-color: #18BC9C;
 }
 
 /* line 39, ../sass/_main.scss */
@@ -130,14 +130,14 @@ body {
 
 /* line 105, ../sass/_main.scss */
 .AddressListPanel > .panel-primary > .panel-heading {
-  background-color: #F39C12;
-  border-color: #F39C12;
+  background-color: #18BC9C;
+  border-color: #18BC9C;
 }
 
 /* line 110, ../sass/_main.scss */
 .UserInfoModal > .panel-primary > .panel-heading {
-  background-color: #F39C12;
-  border-color: #F39C12;
+  background-color: #18BC9C;
+  border-color: #18BC9C;
 }
 
 /* line 115, ../sass/_main.scss */
@@ -149,8 +149,8 @@ body {
 
 /* line 121, ../sass/_main.scss */
 .AddressEditModal > .panel-primary > .panel-heading {
-  background-color: #F39C12;
-  border-color: #F39C12;
+  background-color: #18BC9C;
+  border-color: #18BC9C;
 }
 
 /* line 126, ../sass/_main.scss */
@@ -170,13 +170,13 @@ body {
 
 /* line 139, ../sass/_main.scss */
 .AddressListPanel > .panel > .panel-body {
-  background-color: #FFEA9B;
+  background-color: #A4D3C1;
 }
 
 /* line 143, ../sass/_main.scss */
 .Address > .panel-primary > .panel-heading {
-  background-color: #FFE071;
-  border-color: #FFE071;
+  background-color: #7EDAC8;
+  border-color: #7EDAC8;
 }
 
 /* line 148, ../sass/_main.scss */

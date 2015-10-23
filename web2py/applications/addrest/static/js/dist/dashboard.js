@@ -35420,7 +35420,7 @@ var NavbarButton = React.createClass({
     render: function render() {
         return React.createElement(
             'button',
-            { type: 'button', className: 'btn btn-warning', onClick: this.props.onClick },
+            { type: 'button', className: 'btn btn-success', onClick: this.props.onClick },
             this.props.children
         );
     }
@@ -35467,8 +35467,8 @@ var Switch = React.createClass({
         }
     },
     render: function render() {
-        var onClassName = "btn btn-warning btn-xs";
-        var offClassName = "btn btn-warning btn-xs";
+        var onClassName = "btn btn-success btn-xs";
+        var offClassName = "btn btn-success btn-xs";
         if (this.props.state) {
             onClassName += " active";
         } else {
@@ -35537,7 +35537,7 @@ var DismissibleAlert = React.createClass({
         console.log("Alert is rendering.");
         return React.createElement(
             Alert,
-            { bsStyle: 'danger', onDismiss: this.props.onDismiss },
+            { bsStyle: this.props.style, onDismiss: this.props.onDismiss },
             this.getTitle(),
             React.createElement(
                 'p',
@@ -35847,7 +35847,7 @@ var AddressToolbar = React.createClass({
             null,
             React.createElement(
                 'button',
-                { type: 'button', className: 'btn btn-warning btn-xs', onClick: this.handleOnClick },
+                { type: 'button', className: 'btn btn-success btn-xs', onClick: this.handleOnClick },
                 'Edit'
             ),
             React.createElement(
@@ -35890,7 +35890,7 @@ var AddressEditModal = React.createClass({
                     { className: 'col-xs-6 LeftExtend' },
                     React.createElement(
                         'button',
-                        { className: 'btn btn-warning btn-block', onClick: this.props.handleOnSave },
+                        { className: 'btn btn-success btn-block', onClick: this.props.handleOnSave },
                         'Save'
                     )
                 )
@@ -35898,7 +35898,7 @@ var AddressEditModal = React.createClass({
         } else {
             return React.createElement(
                 'button',
-                { className: 'btn btn-warning btn-block', onClick: this.props.handleOnSave },
+                { className: 'btn btn-success btn-block', onClick: this.props.handleOnSave },
                 'Save'
             );
         }

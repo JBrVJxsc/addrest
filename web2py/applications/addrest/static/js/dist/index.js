@@ -35420,7 +35420,7 @@ var NavbarButton = React.createClass({
     render: function render() {
         return React.createElement(
             'button',
-            { type: 'button', className: 'btn btn-warning', onClick: this.props.onClick },
+            { type: 'button', className: 'btn btn-success', onClick: this.props.onClick },
             this.props.children
         );
     }
@@ -35467,8 +35467,8 @@ var Switch = React.createClass({
         }
     },
     render: function render() {
-        var onClassName = "btn btn-warning btn-xs";
-        var offClassName = "btn btn-warning btn-xs";
+        var onClassName = "btn btn-success btn-xs";
+        var offClassName = "btn btn-success btn-xs";
         if (this.props.state) {
             onClassName += " active";
         } else {
@@ -35537,7 +35537,7 @@ var DismissibleAlert = React.createClass({
         console.log("Alert is rendering.");
         return React.createElement(
             Alert,
-            { bsStyle: 'danger', onDismiss: this.props.onDismiss },
+            { bsStyle: this.props.style, onDismiss: this.props.onDismiss },
             this.getTitle(),
             React.createElement(
                 'p',
@@ -35893,20 +35893,20 @@ var UserInfoForm = React.createClass({
     },
     getError: function getError() {
         if (this.props.error) {
-            return React.createElement(Alert, { bsStyle: 'danger', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
+            return React.createElement(Alert, { style: 'info', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
         }
     },
     getButton: function getButton() {
         if (this.props.workInfo.working) {
             return React.createElement(
                 'button',
-                { className: 'btn btn-warning btn-block disabled', onClick: this.handleOnClick },
+                { className: 'btn btn-success btn-block disabled', onClick: this.handleOnClick },
                 this.props.workInfo.message
             );
         }
         return React.createElement(
             'button',
-            { className: 'btn btn-warning btn-block', onClick: this.handleOnClick },
+            { className: 'btn btn-success btn-block', onClick: this.handleOnClick },
             this.props.button
         );
     },

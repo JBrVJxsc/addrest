@@ -43,7 +43,7 @@ var Navbar = React.createClass({
 var NavbarButton = React.createClass({
     render: function() {
         return (
-            <button type="button" className="btn btn-warning" onClick={this.props.onClick}>{this.props.children}</button>
+            <button type="button" className="btn btn-success" onClick={this.props.onClick}>{this.props.children}</button>
         );
     }
 });
@@ -83,8 +83,8 @@ var Switch = React.createClass({
         }
     },
     render: function() {
-        var onClassName = "btn btn-warning btn-xs";
-        var offClassName = "btn btn-warning btn-xs";
+        var onClassName = "btn btn-success btn-xs";
+        var offClassName = "btn btn-success btn-xs";
         if (this.props.state) {
             onClassName += " active";
         } else {
@@ -142,7 +142,7 @@ var DismissibleAlert = React.createClass({
     render: function() {
         console.log("Alert is rendering.");
         return (
-            <Alert bsStyle="danger" onDismiss={this.props.onDismiss}>
+            <Alert bsStyle={this.props.style} onDismiss={this.props.onDismiss}>
                 {this.getTitle()}
                 <p>{this.props.message}</p>
             </Alert>

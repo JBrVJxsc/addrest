@@ -312,18 +312,18 @@ var UserInfoForm = React.createClass({
     getError: function() {
         if (this.props.error) {
             return (
-                <Alert bsStyle="danger" onDismiss={this.props.onAlertDismiss} title={this.props.error.title} message={this.props.error.message} />
+                <Alert style="info" onDismiss={this.props.onAlertDismiss} title={this.props.error.title} message={this.props.error.message} />
             );
         }
     },
     getButton: function() {
         if (this.props.workInfo.working) {
             return (
-                <button className="btn btn-warning btn-block disabled" onClick={this.handleOnClick}>{this.props.workInfo.message}</button>
+                <button className="btn btn-success btn-block disabled" onClick={this.handleOnClick}>{this.props.workInfo.message}</button>
             );
         }
         return (
-            <button className="btn btn-warning btn-block" onClick={this.handleOnClick}>{this.props.button}</button>
+            <button className="btn btn-success btn-block" onClick={this.handleOnClick}>{this.props.button}</button>
         );
     },
 	render: function() {
