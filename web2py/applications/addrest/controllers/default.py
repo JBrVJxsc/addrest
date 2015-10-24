@@ -237,7 +237,11 @@ def boards():
     return locals()
 
 
-def delete():
+def delete_board():
     print "deleting", request.vars
     return locals()
 
+
+def create_board():
+    result = False
+    return locals()

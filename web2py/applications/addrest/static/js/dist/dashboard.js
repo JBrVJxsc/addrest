@@ -35434,14 +35434,12 @@ var NavbarButton = React.createClass({
     displayName: 'NavbarButton',
 
     getButton: function getButton() {
-        if (this.props.workInfo) {
-            if (this.props.workInfo.working) {
-                return React.createElement(
-                    'button',
-                    { type: 'button', className: 'btn btn-info disabled', onClick: this.props.onClick },
-                    this.props.workInfo.message
-                );
-            }
+        if (this.props.workInfo && this.props.workInfo.working) {
+            return React.createElement(
+                'button',
+                { type: 'button', className: 'btn btn-info disabled', onClick: this.props.onClick },
+                this.props.workInfo.message
+            );
         }
         return React.createElement(
             'button',
@@ -35589,7 +35587,7 @@ var ConfirmWindow = React.createClass({
         }
     },
     getButton: function getButton() {
-        if (this.props.workInfo.working) {
+        if (this.props.workInfo && this.props.workInfo.working) {
             return React.createElement(
                 'button',
                 { ref: 'yes', className: 'btn btn-info btn-block disabled', onClick: this.handleOnClick },

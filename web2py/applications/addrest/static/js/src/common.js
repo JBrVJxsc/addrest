@@ -54,12 +54,10 @@ var Navbar = React.createClass({
 
 var NavbarButton = React.createClass({
     getButton: function() {
-        if (this.props.workInfo) {
-            if (this.props.workInfo.working) {
-                return (
-                    <button type="button" className="btn btn-info disabled" onClick={this.props.onClick}>{this.props.workInfo.message}</button>
-                );
-            }
+        if (this.props.workInfo && this.props.workInfo.working) {
+            return (
+                <button type="button" className="btn btn-info disabled" onClick={this.props.onClick}>{this.props.workInfo.message}</button>
+            );
         }
         return (
             <button type="button" className="btn btn-info" onClick={this.props.onClick}>{this.props.children}</button>
@@ -183,7 +181,7 @@ var ConfirmWindow = React.createClass({
         }
     },
     getButton: function() {
-        if (this.props.workInfo.working) {
+        if (this.props.workInfo && this.props.workInfo.working) {
             return (
                 <button ref="yes" className="btn btn-info btn-block disabled" onClick={this.handleOnClick}>{this.props.workInfo.message}</button>
             );
