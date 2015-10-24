@@ -35351,6 +35351,7 @@ module.exports = require('./lib/React');
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Boron = require('boron');
 var Alert = require('react-bootstrap').Alert;
 
@@ -35358,9 +35359,14 @@ var Navbar = React.createClass({
     displayName: 'Navbar',
 
     getTitle: function getTitle() {
-        if (this.props.user) {
-            return this.props.user.email;
-        }
+        // Here we can show user's email as title if
+        // user has been logged in. I comment this
+        // because sometimes the graders' test-email
+        // is not formal and will ruin the uniform
+        // of the page.
+        //if (this.props.user) {
+        //    return this.props.user.email;
+        //}
         return this.props.defaultTitle;
     },
     getButtons: function getButtons(buttons) {
@@ -35548,6 +35554,83 @@ var DismissibleAlert = React.createClass({
     }
 });
 
+var ConfirmWindow = React.createClass({
+    displayName: 'ConfirmWindow',
+
+    handleOnClick: function handleOnClick(e) {
+        var yes = ReactDOM.findDOMNode(this.refs.yes);
+        var no = ReactDOM.findDOMNode(this.refs.no);
+        if (e.target === yes) {
+            this.props.onConfirm(true);
+        } else if (e.target === no) {
+            this.props.onConfirm(false);
+        }
+    },
+    getButton: function getButton() {
+        if (this.props.workInfo.working) {
+            return React.createElement(
+                'button',
+                { ref: 'yes', className: 'btn btn-info btn-block disabled', onClick: this.handleOnClick },
+                this.props.workInfo.message
+            );
+        }
+        return React.createElement(
+            'button',
+            { ref: 'yes', className: 'btn btn-info btn-block', onClick: this.handleOnClick },
+            'Yes'
+        );
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'ConfirmWindow' },
+            React.createElement(
+                'div',
+                { className: 'panel panel-info' },
+                React.createElement(
+                    'div',
+                    { className: 'panel-heading' },
+                    React.createElement(
+                        'h3',
+                        { className: 'panel-title' },
+                        this.props.title
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'panel-body' },
+                    React.createElement(
+                        'div',
+                        { className: 'form center-block' },
+                        React.createElement(
+                            'div',
+                            { className: 'form-group' },
+                            React.createElement(
+                                'div',
+                                { className: 'row' },
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-xs-6 RightExtend' },
+                                    React.createElement(
+                                        'button',
+                                        { ref: 'no', className: 'btn btn-block', onClick: this.handleOnClick },
+                                        'No'
+                                    )
+                                ),
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-xs-6 LeftExtend' },
+                                    this.getButton()
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+    }
+});
+
 var Utils = {
     validateEmail: function validateEmail(email) {
         var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
@@ -35561,10 +35644,11 @@ module.exports = {
     Modal: Modal,
     Input: Input,
     Switch: Switch,
-    Alert: DismissibleAlert
+    Alert: DismissibleAlert,
+    ConfirmWindow: ConfirmWindow
 };
 
-},{"boron":1,"react":409,"react-bootstrap":85}],411:[function(require,module,exports){
+},{"boron":1,"react":409,"react-bootstrap":85,"react-dom":252}],411:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -35574,6 +35658,7 @@ var Navbar = require('./common').Navbar;
 var Modal = require('./common').Modal;
 var Input = require('./common').Input;
 var Alert = require('./common').Alert;
+var ConfirmWindow = require('./common').ConfirmWindow;
 
 var Index = React.createClass({
     displayName: 'Index',
@@ -35583,19 +35668,37 @@ var Index = React.createClass({
             user: null,
             boards: [],
             errors: {},
-            work_info: {}
+            work_info: {},
+            deleting: null
         };
+    },
+    getBoardEventHandlers: function getBoardEventHandlers() {
+        return {
+            handleOnEdit: (function (e) {
+                console.log("editing");
+            }).bind(this),
+            handleOnDelete: (function (e) {
+                this.setState({
+                    deleting: e
+                });
+                this.refs['delete'].show();
+            }).bind(this)
+        };
+    },
+    handleOnDelete: function handleOnDelete(e) {
+        console.log(e);
+        if (e) {
+            this['delete'](this.state.deleting);
+        } else {
+            this.refs['delete'].hide();
+        }
     },
     handleOnAlertDismiss: function handleOnAlertDismiss() {
         this.clearErrors();
     },
     handleOnLogin: function handleOnLogin(email, password) {
-        // Clear old errors first.
         this.clearErrors();
 
-        console.log("handleOnLogin");
-
-        // Check email.
         if (!Utils.validateEmail(email)) {
             this.setErrors({
                 login: {
@@ -35608,10 +35711,8 @@ var Index = React.createClass({
         this.login(email, password);
     },
     handleOnSignup: function handleOnSignup(email, password) {
-        // Clear old errors first.
         this.clearErrors();
 
-        // Check email.
         if (!Utils.validateEmail(email)) {
             this.setErrors({
                 signup: {
@@ -35621,7 +35722,6 @@ var Index = React.createClass({
             return;
         }
 
-        // Check password.
         if (password.length < 4) {
             this.setErrors({
                 signup: {
@@ -35650,7 +35750,6 @@ var Index = React.createClass({
         };
 
         var callback = (function (data) {
-            console.log(data);
             this.work(false, "");
             if (data.result === false) {
                 this.setErrors({
@@ -35674,7 +35773,7 @@ var Index = React.createClass({
             });
         }).bind(this);
 
-        setTimeout(delay, 1000);
+        setTimeout(delay, 1500);
     },
     signup: function signup(email, password) {
         this.work(true, "Signing...");
@@ -35685,7 +35784,6 @@ var Index = React.createClass({
         };
 
         var callback = (function (data) {
-            console.log(data);
             this.work(false, "");
             if (data.result === false) {
                 this.setErrors({
@@ -35707,20 +35805,46 @@ var Index = React.createClass({
             });
         }).bind(this);
 
-        setTimeout(delay, 1000);
+        setTimeout(delay, 1500);
     },
-    logout: function logout() {},
+    logout: function logout() {
+        var callback = (function (data) {
+            this.getBoards();
+        }).bind(this);
+
+        $.ajax({
+            type: 'POST',
+            url: this.props.APIs.logout,
+            success: callback
+        });
+    },
+    create: function create(board) {},
+    'delete': function _delete(board) {
+        this.work(true, "Deleting...");
+
+        var callback = (function (data) {
+            console.log(data);
+            this.refs['delete'].hide();
+            this.work(false, "");
+        }).bind(this);
+
+        var delay = (function () {
+            $.ajax({
+                type: 'POST',
+                url: this.props.APIs['delete'],
+                data: board,
+                success: callback
+            });
+        }).bind(this);
+
+        setTimeout(delay, 1500);
+    },
     getBoards: function getBoards() {
         $.ajax({
             type: 'POST',
             url: this.props.APIs.boards,
             success: (function (data) {
-                console.log("user");
-                console.log(data);
                 if (this.isMounted()) {
-                    console.log("got boards and is mounted");
-                    console.log(data.result.boards);
-                    console.log(data.result.user);
                     this.setState({
                         boards: data.result.boards,
                         user: data.result.user
@@ -35735,14 +35859,11 @@ var Index = React.createClass({
         });
     },
     clearErrors: function clearErrors() {
-        console.log("Alert is clearing.");
         this.setState({
             errors: {}
         });
     },
     getButtons: function getButtons() {
-        console.log("getButtons...");
-        console.log(this.state.user);
         if (this.state.user) {
             return {
                 left: [{
@@ -35754,7 +35875,7 @@ var Index = React.createClass({
                 }],
                 right: [{
                     onClick: (function () {
-                        window.location.href = this.props.APIs.logout;
+                        this.logout();
                     }).bind(this),
                     text: "Log out"
                 }]
@@ -35800,8 +35921,13 @@ var Index = React.createClass({
                 { ref: 'create', type: 'WaveModal' },
                 'Create Board!'
             ),
+            React.createElement(
+                Modal,
+                { ref: 'delete', type: 'WaveModal' },
+                React.createElement(ConfirmWindow, { workInfo: this.state.work_info, title: 'Are you sure?', onConfirm: this.handleOnDelete })
+            ),
             React.createElement(Navbar, { user: this.state.user, defaultTitle: 'Boards', ref: 'navbar', buttons: this.getButtons() }),
-            React.createElement(BoardListPanel, { boards: this.state.boards })
+            React.createElement(BoardListPanel, { user: this.state.user, boards: this.state.boards, onBoardEvents: this.getBoardEventHandlers() })
         );
     }
 });
@@ -35812,11 +35938,72 @@ var BoardListPanel = React.createClass({
     render: function render() {
         return React.createElement(
             'div',
-            { className: 'BoardListPanel' },
-            React.createElement('br', null),
-            React.createElement('br', null),
-            React.createElement('br', null),
-            React.createElement('br', null)
+            null,
+            React.createElement(
+                'div',
+                { className: 'BoardListPanel box-shadow--3dp' },
+                React.createElement(
+                    'div',
+                    { className: 'panel panel-primary' },
+                    React.createElement(
+                        'div',
+                        { className: 'panel-heading' },
+                        React.createElement(BoardListToolbar, null)
+                    ),
+                    React.createElement(
+                        'div',
+                        { className: 'panel-body' },
+                        React.createElement(BoardList, { user: this.props.user, boards: this.props.boards, onBoardEvents: this.props.onBoardEvents })
+                    ),
+                    React.createElement(
+                        'div',
+                        { className: 'panel-footer' },
+                        React.createElement(
+                            'button',
+                            { type: 'button', className: 'btn btn-info btn-xs', onClick: this.handleOnClick },
+                            'Show more'
+                        )
+                    )
+                )
+            )
+        );
+    }
+});
+
+var BoardListToolbar = React.createClass({
+    displayName: 'BoardListToolbar',
+
+    handleOnChange: function handleOnChange(e) {
+        this.props.onSearch({
+            keyword: e
+        });
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'container-fluid' },
+            React.createElement(
+                'div',
+                { className: 'row' },
+                React.createElement(
+                    'div',
+                    { className: 'col-xs-3' },
+                    React.createElement(SearchTextBox, { onChange: this.handleOnChange })
+                )
+            )
+        );
+    }
+});
+
+var SearchTextBox = React.createClass({
+    displayName: 'SearchTextBox',
+
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'inner-addon left-addon' },
+            React.createElement('i', { className: 'glyphicon glyphicon-search' }),
+            React.createElement(Input, { placeholder: 'Search Boards', onChange: this.props.onChange })
         );
     }
 });
@@ -35824,8 +36011,30 @@ var BoardListPanel = React.createClass({
 var BoardList = React.createClass({
     displayName: 'BoardList',
 
+    getBoards: function getBoards() {
+        var rows = [];
+        var boards = this.props.boards;
+        for (var i in boards) {
+            if (boards[i].show) {
+                rows.push(React.createElement(
+                    'div',
+                    { key: i, className: 'col-xs-3' },
+                    React.createElement(Board, { user: this.props.user, board: boards[i], onBoardEvents: this.props.onBoardEvents })
+                ));
+            }
+        }
+        return rows;
+    },
     render: function render() {
-        return React.createElement('div', null);
+        return React.createElement(
+            'div',
+            { className: 'container' },
+            React.createElement(
+                'div',
+                { className: 'row' },
+                this.getBoards()
+            )
+        );
     }
 });
 
@@ -35833,7 +36042,78 @@ var Board = React.createClass({
     displayName: 'Board',
 
     render: function render() {
-        return React.createElement('div', null);
+        return React.createElement(
+            'div',
+            { className: 'Board box-shadow--3dp' },
+            React.createElement(
+                'div',
+                { className: 'panel panel-primary' },
+                React.createElement(
+                    'div',
+                    { className: 'panel-heading' },
+                    React.createElement(BoardToolbar, { board: this.props.board, user: this.props.user, onBoardEvents: this.props.onBoardEvents })
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'panel-body' },
+                    React.createElement(
+                        'b',
+                        null,
+                        'Left',
+                        React.createElement(
+                            'span',
+                            { className: 'pull-right' },
+                            'Right'
+                        )
+                    ),
+                    React.createElement('hr', { className: 'Separator' }),
+                    'Info1',
+                    React.createElement('hr', { className: 'Separator' }),
+                    'Info2'
+                )
+            )
+        );
+    }
+});
+
+var BoardToolbar = React.createClass({
+    displayName: 'BoardToolbar',
+
+    handleOnEdit: function handleOnEdit() {
+        this.props.onBoardEvents.handleOnEdit(this.props.board);
+    },
+    handleOnDelete: function handleOnDelete() {
+        this.props.onBoardEvents.handleOnDelete(this.props.board);
+    },
+    getButtons: function getButtons() {
+        if (this.props.user) {
+            if (this.props.board.email) {
+                if (this.props.user.email === this.props.board.email) {
+                    return React.createElement(
+                        'div',
+                        { className: 'pull-right' },
+                        React.createElement(
+                            'button',
+                            { ref: 'edit', type: 'button', className: 'btn btn-info btn-xs', onClick: this.handleOnEdit },
+                            React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+                        ),
+                        React.createElement(
+                            'button',
+                            { ref: 'delete', type: 'button', className: 'btn btn-info btn-xs', onClick: this.handleOnDelete },
+                            React.createElement('span', { className: 'glyphicon glyphicon-trash' })
+                        )
+                    );
+                }
+            }
+        }
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'BoardToolbar' },
+            this.props.board.title,
+            this.getButtons()
+        );
     }
 });
 
@@ -35962,6 +36242,7 @@ var APIs = {
     login: "login.json",
     signup: "signup.json",
     boards: "boards.json",
+    'delete': "delete.json",
     logout: "logout"
 };
 

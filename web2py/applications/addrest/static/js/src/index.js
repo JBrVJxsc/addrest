@@ -5,6 +5,7 @@ var Navbar = require('./common').Navbar;
 var Modal = require('./common').Modal;
 var Input = require('./common').Input;
 var Alert = require('./common').Alert;
+var ConfirmWindow = require('./common').ConfirmWindow;
 
 var Index = React.createClass({
     getInitialState: function() {
@@ -12,19 +13,37 @@ var Index = React.createClass({
             user: null,
             boards: [],
             errors: {},
-            work_info: {}
+            work_info: {},
+            deleting: null
         };
+    },
+    getBoardEventHandlers: function() {
+        return {
+            handleOnEdit: function(e) {
+                console.log("editing");
+            }.bind(this),
+            handleOnDelete: function(e) {
+                this.setState({
+                    deleting: e
+                });
+                this.refs.delete.show();
+            }.bind(this)
+        };
+    },
+    handleOnDelete: function(e) {
+        console.log(e);
+        if (e) {
+            this.delete(this.state.deleting);
+        } else {
+            this.refs.delete.hide();
+        }
     },
     handleOnAlertDismiss: function() {
         this.clearErrors();
     },
     handleOnLogin: function(email, password) {
-        // Clear old errors first.
         this.clearErrors();
 
-        console.log("handleOnLogin");
-
-        // Check email.
         if (!Utils.validateEmail(email)) {
             this.setErrors({
                 login: {
@@ -37,10 +56,8 @@ var Index = React.createClass({
         this.login(email, password);
     },
     handleOnSignup: function(email, password) {
-        // Clear old errors first.
         this.clearErrors();
 
-        // Check email.
         if (!Utils.validateEmail(email)) {
             this.setErrors({
                 signup: {
@@ -50,7 +67,6 @@ var Index = React.createClass({
             return;
         }
 
-        // Check password.
         if (password.length < 4) {
             this.setErrors({
                 signup: {
@@ -79,7 +95,6 @@ var Index = React.createClass({
         };
 
         var callback = function(data) {
-            console.log(data);
             this.work(false, "");
             if (data.result === false) {
                 this.setErrors({
@@ -103,7 +118,7 @@ var Index = React.createClass({
             });
         }.bind(this);
 
-        setTimeout(delay, 1000);
+        setTimeout(delay, 1500);
     },
     signup: function(email, password) {
         this.work(true, "Signing...");
@@ -114,7 +129,6 @@ var Index = React.createClass({
         };
 
         var callback = function(data) {
-            console.log(data);
             this.work(false, "");
             if (data.result === false) {
                 this.setErrors({
@@ -136,22 +150,48 @@ var Index = React.createClass({
             });
         }.bind(this);
 
-        setTimeout(delay, 1000);
+        setTimeout(delay, 1500);
     },
     logout: function() {
-        
+        var callback = function(data) {
+            this.getBoards();
+        }.bind(this);
+
+        $.ajax({
+            type: 'POST',
+            url: this.props.APIs.logout,
+            success: callback
+        });
+    },
+    create: function(board) {
+
+    },
+    delete: function(board) {
+        this.work(true, "Deleting...");
+
+        var callback = function(data) {
+            console.log(data);
+            this.refs.delete.hide();
+            this.work(false, "");
+        }.bind(this);
+
+        var delay = function() {
+            $.ajax({
+                type: 'POST',
+                url: this.props.APIs.delete,
+                data: board,
+                success: callback
+            });
+        }.bind(this);
+
+        setTimeout(delay, 1500);
     },
     getBoards: function() {
         $.ajax({
             type: 'POST',
             url: this.props.APIs.boards,
             success: function(data) {
-                console.log("user");
-                console.log(data);
                 if (this.isMounted()) {
-                    console.log("got boards and is mounted");
-                    console.log(data.result.boards);
-                    console.log(data.result.user);
                     this.setState({
                         boards: data.result.boards,
                         user: data.result.user
@@ -166,33 +206,26 @@ var Index = React.createClass({
         });
     },
     clearErrors: function() {
-        console.log("Alert is clearing.");
         this.setState({
             errors: {}
         });
     },
     getButtons: function() {
-        console.log("getButtons...");
-        console.log(this.state.user);
         if (this.state.user) {
             return {
-                left: [
-                    {
+                left: [{
                         onClick: function () {
                             this.clearErrors();
                             this.refs.create.show();
                         }.bind(this),
                         text: "Create"
-                    }
-                ],
-                right: [
-                    {
+                    }],
+                right: [{
                         onClick: function () {
-                            window.location.href = this.props.APIs.logout;
+                            this.logout();
                         }.bind(this),
                         text: "Log out"
-                    }
-                ]
+                    }]
             }
         } else {
             return {
@@ -231,8 +264,11 @@ var Index = React.createClass({
 				<Modal ref="create" type="WaveModal">
                     Create Board!
                 </Modal>
+				<Modal ref="delete" type="WaveModal">
+                    <ConfirmWindow workInfo={this.state.work_info} title="Are you sure?" onConfirm={this.handleOnDelete} />
+                </Modal>
 				<Navbar user={this.state.user} defaultTitle="Boards" ref="navbar" buttons={this.getButtons()} />
-                <BoardListPanel boards={this.state.boards} />
+                <BoardListPanel user={this.state.user} boards={this.state.boards} onBoardEvents={this.getBoardEventHandlers()} />
 			</div>
 		);
 	}
@@ -241,21 +277,76 @@ var Index = React.createClass({
 var BoardListPanel = React.createClass({
     render: function() {
         return (
-            <div className="BoardListPanel">
-                <br />
-                <br />
-                <br />
-                <br />
+            <div>
+                <div className="BoardListPanel box-shadow--3dp">
+                    <div className="panel panel-primary">
+                        <div className="panel-heading">
+                            <BoardListToolbar />
+                        </div>
+                        <div className="panel-body">
+                            <BoardList user={this.props.user} boards={this.props.boards} onBoardEvents={this.props.onBoardEvents} />
+                        </div>
+                        <div className="panel-footer">
+                            <button type="button" className="btn btn-info btn-xs" onClick={this.handleOnClick}>Show more</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+});
+
+var BoardListToolbar = React.createClass({
+    handleOnChange: function(e) {
+        this.props.onSearch({
+            keyword: e
+        });
+    },
+    render: function() {
+        return (
+            <div className="container-fluid">
+                <div className="row">
+                    <div className="col-xs-3">
+                        <SearchTextBox onChange={this.handleOnChange}/>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+});
+
+var SearchTextBox = React.createClass({
+    render: function() {
+        return (
+            <div className="inner-addon left-addon">
+                <i className="glyphicon glyphicon-search"></i>
+                <Input placeholder="Search Boards" onChange={this.props.onChange}></Input>
             </div>
         );
     }
 });
 
 var BoardList = React.createClass({
+    getBoards: function() {
+        var rows = [];
+        var boards = this.props.boards;
+        for (var i in boards) {
+            if (boards[i].show) {
+                rows.push(
+                    <div key={i} className="col-xs-3">
+                        <Board user={this.props.user} board={boards[i]} onBoardEvents={this.props.onBoardEvents} />
+                    </div>
+                );
+            }
+        }
+        return rows;
+    },
     render: function() {
         return (
-            <div>
-
+            <div className="container">
+                <div className="row">
+                    {this.getBoards()}
+                </div>
             </div>
         );
     }
@@ -264,8 +355,57 @@ var BoardList = React.createClass({
 var Board = React.createClass({
     render: function() {
         return (
-            <div>
+            <div className="Board box-shadow--3dp">
+				<div className="panel panel-primary">
+                    <div className="panel-heading">
+                        <BoardToolbar board={this.props.board} user={this.props.user} onBoardEvents={this.props.onBoardEvents} />
+                    </div>
+                    <div className="panel-body">
+                        <b>
+                            Left
+                            <span className="pull-right">Right</span>
+                        </b>
+                        <hr className="Separator" />
+                        Info1
+                        <hr className="Separator" />
+                        Info2
+                    </div>
+				</div>
+            </div>
+        );
+    }
+});
 
+var BoardToolbar = React.createClass({
+    handleOnEdit: function() {
+        this.props.onBoardEvents.handleOnEdit(this.props.board);
+    },
+    handleOnDelete: function() {
+        this.props.onBoardEvents.handleOnDelete(this.props.board);
+    },
+    getButtons: function() {
+        if (this.props.user) {
+            if (this.props.board.email) {
+                if (this.props.user.email === this.props.board.email) {
+                    return (
+                        <div className="pull-right">
+                            <button ref="edit" type="button" className="btn btn-info btn-xs" onClick={this.handleOnEdit}>
+                                <span className="glyphicon glyphicon-pencil" />
+                            </button>
+                            <button ref="delete" type="button" className="btn btn-info btn-xs" onClick={this.handleOnDelete}>
+                                <span className="glyphicon glyphicon-trash" />
+                            </button>
+                        </div>
+                    );
+                }
+            }
+        }
+    },
+    render: function() {
+        return (
+            <div className="BoardToolbar">
+                {this.props.board.title}
+                {this.getButtons()}
             </div>
         );
     }
@@ -368,6 +508,7 @@ var APIs = {
     login: "login.json",
     signup: "signup.json",
     boards: "boards.json",
+    delete: "delete.json",
     logout: "logout"
 };
 

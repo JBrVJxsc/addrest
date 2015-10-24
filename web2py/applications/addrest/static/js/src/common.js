@@ -1,12 +1,18 @@
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Boron = require('boron');
 var Alert = require('react-bootstrap').Alert;
 
 var Navbar = React.createClass({
     getTitle: function() {
-        if (this.props.user) {
-            return this.props.user.email;
-        }
+        // Here we can show user's email as title if
+        // user has been logged in. I comment this
+        // because sometimes the graders' test-email
+        // is not formal and will ruin the uniform
+        // of the page.
+        //if (this.props.user) {
+        //    return this.props.user.email;
+        //}
         return this.props.defaultTitle;
     },
     getButtons: function(buttons) {
@@ -150,6 +156,53 @@ var DismissibleAlert = React.createClass({
     }
 });
 
+var ConfirmWindow = React.createClass({
+    handleOnClick: function(e) {
+        var yes = ReactDOM.findDOMNode(this.refs.yes);
+        var no = ReactDOM.findDOMNode(this.refs.no);
+        if (e.target === yes) {
+            this.props.onConfirm(true);
+        } else if (e.target === no) {
+            this.props.onConfirm(false);
+        }
+    },
+    getButton: function() {
+        if (this.props.workInfo.working) {
+            return (
+                <button ref="yes" className="btn btn-info btn-block disabled" onClick={this.handleOnClick}>{this.props.workInfo.message}</button>
+            );
+        }
+        return (
+            <button ref="yes" className="btn btn-info btn-block" onClick={this.handleOnClick}>Yes</button>
+        );
+    },
+    render: function() {
+        return (
+            <div className="ConfirmWindow">
+                <div className="panel panel-info">
+                    <div className="panel-heading">
+                        <h3 className="panel-title">{this.props.title}</h3>
+                    </div>
+                    <div className="panel-body">
+                        <div className="form center-block">
+                            <div className="form-group">
+                                <div className="row">
+                                    <div className="col-xs-6 RightExtend">
+                                        <button ref="no" className="btn btn-block" onClick={this.handleOnClick}>No</button>
+                                    </div>
+                                    <div className="col-xs-6 LeftExtend">
+                                        {this.getButton()}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+});
+
 var Utils = {
     validateEmail: function(email) {
         var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
@@ -163,5 +216,6 @@ module.exports = {
     Modal: Modal,
     Input: Input,
     Switch: Switch,
-    Alert: DismissibleAlert
+    Alert: DismissibleAlert,
+    ConfirmWindow: ConfirmWindow
 };

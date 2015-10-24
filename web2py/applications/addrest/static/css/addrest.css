@@ -97,104 +97,110 @@ body {
   box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.2);
 }
 
-/* line 81, ../sass/_main.scss */
-.box-shadow--8dp {
-  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
-}
-
-/* line 84, ../sass/_main.scss */
-.box-shadow--16dp {
-  box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
-}
-
-/* line 88, ../sass/_main.scss */
+/* line 82, ../sass/_main.scss */
 .btn-group .active {
   box-shadow: none;
 }
 
-/* line 92, ../sass/_main.scss */
+/* line 86, ../sass/_main.scss */
 .RightExtend {
   padding-right: 5px;
 }
 
-/* line 96, ../sass/_main.scss */
+/* line 90, ../sass/_main.scss */
 .LeftExtend {
   padding-left: 5px;
 }
 
-/* line 100, ../sass/_main.scss */
+/* line 94, ../sass/_main.scss */
 .Extend {
   padding-right: 5px;
   padding-left: 5px;
 }
 
-/* line 105, ../sass/_main.scss */
-.AddressListPanel > .panel-primary > .panel-heading {
+/* line 99, ../sass/_main.scss */
+.BoardListPanel > .panel-primary > .panel-heading {
   background-color: #3498DB;
   border-color: #3498DB;
 }
 
-/* line 110, ../sass/_main.scss */
+/* line 104, ../sass/_main.scss */
 .UserInfoModal > .panel-primary > .panel-heading {
   background-color: #3498DB;
   border-color: #3498DB;
 }
 
-/* line 115, ../sass/_main.scss */
+/* line 109, ../sass/_main.scss */
 .UserInfoModal .panel {
   position: relative;
   width: 325px;
   right: 162.5px;
 }
 
-/* line 121, ../sass/_main.scss */
-.AddressEditModal > .panel-primary > .panel-heading {
+/* line 115, ../sass/_main.scss */
+.BoardEditModal > .panel-primary > .panel-heading {
   background-color: #3498DB;
   border-color: #3498DB;
 }
 
-/* line 126, ../sass/_main.scss */
-.AddressEditModal .panel {
+/* line 120, ../sass/_main.scss */
+.BoardListPanel > .panel > .panel-body {
+  background-color: #89DBF1;
+}
+
+/* line 124, ../sass/_main.scss */
+.BoardListPanel > .panel > .panel-footer {
+  background-color: #50AFE2;
+  border-color: #50AFE2;
+}
+
+/* line 129, ../sass/_main.scss */
+.BoardEditModal .panel {
   position: relative;
   width: 400px;
   right: 200px;
 }
 
-/* line 132, ../sass/_main.scss */
-.AddressListPanel {
-  position: relative;
-  top: 80px;
-  width: 50%;
-  margin: 0 auto;
-}
-
-/* line 139, ../sass/_main.scss */
-.AddressListPanel > .panel > .panel-body {
-  background-color: #89DBF1;
-}
-
-/* line 143, ../sass/_main.scss */
-.Address > .panel-primary > .panel-heading {
+/* line 135, ../sass/_main.scss */
+.Board > .panel-primary > .panel-heading {
   background-color: #50AFE2;
   border-color: #50AFE2;
 }
 
-/* line 148, ../sass/_main.scss */
+/* line 140, ../sass/_main.scss */
 .Separator {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-/* line 153, ../sass/_main.scss */
+/* line 145, ../sass/_main.scss */
 .Address {
   width: 80%;
   margin: 5px auto;
 }
 
-/* line 158, ../sass/_main.scss */
+/* line 150, ../sass/_main.scss */
 .BoardListPanel {
   position: relative;
   top: 80px;
   width: 95%;
   margin: 0 auto;
+}
+
+/* line 157, ../sass/_main.scss */
+.BoardToolbar .btn {
+  margin-left: 5px;
+}
+
+/* line 161, ../sass/_main.scss */
+.ConfirmWindow {
+  position: relative;
+  width: 325px;
+  right: 162.5px;
+}
+
+/* line 167, ../sass/_main.scss */
+.ConfirmWindow .panel .panel-body {
+  position: relative;
+  top: 6px;
 }

@@ -35351,6 +35351,7 @@ module.exports = require('./lib/React');
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Boron = require('boron');
 var Alert = require('react-bootstrap').Alert;
 
@@ -35358,9 +35359,14 @@ var Navbar = React.createClass({
     displayName: 'Navbar',
 
     getTitle: function getTitle() {
-        if (this.props.user) {
-            return this.props.user.email;
-        }
+        // Here we can show user's email as title if
+        // user has been logged in. I comment this
+        // because sometimes the graders' test-email
+        // is not formal and will ruin the uniform
+        // of the page.
+        //if (this.props.user) {
+        //    return this.props.user.email;
+        //}
         return this.props.defaultTitle;
     },
     getButtons: function getButtons(buttons) {
@@ -35548,6 +35554,83 @@ var DismissibleAlert = React.createClass({
     }
 });
 
+var ConfirmWindow = React.createClass({
+    displayName: 'ConfirmWindow',
+
+    handleOnClick: function handleOnClick(e) {
+        var yes = ReactDOM.findDOMNode(this.refs.yes);
+        var no = ReactDOM.findDOMNode(this.refs.no);
+        if (e.target === yes) {
+            this.props.onConfirm(true);
+        } else if (e.target === no) {
+            this.props.onConfirm(false);
+        }
+    },
+    getButton: function getButton() {
+        if (this.props.workInfo.working) {
+            return React.createElement(
+                'button',
+                { ref: 'yes', className: 'btn btn-info btn-block disabled', onClick: this.handleOnClick },
+                this.props.workInfo.message
+            );
+        }
+        return React.createElement(
+            'button',
+            { ref: 'yes', className: 'btn btn-info btn-block', onClick: this.handleOnClick },
+            'Yes'
+        );
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'ConfirmWindow' },
+            React.createElement(
+                'div',
+                { className: 'panel panel-info' },
+                React.createElement(
+                    'div',
+                    { className: 'panel-heading' },
+                    React.createElement(
+                        'h3',
+                        { className: 'panel-title' },
+                        this.props.title
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'panel-body' },
+                    React.createElement(
+                        'div',
+                        { className: 'form center-block' },
+                        React.createElement(
+                            'div',
+                            { className: 'form-group' },
+                            React.createElement(
+                                'div',
+                                { className: 'row' },
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-xs-6 RightExtend' },
+                                    React.createElement(
+                                        'button',
+                                        { ref: 'no', className: 'btn btn-block', onClick: this.handleOnClick },
+                                        'No'
+                                    )
+                                ),
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-xs-6 LeftExtend' },
+                                    this.getButton()
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+    }
+});
+
 var Utils = {
     validateEmail: function validateEmail(email) {
         var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
@@ -35561,10 +35644,11 @@ module.exports = {
     Modal: Modal,
     Input: Input,
     Switch: Switch,
-    Alert: DismissibleAlert
+    Alert: DismissibleAlert,
+    ConfirmWindow: ConfirmWindow
 };
 
-},{"boron":1,"react":409,"react-bootstrap":85}],411:[function(require,module,exports){
+},{"boron":1,"react":409,"react-bootstrap":85,"react-dom":252}],411:[function(require,module,exports){
 'use strict';
 
 var React = require('react');

@@ -65,38 +65,179 @@ def dashboard():
 
 def login():
     result = Auth(db=db).login_bare(request.vars.email, request.vars.password)
-    # time.sleep(3)
     return locals()
 
 
 def signup():
-    print "vars:", request.vars
-    print "args:", request.args
     result = Auth(db=db).register_bare(**request.vars)
-    # time.sleep(3)
     return locals()
 
 
 def logout():
-    print "logging out."
-    redirect(URL('default', 'user', args='logout'))
+    result = Auth(db=db).logout(next=None)
+    return locals()
 
 
 def boards():
-    # is_logged_in = auth.is_logged_in()
-    # time.sleep(1)
-    print auth.user
     result = {
         'boards': [
             {
+                'email': "x1@x.com",
                 'title': "Jobs",
-                'recent': 6
+                'recent': 6,
+                'show': True
             },
             {
+                'email': "x@x.com",
                 'title': "Housing",
-                'recent': 12
+                'recent': 12,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Jobs",
+                'recent': 6,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Housing",
+                'recent': 12,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Jobs",
+                'recent': 6,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Housing",
+                'recent': 12,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Jobs",
+                'recent': 6,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Housing",
+                'recent': 12,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Jobs",
+                'recent': 6,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Housing",
+                'recent': 12,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Jobs",
+                'recent': 6,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Housing",
+                'recent': 12,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Jobs",
+                'recent': 6,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Housing",
+                'recent': 12,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Jobs",
+                'recent': 6,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Housing",
+                'recent': 12,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Jobs",
+                'recent': 6,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Housing",
+                'recent': 12,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Jobs",
+                'recent': 6,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Housing",
+                'recent': 12,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Jobs",
+                'recent': 6,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Housing",
+                'recent': 12,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Jobs",
+                'recent': 6,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Housing",
+                'recent': 12,
+                'show': True
+            },
+            {
+                'email': "x@x.com",
+                'title': "Housing",
+                'recent': 12,
+                'show': True
             },
         ],
         'user': auth.user
     }
     return locals()
+
+
+def delete():
+    print "deleting", request.vars
+    return locals()
+
