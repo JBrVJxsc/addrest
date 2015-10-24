@@ -53,7 +53,7 @@ var IndexBackground = React.createClass({
     }
 });
 
-var UserInfoModal = React.createClass({
+var UserInfoForm = React.createClass({
 	render: function() {
 		return (
 			<div className="UserInfoModal">
@@ -61,27 +61,21 @@ var UserInfoModal = React.createClass({
                     <div className="panel-heading">
                         <h3 className="panel-title">{this.props.title}</h3>
                     </div>
-                    <div className="panel-body">{this.props.children}</div>
+                    <div className="panel-body">
+                        <form className="form center-block">
+                            <div className="form-group">
+                                <Input placeholder="Email" size="input-md"></Input>
+                            </div>
+                            <div className="form-group">
+                                <Input placeholder="Password" type="password" size="input-md"></Input>
+                            </div>
+                            <div className="form-group">
+                                <button className="btn btn-warning btn-block">{this.props.button}</button>
+                            </div>
+                        </form>
+                    </div>
 				</div>
 			</div>
-		);
-	}
-});
-
-var UserInfoForm = React.createClass({
-	render: function() {
-		return (
-			<form className="form center-block">
-				<div className="form-group">
-					<Input placeholder="Email" size="input-md"></Input>
-				</div>
-				<div className="form-group">
-                    <Input placeholder="Password" type="password" size="input-md"></Input>
-				</div>
-				<div className="form-group">
-					<button className="btn btn-warning btn-block">{this.props.button}</button>
-				</div>
-			</form>
 		);
 	}
 });
@@ -89,9 +83,7 @@ var UserInfoForm = React.createClass({
 var Login = React.createClass({
 	render: function() {
 		return (
-			<UserInfoModal title="Log In">
-                <UserInfoForm button="Log In" />
-			</UserInfoModal>
+            <UserInfoForm title="Log In" button="Log In" />
 		);
 	}
 });
@@ -99,9 +91,7 @@ var Login = React.createClass({
 var Signup = React.createClass({
 	render: function() {
 		return (
-			<UserInfoModal title="Sign up">
-                <UserInfoForm button="Sign up" />
-			</UserInfoModal>
+            <UserInfoForm title="Sign up" button="Sign up" />
 		);
 	}
 });
