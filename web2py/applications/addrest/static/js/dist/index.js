@@ -35373,11 +35373,21 @@ var Navbar = React.createClass({
         var buttonList = [];
         for (var i in buttons) {
             var button = buttons[i];
-            buttonList.push(React.createElement(
-                NavbarButton,
-                { key: i, onClick: button.onClick },
-                button.text
-            ));
+            var navbarButton;
+            if (button.working) {
+                navbarButton = React.createElement(
+                    NavbarButton,
+                    { key: i, workInfo: this.props.workInfo, onClick: button.onClick },
+                    button.text
+                );
+            } else {
+                navbarButton = React.createElement(
+                    NavbarButton,
+                    { key: i, onClick: button.onClick },
+                    button.text
+                );
+            }
+            buttonList.push(navbarButton);
         }
         return buttonList;
     },
@@ -35423,12 +35433,24 @@ var Navbar = React.createClass({
 var NavbarButton = React.createClass({
     displayName: 'NavbarButton',
 
-    render: function render() {
+    getButton: function getButton() {
+        if (this.props.workInfo) {
+            if (this.props.workInfo.working) {
+                return React.createElement(
+                    'button',
+                    { type: 'button', className: 'btn btn-info disabled', onClick: this.props.onClick },
+                    this.props.workInfo.message
+                );
+            }
+        }
         return React.createElement(
             'button',
             { type: 'button', className: 'btn btn-info', onClick: this.props.onClick },
             this.props.children
         );
+    },
+    render: function render() {
+        return this.getButton();
     }
 });
 
@@ -35808,15 +35830,22 @@ var Index = React.createClass({
         setTimeout(delay, 1500);
     },
     logout: function logout() {
+        this.work(true, "Goodbye...");
+
         var callback = (function (data) {
+            this.work(false, "");
             this.getBoards();
         }).bind(this);
 
-        $.ajax({
-            type: 'POST',
-            url: this.props.APIs.logout,
-            success: callback
-        });
+        var delay = (function () {
+            $.ajax({
+                type: 'POST',
+                url: this.props.APIs.logout,
+                success: callback
+            });
+        }).bind(this);
+
+        setTimeout(delay, 1500);
     },
     create: function create(board) {},
     'delete': function _delete(board) {
@@ -35877,7 +35906,8 @@ var Index = React.createClass({
                     onClick: (function () {
                         this.logout();
                     }).bind(this),
-                    text: "Log out"
+                    text: "Log out",
+                    working: true
                 }]
             };
         } else {
@@ -35926,7 +35956,7 @@ var Index = React.createClass({
                 { ref: 'delete', type: 'WaveModal' },
                 React.createElement(ConfirmWindow, { workInfo: this.state.work_info, title: 'Are you sure?', onConfirm: this.handleOnDelete })
             ),
-            React.createElement(Navbar, { user: this.state.user, defaultTitle: 'Boards', ref: 'navbar', buttons: this.getButtons() }),
+            React.createElement(Navbar, { workInfo: this.state.work_info, user: this.state.user, defaultTitle: 'Boards', ref: 'navbar', buttons: this.getButtons() }),
             React.createElement(BoardListPanel, { user: this.state.user, boards: this.state.boards, onBoardEvents: this.getBoardEventHandlers() })
         );
     }
@@ -35987,7 +36017,7 @@ var BoardListToolbar = React.createClass({
                 { className: 'row' },
                 React.createElement(
                     'div',
-                    { className: 'col-xs-3' },
+                    { className: 'col-xs-4' },
                     React.createElement(SearchTextBox, { onChange: this.handleOnChange })
                 )
             )
@@ -36018,7 +36048,7 @@ var BoardList = React.createClass({
             if (boards[i].show) {
                 rows.push(React.createElement(
                     'div',
-                    { key: i, className: 'col-xs-3' },
+                    { key: i, className: 'col-xs-4' },
                     React.createElement(Board, { user: this.props.user, board: boards[i], onBoardEvents: this.props.onBoardEvents })
                 ));
             }
@@ -36028,7 +36058,7 @@ var BoardList = React.createClass({
     render: function render() {
         return React.createElement(
             'div',
-            { className: 'container' },
+            { className: 'container-fluid' },
             React.createElement(
                 'div',
                 { className: 'row' },
@@ -36207,8 +36237,12 @@ var UserInfoForm = React.createClass({
             ),
             React.createElement(
                 'div',
-                { className: 'form-group' },
-                this.getButton()
+                { className: 'UserInfoFormButton' },
+                React.createElement(
+                    'div',
+                    { className: 'form-group' },
+                    this.getButton()
+                )
             )
         );
     }

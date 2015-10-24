@@ -19,7 +19,13 @@ var Navbar = React.createClass({
         var buttonList = [];
         for (var i in buttons) {
             var button = buttons[i];
-            buttonList.push(<NavbarButton key={i} onClick={button.onClick}>{button.text}</NavbarButton>);
+            var navbarButton;
+            if (button.working) {
+                navbarButton = <NavbarButton key={i} workInfo={this.props.workInfo} onClick={button.onClick}>{button.text}</NavbarButton>;
+            } else {
+                navbarButton = <NavbarButton key={i} onClick={button.onClick}>{button.text}</NavbarButton>
+            }
+            buttonList.push(navbarButton);
         }
         return buttonList;
     },
@@ -47,10 +53,20 @@ var Navbar = React.createClass({
 });
 
 var NavbarButton = React.createClass({
-    render: function() {
+    getButton: function() {
+        if (this.props.workInfo) {
+            if (this.props.workInfo.working) {
+                return (
+                    <button type="button" className="btn btn-info disabled" onClick={this.props.onClick}>{this.props.workInfo.message}</button>
+                );
+            }
+        }
         return (
             <button type="button" className="btn btn-info" onClick={this.props.onClick}>{this.props.children}</button>
         );
+    },
+    render: function() {
+        return this.getButton();
     }
 });
 

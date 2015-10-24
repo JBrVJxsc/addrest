@@ -35373,11 +35373,21 @@ var Navbar = React.createClass({
         var buttonList = [];
         for (var i in buttons) {
             var button = buttons[i];
-            buttonList.push(React.createElement(
-                NavbarButton,
-                { key: i, onClick: button.onClick },
-                button.text
-            ));
+            var navbarButton;
+            if (button.working) {
+                navbarButton = React.createElement(
+                    NavbarButton,
+                    { key: i, workInfo: this.props.workInfo, onClick: button.onClick },
+                    button.text
+                );
+            } else {
+                navbarButton = React.createElement(
+                    NavbarButton,
+                    { key: i, onClick: button.onClick },
+                    button.text
+                );
+            }
+            buttonList.push(navbarButton);
         }
         return buttonList;
     },
@@ -35423,12 +35433,24 @@ var Navbar = React.createClass({
 var NavbarButton = React.createClass({
     displayName: 'NavbarButton',
 
-    render: function render() {
+    getButton: function getButton() {
+        if (this.props.workInfo) {
+            if (this.props.workInfo.working) {
+                return React.createElement(
+                    'button',
+                    { type: 'button', className: 'btn btn-info disabled', onClick: this.props.onClick },
+                    this.props.workInfo.message
+                );
+            }
+        }
         return React.createElement(
             'button',
             { type: 'button', className: 'btn btn-info', onClick: this.props.onClick },
             this.props.children
         );
+    },
+    render: function render() {
+        return this.getButton();
     }
 });
 

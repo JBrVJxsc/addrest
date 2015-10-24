@@ -150,12 +150,13 @@ body {
 .BoardListPanel {
   position: relative;
   top: 80px;
-  width: 95%;
+  width: 70%;
   margin: 0 auto;
 }
 
 .BoardToolbar .btn {
-  margin-left: 5px;
+  margin-left: 13px;
+  margin-right: -6px;
 }
 
 .ConfirmWindow {
@@ -167,4 +168,8 @@ body {
 .ConfirmWindow .panel .panel-body {
   position: relative;
   top: 6px;
+}
+
+.UserInfoFormButton .form-group {
+  margin-bottom: 8px;
 }

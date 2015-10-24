@@ -153,15 +153,22 @@ var Index = React.createClass({
         setTimeout(delay, 1500);
     },
     logout: function() {
+        this.work(true, "Goodbye...");
+
         var callback = function(data) {
+            this.work(false, "");
             this.getBoards();
         }.bind(this);
 
-        $.ajax({
-            type: 'POST',
-            url: this.props.APIs.logout,
-            success: callback
-        });
+        var delay = function() {
+            $.ajax({
+                type: 'POST',
+                url: this.props.APIs.logout,
+                success: callback
+            });
+        }.bind(this);
+
+        setTimeout(delay, 1500);
     },
     create: function(board) {
 
@@ -224,7 +231,8 @@ var Index = React.createClass({
                         onClick: function () {
                             this.logout();
                         }.bind(this),
-                        text: "Log out"
+                        text: "Log out",
+                        working: true
                     }]
             }
         } else {
@@ -267,7 +275,7 @@ var Index = React.createClass({
 				<Modal ref="delete" type="WaveModal">
                     <ConfirmWindow workInfo={this.state.work_info} title="Are you sure?" onConfirm={this.handleOnDelete} />
                 </Modal>
-				<Navbar user={this.state.user} defaultTitle="Boards" ref="navbar" buttons={this.getButtons()} />
+				<Navbar workInfo={this.state.work_info} user={this.state.user} defaultTitle="Boards" ref="navbar" buttons={this.getButtons()} />
                 <BoardListPanel user={this.state.user} boards={this.state.boards} onBoardEvents={this.getBoardEventHandlers()} />
 			</div>
 		);
@@ -306,7 +314,7 @@ var BoardListToolbar = React.createClass({
         return (
             <div className="container-fluid">
                 <div className="row">
-                    <div className="col-xs-3">
+                    <div className="col-xs-4">
                         <SearchTextBox onChange={this.handleOnChange}/>
                     </div>
                 </div>
@@ -333,7 +341,7 @@ var BoardList = React.createClass({
         for (var i in boards) {
             if (boards[i].show) {
                 rows.push(
-                    <div key={i} className="col-xs-3">
+                    <div key={i} className="col-xs-4">
                         <Board user={this.props.user} board={boards[i]} onBoardEvents={this.props.onBoardEvents} />
                     </div>
                 );
@@ -343,7 +351,7 @@ var BoardList = React.createClass({
     },
     render: function() {
         return (
-            <div className="container">
+            <div className="container-fluid">
                 <div className="row">
                     {this.getBoards()}
                 </div>
@@ -476,9 +484,11 @@ var UserInfoForm = React.createClass({
 				<div className="form-group">
                     <Input ref="password" placeholder="Password" type="password" size="input-md" onKeyDown={this.handleOnKeyDown}></Input>
 				</div>
-				<div className="form-group">
-                    {this.getButton()}
-				</div>
+                <div className="UserInfoFormButton">
+                    <div className="form-group">
+                        {this.getButton()}
+                    </div>
+                </div>
 			</div>
 		);
 	}

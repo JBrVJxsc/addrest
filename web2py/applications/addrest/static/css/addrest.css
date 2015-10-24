@@ -183,24 +183,30 @@ body {
 .BoardListPanel {
   position: relative;
   top: 80px;
-  width: 95%;
+  width: 70%;
   margin: 0 auto;
 }
 
 /* line 157, ../sass/_main.scss */
 .BoardToolbar .btn {
-  margin-left: 5px;
+  margin-left: 13px;
+  margin-right: -6px;
 }
 
-/* line 161, ../sass/_main.scss */
+/* line 162, ../sass/_main.scss */
 .ConfirmWindow {
   position: relative;
   width: 325px;
   right: 162.5px;
 }
 
-/* line 167, ../sass/_main.scss */
+/* line 168, ../sass/_main.scss */
 .ConfirmWindow .panel .panel-body {
   position: relative;
   top: 6px;
+}
+
+/* line 173, ../sass/_main.scss */
+.UserInfoFormButton .form-group {
+  margin-bottom: 8px;
 }
