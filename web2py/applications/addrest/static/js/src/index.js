@@ -15,7 +15,8 @@ var Index = React.createClass({
             error: {},
             work_info: {},
             deleting: null,
-            editing: null
+            editing: null,
+            keyword: ""
         };
     },
     getBoardEventHandlers: function() {
@@ -31,6 +32,11 @@ var Index = React.createClass({
                     deleting: e
                 });
                 this.refs.delete.show();
+            }.bind(this),
+            handleOnSearch: function(e) {
+                this.setState({
+                    keyword: e.keyword
+                });
             }.bind(this)
         };
     },
@@ -303,6 +309,24 @@ var Index = React.createClass({
             }.bind(this)
         });
     },
+    getFilteredBoards: function() {
+        var boards = this.state.boards;
+        for (var i in boards) {
+            var board = boards[i];
+            board.show = false;
+
+            if (this.state.keyword.trim() !== "") {
+                var content = board.title + " ";
+                content += board.email;
+                if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
+                    continue;
+                }
+            }
+
+            board.show = true;
+        }
+        return boards;
+    },
     setError: function(worker, message) {
         var error = {};
         error[worker] = {
@@ -379,7 +403,7 @@ var Index = React.createClass({
                     <ConfirmWindow workInfo={this.state.work_info.delete} error={this.state.error.delete} title="Are you sure?" onConfirm={this.handleOnDelete} onAlertDismiss={this.handleOnAlertDismiss} />
                 </Modal>
 				<Navbar workInfo={this.state.work_info.logout} user={this.state.user} defaultTitle="Boards" ref="navbar" buttons={this.getButtons()} />
-                <BoardListPanel user={this.state.user} boards={this.state.boards} onBoardEvents={this.getBoardEventHandlers()} />
+                <BoardListPanel user={this.state.user} boards={this.getFilteredBoards()} onBoardEvents={this.getBoardEventHandlers()} />
 			</div>
 		);
 	}
@@ -391,7 +415,7 @@ var BoardListPanel = React.createClass({
             <div className="BoardListPanel box-shadow--3dp">
                 <div className="panel panel-primary">
                     <div className="panel-heading">
-                        <BoardListToolbar />
+                        <BoardListToolbar onSearch={this.props.onBoardEvents.handleOnSearch} />
                     </div>
                     <div className="panel-body">
                         <BoardList user={this.props.user} boards={this.props.boards} onBoardEvents={this.props.onBoardEvents} />
