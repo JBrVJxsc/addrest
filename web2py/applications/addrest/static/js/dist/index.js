@@ -35560,7 +35560,7 @@ var DismissibleAlert = React.createClass({
         }
     },
     render: function render() {
-        console.log("Alert is rendering.");
+        console.log(this.props.style);
         return React.createElement(
             Alert,
             { bsStyle: this.props.style, onDismiss: this.props.onDismiss },
@@ -35689,13 +35689,17 @@ var Index = React.createClass({
             boards: [],
             error: {},
             work_info: {},
-            deleting: null
+            deleting: null,
+            editing: null
         };
     },
     getBoardEventHandlers: function getBoardEventHandlers() {
         return {
             handleOnEdit: (function (e) {
-                console.log("editing");
+                this.setState({
+                    editing: e
+                });
+                this.refs.edit.show();
             }).bind(this),
             handleOnDelete: (function (e) {
                 this.setState({
@@ -35741,15 +35745,35 @@ var Index = React.createClass({
 
         this.signup(email, password);
     },
-    handleOnCreate: function handleOnCreate(name) {
+    handleOnCreate: function handleOnCreate(title) {
         this.clearError();
 
-        if (name.trim().length === 0) {
-            this.setError("create", "Please enter a valid name.");
+        if (title.trim().length === 0) {
+            this.setError("create", "Please enter a valid title.");
             return;
         }
 
-        this.create(name);
+        this.create(title);
+    },
+    handleOnEdit: function handleOnEdit(title) {
+        this.clearError();
+
+        console.log("handleOnEdit 1");
+
+        if (title === null) {
+            console.log("title is null");
+            this.refs.edit.hide();
+            return;
+        }
+
+        console.log("handleOnEdit 2");
+
+        if (title.trim().length === 0) {
+            this.setError("edit", "Please enter a valid title.");
+            return;
+        }
+
+        this.edit(title);
     },
     work: function work(worker, working, message) {
         var info = {};
@@ -35846,24 +35870,72 @@ var Index = React.createClass({
 
         setTimeout(delay, 1500);
     },
-    create: function create(name) {
+    create: function create(title) {
         this.work("create", true, "Creating...");
 
         var callback = (function (data) {
             this.stopWork();
-            if (data.result === false) {
-                this.setError("create", "Board name has been used.");
+            if (data.result.state === false) {
+                this.setError("create", "Board title has been used.");
             } else {
+                this.refs.create.hide();
                 this.getBoards();
             }
+        }).bind(this);
+
+        var error = (function () {
+            this.stopWork();
+            this.setError("create", "Something was wrong...");
         }).bind(this);
 
         var delay = (function () {
             $.ajax({
                 type: 'POST',
                 url: this.props.APIs.create,
-                data: name,
-                success: callback
+                data: {
+                    title: title
+                },
+                error: error,
+                success: callback,
+                timeout: 3000
+            });
+        }).bind(this);
+
+        setTimeout(delay, 1500);
+    },
+    edit: function edit(title) {
+        this.work("edit", true, "Saving...");
+
+        var callback = (function (data) {
+            this.stopWork();
+            if (data.result.state === false) {
+                this.setError("edit", "Board title has been used.");
+            } else {
+                this.refs.edit.hide();
+                this.getBoards();
+            }
+        }).bind(this);
+
+        var error = (function () {
+            this.stopWork();
+            this.setError("edit", "Something was wrong...");
+        }).bind(this);
+
+        console.log(this.state);
+
+        var data = {
+            id: this.state.editing.id,
+            title: title
+        };
+
+        var delay = (function () {
+            $.ajax({
+                type: 'POST',
+                url: this.props.APIs.edit,
+                data: data,
+                error: error,
+                success: callback,
+                timeout: 3000
             });
         }).bind(this);
 
@@ -35975,6 +36047,11 @@ var Index = React.createClass({
                 Modal,
                 { ref: 'create', type: 'WaveModal' },
                 React.createElement(Create, { workInfo: this.state.work_info.create, error: this.state.error.create, onCreate: this.handleOnCreate, onAlertDismiss: this.handleOnAlertDismiss })
+            ),
+            React.createElement(
+                Modal,
+                { ref: 'edit', type: 'WaveModal' },
+                React.createElement(Edit, { board: this.state.editing, workInfo: this.state.work_info.edit, error: this.state.error.edit, onCreate: this.handleOnEdit, onAlertDismiss: this.handleOnAlertDismiss })
             ),
             React.createElement(
                 Modal,
@@ -36136,6 +36213,24 @@ var BoardToolbar = React.createClass({
     handleOnDelete: function handleOnDelete() {
         this.props.onBoardEvents.handleOnDelete(this.props.board);
     },
+    getTitle: function getTitle() {
+        if (this.props.user) {
+            if (this.props.board.email) {
+                if (this.props.user.email === this.props.board.email) {
+                    return React.createElement(
+                        'div',
+                        { className: 'HalfTitle' },
+                        this.props.board.title
+                    );
+                }
+            }
+        }
+        return React.createElement(
+            'div',
+            { className: 'FullTitle' },
+            this.props.board.title
+        );
+    },
     getButtons: function getButtons() {
         if (this.props.user) {
             if (this.props.board.email) {
@@ -36162,7 +36257,7 @@ var BoardToolbar = React.createClass({
         return React.createElement(
             'div',
             { className: 'BoardToolbar' },
-            this.props.board.title,
+            this.getTitle(),
             this.getButtons()
         );
     }
@@ -36196,7 +36291,7 @@ var UserInfoForm = React.createClass({
     getError: function getError() {
         console.log(this.props.error);
         if (this.props.error) {
-            return React.createElement(Alert, { style: 'info', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
+            return React.createElement(Alert, { style: 'warning', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
         }
     },
     getButton: function getButton() {
@@ -36283,8 +36378,8 @@ var BoardForm = React.createClass({
 
     handleOnKeyDown: function handleOnKeyDown(e) {
         if (e.keyCode === 13) {
-            var name = ReactDOM.findDOMNode(this.refs.name);
-            if (e.target === name) {
+            var title = ReactDOM.findDOMNode(this.refs.title);
+            if (e.target === title) {
                 this.submit();
             }
         }
@@ -36293,17 +36388,19 @@ var BoardForm = React.createClass({
         this.submit();
     },
     submit: function submit() {
-        console.log("submit");
         if (this.props.workInfo && this.props.workInfo.working) {
             return;
         }
-        var name = ReactDOM.findDOMNode(this.refs.name).value;
-        console.log(this.props.onClick);
-        this.props.onClick(name);
+        var title = ReactDOM.findDOMNode(this.refs.title).value;
+        if (this.props.board && this.props.board.title === title) {
+            this.props.onClick(null);
+            return;
+        }
+        this.props.onClick(title);
     },
     getError: function getError() {
         if (this.props.error) {
-            return React.createElement(Alert, { style: 'info', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
+            return React.createElement(Alert, { style: 'warning', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
         }
     },
     getButton: function getButton() {
@@ -36321,6 +36418,10 @@ var BoardForm = React.createClass({
         );
     },
     render: function render() {
+        var board = {};
+        if (this.props.board) {
+            board = this.props.board;
+        }
         return React.createElement(
             'div',
             { className: 'UserInfoModal' },
@@ -36333,7 +36434,11 @@ var BoardForm = React.createClass({
                     React.createElement(
                         'h3',
                         { className: 'panel-title' },
-                        this.props.title
+                        React.createElement(
+                            'div',
+                            { className: 'Overflow' },
+                            this.props.title
+                        )
                     )
                 ),
                 React.createElement(
@@ -36346,7 +36451,11 @@ var BoardForm = React.createClass({
                         React.createElement(
                             'div',
                             { className: 'form-group' },
-                            React.createElement(Input, { ref: 'name', placeholder: 'Board Name', size: 'input-md', onKeyDown: this.handleOnKeyDown })
+                            React.createElement(
+                                Input,
+                                { ref: 'title', placeholder: 'Board Title', size: 'input-md', onKeyDown: this.handleOnKeyDown },
+                                board.title
+                            )
                         ),
                         React.createElement(
                             'div',
@@ -36376,16 +36485,17 @@ var Edit = React.createClass({
     displayName: 'Edit',
 
     render: function render() {
-        return React.createElement(BoardForm, { title: 'Edit', button: 'Save' });
+        return React.createElement(BoardForm, { board: this.props.board, title: 'Edit', workInfo: this.props.workInfo, button: 'Save', error: this.props.error, onClick: this.props.onCreate, onAlertDismiss: this.props.onAlertDismiss });
     }
 });
 
 var APIs = {
     login: "login.json",
     signup: "signup.json",
-    boards: "boards.json",
+    boards: "get_boards.json",
     'delete': "delete_board.json",
     create: "create_board.json",
+    edit: "edit_board.json",
     logout: "logout"
 };
 

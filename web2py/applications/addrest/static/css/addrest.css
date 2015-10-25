@@ -210,3 +210,31 @@ body {
 .UserInfoFormButton .form-group {
   margin-bottom: 8px;
 }
+
+/* line 177, ../sass/_main.scss */
+.FullTitle {
+  white-space: nowrap;
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* line 185, ../sass/_main.scss */
+.HalfTitle {
+  white-space: nowrap;
+  display: inline-block;
+  width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* line 193, ../sass/_main.scss */
+.Right {
+  float: right;
+}
+
+/* line 197, ../sass/_main.scss */
+.Left {
+  float: left;
+}

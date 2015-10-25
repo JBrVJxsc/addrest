@@ -173,3 +173,27 @@ body {
 .UserInfoFormButton .form-group {
   margin-bottom: 8px;
 }
+
+.FullTitle {
+  white-space: nowrap;
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.HalfTitle {
+  white-space: nowrap;
+  display: inline-block;
+  width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.Right {
+  float: right;
+}
+
+.Left {
+  float: left;
+}

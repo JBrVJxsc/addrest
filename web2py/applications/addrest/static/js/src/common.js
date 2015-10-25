@@ -160,7 +160,7 @@ var DismissibleAlert = React.createClass({
         }
     },
     render: function() {
-        console.log("Alert is rendering.");
+        console.log(this.props.style);
         return (
             <Alert bsStyle={this.props.style} onDismiss={this.props.onDismiss}>
                 {this.getTitle()}

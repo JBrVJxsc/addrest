@@ -78,163 +78,27 @@ def logout():
     return locals()
 
 
-def boards():
-    result = {
-        'boards': [
-            {
-                'email': "x1@x.com",
-                'title': "Jobs",
-                'recent': 6,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Housing",
-                'recent': 12,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Jobs",
-                'recent': 6,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Housing",
-                'recent': 12,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Jobs",
-                'recent': 6,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Housing",
-                'recent': 12,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Jobs",
-                'recent': 6,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Housing",
-                'recent': 12,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Jobs",
-                'recent': 6,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Housing",
-                'recent': 12,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Jobs",
-                'recent': 6,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Housing",
-                'recent': 12,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Jobs",
-                'recent': 6,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Housing",
-                'recent': 12,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Jobs",
-                'recent': 6,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Housing",
-                'recent': 12,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Jobs",
-                'recent': 6,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Housing",
-                'recent': 12,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Jobs",
-                'recent': 6,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Housing",
-                'recent': 12,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Jobs",
-                'recent': 6,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Housing",
-                'recent': 12,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Jobs",
-                'recent': 6,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Housing",
-                'recent': 12,
-                'show': True
-            },
-            {
-                'email': "x@x.com",
-                'title': "Housing",
-                'recent': 12,
-                'show': True
-            },
-        ],
-        'user': auth.user
+def get_boards():
+    print auth.user
+    rows = db().select(db.board.ALL, orderby=~db.board.last_active_time)
+    boards = []
+    for row in rows:
+        board = {
+            'id': row.id,
+            'title': row.title,
+            'email': row.email,
+            'create_time': row.create_time,
+            'last_active_post': row.last_active_post,
+            'last_active_time': row.last_active_time,
+            'show': True
+        }
+        boards.append(board)
+    return {
+        'result': {
+            'boards': boards,
+            'user': auth.user,
+        }
     }
-    return locals()
 
 
 def delete_board():
@@ -243,5 +107,57 @@ def delete_board():
 
 
 def create_board():
-    result = False
-    return locals()
+    rows = db(db.board.title == request.vars.title).select()
+    if len(rows) > 0:
+        return {
+            'result': {
+                'state': False,
+            }
+        }
+    board = {
+        'title': request.vars.title,
+        'email': auth.user.email
+    }
+    db.board.insert(**board)
+    return {
+        'result': {
+            'state': True,
+        }
+    }
+
+
+def edit_board():
+    rows = db(db.board.title == request.vars.title).select()
+    if len(rows) > 0:
+        return {
+            'result': {
+                'state': False,
+            }
+        }
+    info = request.vars
+    db(db.board.id == info.id).update(title=info.title)
+    return {
+        'result': {
+            'state': True,
+        }
+    }
+
+
+def create_post():
+    post = {
+        'title': str(request.now),
+        'email': auth.user.email,
+        'post_content': str(request.now),
+        'board': 6,
+    }
+    db.post.insert(**post)
+    return {
+        'result': {
+            'state': True,
+        }
+    }
+
+
+def get_posts():
+    rows = db(db.post.board == '1').select()
+    print rows
