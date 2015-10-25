@@ -74,6 +74,11 @@ var Modal = React.createClass({
 	},
 	show: function() {
 		this.refs.dialog.show();
+        var callback = function() {
+            var input = $('#Modal-Content').find('input[type=text]');
+            input.focus();
+        };
+        setTimeout(callback, 200);
 	},
 	hide: function() {
 		this.refs.dialog.hide();
@@ -81,7 +86,11 @@ var Modal = React.createClass({
 	render: function() {
 		var Dialog = Boron[this.props.type];
 		return (
-			<Dialog ref="dialog">{this.props.children}</Dialog>
+			<Dialog ref="dialog">
+                <div id="Modal-Content">
+                    {this.props.children}
+                </div>
+            </Dialog>
 		)
 	}
 });

@@ -35,7 +35,6 @@ var Index = React.createClass({
         };
     },
     handleOnDelete: function(e) {
-        console.log(e);
         if (e) {
             this.delete(this.state.deleting);
         } else {
@@ -83,15 +82,10 @@ var Index = React.createClass({
     handleOnEdit: function(title) {
         this.clearError();
 
-        console.log("handleOnEdit 1");
-
         if (title === null) {
-            console.log("title is null");
             this.refs.edit.hide();
             return;
         }
-
-        console.log("handleOnEdit 2");
 
         if (title.trim().length === 0) {
             this.setError("edit", "Please enter a valid title.");
@@ -568,7 +562,6 @@ var UserInfoForm = React.createClass({
         this.props.onClick(email, password);
     },
     getError: function() {
-        console.log(this.props.error);
         if (this.props.error) {
             return (
                 <Alert style="warning" onDismiss={this.props.onAlertDismiss} title={this.props.error.title} message={this.props.error.message} />
