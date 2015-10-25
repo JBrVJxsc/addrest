@@ -35578,12 +35578,22 @@ var ConfirmWindow = React.createClass({
     displayName: 'ConfirmWindow',
 
     handleOnClick: function handleOnClick(e) {
+        if (this.props.workInfo && this.props.workInfo.working) {
+            return;
+        }
         var yes = ReactDOM.findDOMNode(this.refs.yes);
         var no = ReactDOM.findDOMNode(this.refs.no);
         if (e.target === yes) {
             this.props.onConfirm(true);
         } else if (e.target === no) {
             this.props.onConfirm(false);
+        }
+    },
+    getError: function getError() {
+        if (this.props.error) {
+            console.log("getting delete error");
+            console.log(this.props.error);
+            return React.createElement(DismissibleAlert, { style: 'warning', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
         }
     },
     getButton: function getButton() {
@@ -35622,6 +35632,7 @@ var ConfirmWindow = React.createClass({
                     React.createElement(
                         'div',
                         { className: 'form center-block' },
+                        this.getError(),
                         React.createElement(
                             'div',
                             { className: 'form-group' },
@@ -35921,8 +35932,6 @@ var Index = React.createClass({
             this.setError("edit", "Something was wrong...");
         }).bind(this);
 
-        console.log(this.state);
-
         var data = {
             id: this.state.editing.id,
             title: title
@@ -35945,9 +35954,18 @@ var Index = React.createClass({
         this.work("delete", true, "Deleting...");
 
         var callback = (function (data) {
-            console.log(data);
-            this.refs['delete'].hide();
             this.stopWork();
+            if (data.result.state === false) {
+                this.setError("delete", "Something was wrong...");
+            } else {
+                this.refs['delete'].hide();
+                this.getBoards();
+            }
+        }).bind(this);
+
+        var error = (function () {
+            this.stopWork();
+            this.setError("delete", "Something was wrong...");
         }).bind(this);
 
         var delay = (function () {
@@ -35955,7 +35973,9 @@ var Index = React.createClass({
                 type: 'POST',
                 url: this.props.APIs['delete'],
                 data: board,
-                success: callback
+                error: error,
+                success: callback,
+                timeout: 3000
             });
         }).bind(this);
 
@@ -36056,7 +36076,7 @@ var Index = React.createClass({
             React.createElement(
                 Modal,
                 { ref: 'delete', type: 'WaveModal' },
-                React.createElement(ConfirmWindow, { workInfo: this.state.work_info['delete'], title: 'Are you sure?', onConfirm: this.handleOnDelete })
+                React.createElement(ConfirmWindow, { workInfo: this.state.work_info['delete'], error: this.state.error['delete'], title: 'Are you sure?', onConfirm: this.handleOnDelete, onAlertDismiss: this.handleOnAlertDismiss })
             ),
             React.createElement(Navbar, { workInfo: this.state.work_info.logout, user: this.state.user, defaultTitle: 'Boards', ref: 'navbar', buttons: this.getButtons() }),
             React.createElement(BoardListPanel, { user: this.state.user, boards: this.state.boards, onBoardEvents: this.getBoardEventHandlers() })

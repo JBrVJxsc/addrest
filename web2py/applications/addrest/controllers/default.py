@@ -102,8 +102,12 @@ def get_boards():
 
 
 def delete_board():
-    print "deleting", request.vars
-    return locals()
+    db(db.board.id == request.vars.id).delete()
+    return {
+        'result': {
+            'state': True,
+        }
+    }
 
 
 def create_board():

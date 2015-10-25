@@ -172,12 +172,24 @@ var DismissibleAlert = React.createClass({
 
 var ConfirmWindow = React.createClass({
     handleOnClick: function(e) {
+        if (this.props.workInfo && this.props.workInfo.working) {
+            return;
+        }
         var yes = ReactDOM.findDOMNode(this.refs.yes);
         var no = ReactDOM.findDOMNode(this.refs.no);
         if (e.target === yes) {
             this.props.onConfirm(true);
         } else if (e.target === no) {
             this.props.onConfirm(false);
+        }
+    },
+    getError: function() {
+        if (this.props.error) {
+            console.log("getting delete error");
+            console.log(this.props.error);
+            return (
+                <DismissibleAlert style="warning" onDismiss={this.props.onAlertDismiss} title={this.props.error.title} message={this.props.error.message} />
+            );
         }
     },
     getButton: function() {
@@ -199,6 +211,7 @@ var ConfirmWindow = React.createClass({
                     </div>
                     <div className="panel-body">
                         <div className="form center-block">
+                            {this.getError()}
                             <div className="form-group">
                                 <div className="row">
                                     <div className="col-xs-6 RightExtend">

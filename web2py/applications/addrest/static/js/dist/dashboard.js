@@ -35578,12 +35578,22 @@ var ConfirmWindow = React.createClass({
     displayName: 'ConfirmWindow',
 
     handleOnClick: function handleOnClick(e) {
+        if (this.props.workInfo && this.props.workInfo.working) {
+            return;
+        }
         var yes = ReactDOM.findDOMNode(this.refs.yes);
         var no = ReactDOM.findDOMNode(this.refs.no);
         if (e.target === yes) {
             this.props.onConfirm(true);
         } else if (e.target === no) {
             this.props.onConfirm(false);
+        }
+    },
+    getError: function getError() {
+        if (this.props.error) {
+            console.log("getting delete error");
+            console.log(this.props.error);
+            return React.createElement(DismissibleAlert, { style: 'warning', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
         }
     },
     getButton: function getButton() {
@@ -35622,6 +35632,7 @@ var ConfirmWindow = React.createClass({
                     React.createElement(
                         'div',
                         { className: 'form center-block' },
+                        this.getError(),
                         React.createElement(
                             'div',
                             { className: 'form-group' },

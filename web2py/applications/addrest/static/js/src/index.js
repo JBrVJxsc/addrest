@@ -246,8 +246,6 @@ var Index = React.createClass({
             this.setError("edit", "Something was wrong...");
         }.bind(this);
 
-        console.log(this.state);
-
         var data = {
             id: this.state.editing.id,
             title: title
@@ -270,9 +268,18 @@ var Index = React.createClass({
         this.work("delete", true, "Deleting...");
 
         var callback = function(data) {
-            console.log(data);
-            this.refs.delete.hide();
             this.stopWork();
+            if (data.result.state === false) {
+                this.setError("delete", "Something was wrong...");
+            } else {
+                this.refs.delete.hide();
+                this.getBoards();
+            }
+        }.bind(this);
+
+        var error = function() {
+            this.stopWork();
+            this.setError("delete", "Something was wrong...");
         }.bind(this);
 
         var delay = function() {
@@ -280,7 +287,9 @@ var Index = React.createClass({
                 type: 'POST',
                 url: this.props.APIs.delete,
                 data: board,
-                success: callback
+                error: error,
+                success: callback,
+                timeout: 3000
             });
         }.bind(this);
 
@@ -373,7 +382,7 @@ var Index = React.createClass({
                     <Edit board={this.state.editing} workInfo={this.state.work_info.edit} error={this.state.error.edit} onCreate={this.handleOnEdit} onAlertDismiss={this.handleOnAlertDismiss} />
                 </Modal>
 				<Modal ref="delete" type="WaveModal">
-                    <ConfirmWindow workInfo={this.state.work_info.delete} title="Are you sure?" onConfirm={this.handleOnDelete} />
+                    <ConfirmWindow workInfo={this.state.work_info.delete} error={this.state.error.delete} title="Are you sure?" onConfirm={this.handleOnDelete} onAlertDismiss={this.handleOnAlertDismiss} />
                 </Modal>
 				<Navbar workInfo={this.state.work_info.logout} user={this.state.user} defaultTitle="Boards" ref="navbar" buttons={this.getButtons()} />
                 <BoardListPanel user={this.state.user} boards={this.state.boards} onBoardEvents={this.getBoardEventHandlers()} />
