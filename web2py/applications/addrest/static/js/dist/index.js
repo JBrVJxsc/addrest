@@ -35945,7 +35945,10 @@ var Index = React.createClass({
     },
     componentDidMount: function componentDidMount() {
         this.getBoards();
-        setInterval(this.getBoards, this.props.pollInterval);
+        this.interval = setInterval(this.getBoards, this.props.pollInterval);
+    },
+    componentWillUnmount: function componentWillUnmount() {
+        clearInterval(this.interval);
     },
     render: function render() {
         return React.createElement(

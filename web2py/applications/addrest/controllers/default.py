@@ -79,7 +79,6 @@ def logout():
 
 
 def get_boards():
-    print auth.user
     rows = db().select(db.board.ALL, orderby=~db.board.last_active_time)
     boards = []
     for row in rows:
