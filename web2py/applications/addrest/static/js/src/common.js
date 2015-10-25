@@ -169,7 +169,6 @@ var DismissibleAlert = React.createClass({
         }
     },
     render: function() {
-        console.log(this.props.style);
         return (
             <Alert bsStyle={this.props.style} onDismiss={this.props.onDismiss}>
                 {this.getTitle()}
@@ -194,8 +193,6 @@ var ConfirmWindow = React.createClass({
     },
     getError: function() {
         if (this.props.error) {
-            console.log("getting delete error");
-            console.log(this.props.error);
             return (
                 <DismissibleAlert style="warning" onDismiss={this.props.onAlertDismiss} title={this.props.error.title} message={this.props.error.message} />
             );

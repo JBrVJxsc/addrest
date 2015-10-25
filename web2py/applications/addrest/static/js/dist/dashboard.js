@@ -35442,7 +35442,6 @@ var DismissibleAlert = React.createClass({
         }
     },
     render: function render() {
-        console.log(this.props.style);
         return React.createElement(
             Alert,
             { bsStyle: this.props.style, onDismiss: this.props.onDismiss },
@@ -35473,8 +35472,6 @@ var ConfirmWindow = React.createClass({
     },
     getError: function getError() {
         if (this.props.error) {
-            console.log("getting delete error");
-            console.log(this.props.error);
             return React.createElement(DismissibleAlert, { style: 'warning', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
         }
     },

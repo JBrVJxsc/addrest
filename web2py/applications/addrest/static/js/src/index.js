@@ -147,7 +147,7 @@ var Index = React.createClass({
             });
         }.bind(this);
 
-        setTimeout(delay, 1500);
+        setTimeout(delay, 800);
     },
     signup: function(email, password) {
         this.work("signup", true, "Signing...");
@@ -175,7 +175,7 @@ var Index = React.createClass({
             });
         }.bind(this);
 
-        setTimeout(delay, 1500);
+        setTimeout(delay, 800);
     },
     logout: function() {
         this.work("logout", true, "Goodbye...");
@@ -193,7 +193,7 @@ var Index = React.createClass({
             });
         }.bind(this);
 
-        setTimeout(delay, 1500);
+        setTimeout(delay, 800);
     },
     create: function(title) {
         this.work("create", true, "Creating...");
@@ -226,7 +226,7 @@ var Index = React.createClass({
             });
         }.bind(this);
 
-        setTimeout(delay, 1500);
+        setTimeout(delay, 800);
     },
     edit: function(title) {
         this.work("edit", true, "Saving...");
@@ -262,7 +262,7 @@ var Index = React.createClass({
             });
         }.bind(this);
 
-        setTimeout(delay, 1500);
+        setTimeout(delay, 800);
     },
     delete: function(board) {
         this.work("delete", true, "Deleting...");
@@ -293,7 +293,7 @@ var Index = React.createClass({
             });
         }.bind(this);
 
-        setTimeout(delay, 1500);
+        setTimeout(delay, 800);
     },
     getBoards: function() {
         $.ajax({
@@ -383,6 +383,7 @@ var Index = React.createClass({
     },
 	componentDidMount: function() {
         this.getBoards();
+        setInterval(this.getBoards, this.props.pollInterval);
 	},
 	render: function() {
 		return (
@@ -744,6 +745,6 @@ var APIs = {
 };
 
 ReactDOM.render(
-    <Index APIs={APIs} />,
+    <Index APIs={APIs} pollInterval={3500} />,
     document.getElementById("body")
 );

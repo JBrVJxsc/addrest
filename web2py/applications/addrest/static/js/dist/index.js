@@ -35442,7 +35442,6 @@ var DismissibleAlert = React.createClass({
         }
     },
     render: function render() {
-        console.log(this.props.style);
         return React.createElement(
             Alert,
             { bsStyle: this.props.style, onDismiss: this.props.onDismiss },
@@ -35473,8 +35472,6 @@ var ConfirmWindow = React.createClass({
     },
     getError: function getError() {
         if (this.props.error) {
-            console.log("getting delete error");
-            console.log(this.props.error);
             return React.createElement(DismissibleAlert, { style: 'warning', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
         }
     },
@@ -35715,7 +35712,7 @@ var Index = React.createClass({
             });
         }).bind(this);
 
-        setTimeout(delay, 1500);
+        setTimeout(delay, 800);
     },
     signup: function signup(email, password) {
         this.work("signup", true, "Signing...");
@@ -35743,7 +35740,7 @@ var Index = React.createClass({
             });
         }).bind(this);
 
-        setTimeout(delay, 1500);
+        setTimeout(delay, 800);
     },
     logout: function logout() {
         this.work("logout", true, "Goodbye...");
@@ -35761,7 +35758,7 @@ var Index = React.createClass({
             });
         }).bind(this);
 
-        setTimeout(delay, 1500);
+        setTimeout(delay, 800);
     },
     create: function create(title) {
         this.work("create", true, "Creating...");
@@ -35794,7 +35791,7 @@ var Index = React.createClass({
             });
         }).bind(this);
 
-        setTimeout(delay, 1500);
+        setTimeout(delay, 800);
     },
     edit: function edit(title) {
         this.work("edit", true, "Saving...");
@@ -35830,7 +35827,7 @@ var Index = React.createClass({
             });
         }).bind(this);
 
-        setTimeout(delay, 1500);
+        setTimeout(delay, 800);
     },
     'delete': function _delete(board) {
         this.work("delete", true, "Deleting...");
@@ -35861,7 +35858,7 @@ var Index = React.createClass({
             });
         }).bind(this);
 
-        setTimeout(delay, 1500);
+        setTimeout(delay, 800);
     },
     getBoards: function getBoards() {
         $.ajax({
@@ -35948,6 +35945,7 @@ var Index = React.createClass({
     },
     componentDidMount: function componentDidMount() {
         this.getBoards();
+        setInterval(this.getBoards, this.props.pollInterval);
     },
     render: function render() {
         return React.createElement(
@@ -36418,7 +36416,7 @@ var APIs = {
     logout: "logout"
 };
 
-ReactDOM.render(React.createElement(Index, { APIs: APIs }), document.getElementById("body"));
+ReactDOM.render(React.createElement(Index, { APIs: APIs, pollInterval: 3500 }), document.getElementById("body"));
 
 },{"./common":408,"react":407,"react-dom":252}],410:[function(require,module,exports){
 // shim for using process in browser
