@@ -10,5 +10,8 @@
     <script type="text/javascript" src="{{=URL('static','js/jquery.js')}}"></script>
     <script type="text/javascript" src="{{=URL('static','js/bootstrap.min.js')}}"></script>
 </head>
+    <div id="body"></div>
+    <div id="APPLICATION" hidden>{{=request.application}}</div>
+    <div id="CONTROLLER" hidden>{{=request.controller}}</div>
 {{include}}
 </html>

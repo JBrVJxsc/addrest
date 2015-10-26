@@ -35225,6 +35225,702 @@ module.exports = require('./lib/React');
 
 var React = require('react');
 var ReactDOM = require('react-dom');
+var Utils = require('./common').Utils;
+var Navbar = require('./common').Navbar;
+var Modal = require('./common').Modal;
+var Input = require('./common').Input;
+var Alert = require('./common').Alert;
+var ConfirmWindow = require('./common').ConfirmWindow;
+
+var Index = React.createClass({
+    displayName: 'Index',
+
+    getInitialState: function getInitialState() {
+        var app = document.getElementById("APPLICATION").textContent;
+        var controller = document.getElementById("CONTROLLER").textContent;
+        var board_id = document.getElementById("BOARD_ID").textContent;
+        var base_link = window.location.origin + "/" + app + "/" + controller + "/";
+        return {
+            user: null,
+            boards: [],
+            keyword: "",
+            board_id: board_id,
+            base_link: base_link,
+            APIs: {
+                boards: base_link + "get_boards.json",
+                create: base_link + "create_board.json",
+                edit: base_link + "edit_board.json",
+                'delete': base_link + "delete_board.json",
+                login: base_link + "login.json",
+                signup: base_link + "signup.json",
+                logout: base_link + "logout"
+            }
+        };
+    },
+    getBoardEventHandlers: function getBoardEventHandlers() {
+        return {
+            handleOnEdit: (function (e) {
+                this.refs.editor.edit(e);
+            }).bind(this),
+            handleOnDelete: (function (e) {
+                this.refs.editor['delete'](e);
+            }).bind(this),
+            handleOnSearch: (function (e) {
+                this.setState({
+                    keyword: e.keyword
+                });
+            }).bind(this)
+        };
+    },
+    handleOnBoardEdit: function handleOnBoardEdit() {
+        this.getBoards();
+    },
+    handleOnUserChanged: function handleOnUserChanged() {
+        this.getBoards();
+    },
+    getBoards: function getBoards() {
+        $.ajax({
+            type: 'POST',
+            url: this.state.APIs.boards,
+            success: (function (data) {
+                if (this.isMounted()) {
+                    this.setState({
+                        boards: data.result.boards,
+                        user: data.result.user
+                    });
+                }
+            }).bind(this)
+        });
+    },
+    getFilteredBoards: function getFilteredBoards() {
+        var boards = this.state.boards;
+        for (var i in boards) {
+            var board = boards[i];
+            board.show = false;
+
+            if (this.state.keyword.trim() !== "") {
+                var content = board.title + " ";
+                content += board.email;
+                if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
+                    continue;
+                }
+            }
+
+            board.show = true;
+        }
+        return boards;
+    },
+    getButtons: function getButtons() {
+        return [{
+            onClick: (function () {
+                this.refs.editor.create();
+            }).bind(this),
+            text: "Create"
+        }];
+    },
+    componentDidMount: function componentDidMount() {
+        console.log(this.state);
+        this.getBoards();
+        this.interval = setInterval(this.getBoards, this.props.pollInterval);
+    },
+    componentWillUnmount: function componentWillUnmount() {
+        clearInterval(this.interval);
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            null,
+            React.createElement(BoardEditor, { APIs: this.state.APIs, ref: 'editor', onBoardEdit: this.handleOnBoardEdit }),
+            React.createElement(Navbar, { APIs: this.state.APIs, user: this.state.user, title: 'Boards', buttons: this.getButtons(), onUserChanged: this.handleOnUserChanged }),
+            React.createElement(BoardListPanel, { baseLink: this.state.base_link, user: this.state.user, boards: this.getFilteredBoards(), onBoardEvents: this.getBoardEventHandlers() })
+        );
+    }
+});
+
+var BoardEditor = React.createClass({
+    displayName: 'BoardEditor',
+
+    getInitialState: function getInitialState() {
+        return {
+            error: {},
+            work_info: {},
+            editing: null,
+            deleting: null
+        };
+    },
+    handleOnAlertDismiss: function handleOnAlertDismiss() {
+        this.clearError();
+    },
+    handleOnCreate: function handleOnCreate(title) {
+        this.clearError();
+
+        if (title.trim().length === 0) {
+            this.setError("create", "Please enter a valid title.");
+            return;
+        }
+
+        this._create(title);
+    },
+    handleOnEdit: function handleOnEdit(title) {
+        this.clearError();
+
+        if (title === null) {
+            this.refs.edit.hide();
+            return;
+        }
+
+        if (title.trim().length === 0) {
+            this.setError("edit", "Please enter a valid title.");
+            return;
+        }
+
+        this._edit(title);
+    },
+    handleOnDelete: function handleOnDelete(e) {
+        if (e) {
+            this._delete(this.state.deleting);
+        } else {
+            this.refs['delete'].hide();
+        }
+    },
+    create: function create() {
+        this.clearError();
+        this.refs.create.show();
+    },
+    edit: function edit(board) {
+        this.setState({
+            editing: board
+        });
+        this.clearError();
+        this.refs.edit.show();
+    },
+    'delete': function _delete(board) {
+        this.setState({
+            deleting: board
+        });
+        this.clearError();
+        this.refs['delete'].show();
+    },
+    _create: function _create(title) {
+        this.work("create", true, "Creating...");
+
+        var callback = (function (data) {
+            this.stopWork();
+            if (data.result.state === false) {
+                this.setError("create", "Board title has been used.");
+            } else {
+                this.refs.create.hide();
+                this.props.onBoardEdit();
+            }
+        }).bind(this);
+
+        var error = (function () {
+            this.stopWork();
+            this.setError("create", "Something was wrong...");
+        }).bind(this);
+
+        var delay = (function () {
+            $.ajax({
+                type: 'POST',
+                url: this.props.APIs.create,
+                data: {
+                    title: title
+                },
+                error: error,
+                success: callback,
+                timeout: 3000
+            });
+        }).bind(this);
+
+        setTimeout(delay, 800);
+    },
+    _edit: function _edit(title) {
+        this.work("edit", true, "Saving...");
+
+        var callback = (function (data) {
+            this.stopWork();
+            if (data.result.state === false) {
+                this.setError("edit", "Board title has been used.");
+            } else {
+                this.refs.edit.hide();
+                this.props.onBoardEdit();
+            }
+        }).bind(this);
+
+        var error = (function () {
+            this.stopWork();
+            this.setError("edit", "Something was wrong...");
+        }).bind(this);
+
+        var data = {
+            id: this.state.editing.id,
+            title: title
+        };
+
+        var delay = (function () {
+            $.ajax({
+                type: 'POST',
+                url: this.props.APIs.edit,
+                data: data,
+                error: error,
+                success: callback,
+                timeout: 3000
+            });
+        }).bind(this);
+
+        setTimeout(delay, 800);
+    },
+    _delete: function _delete(board) {
+        this.work("delete", true, "Deleting...");
+
+        var callback = (function (data) {
+            this.stopWork();
+            if (data.result.state === false) {
+                this.setError("delete", "Something was wrong...");
+            } else {
+                this.refs['delete'].hide();
+                this.props.onBoardEdit();
+            }
+        }).bind(this);
+
+        var error = (function () {
+            this.stopWork();
+            this.setError("delete", "Something was wrong...");
+        }).bind(this);
+
+        var delay = (function () {
+            $.ajax({
+                type: 'POST',
+                url: this.props.APIs['delete'],
+                data: board,
+                error: error,
+                success: callback,
+                timeout: 3000
+            });
+        }).bind(this);
+
+        setTimeout(delay, 800);
+    },
+    work: function work(worker, working, message) {
+        var info = {};
+        info[worker] = {
+            working: working,
+            message: message
+        };
+        this.setState({
+            work_info: info
+        });
+    },
+    stopWork: function stopWork() {
+        this.setState({
+            work_info: {}
+        });
+    },
+    setError: function setError(worker, message) {
+        var error = {};
+        error[worker] = {
+            message: message
+        };
+        this.setState({
+            error: error
+        });
+    },
+    clearError: function clearError() {
+        this.setState({
+            error: {}
+        });
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            null,
+            React.createElement(
+                Modal,
+                { ref: 'create', type: 'WaveModal' },
+                React.createElement(Create, { workInfo: this.state.work_info.create, error: this.state.error.create, onCreate: this.handleOnCreate, onAlertDismiss: this.handleOnAlertDismiss })
+            ),
+            React.createElement(
+                Modal,
+                { ref: 'edit', type: 'WaveModal' },
+                React.createElement(Edit, { board: this.state.editing, workInfo: this.state.work_info.edit, error: this.state.error.edit, onCreate: this.handleOnEdit, onAlertDismiss: this.handleOnAlertDismiss })
+            ),
+            React.createElement(
+                Modal,
+                { ref: 'delete', type: 'WaveModal' },
+                React.createElement(ConfirmWindow, { workInfo: this.state.work_info['delete'], error: this.state.error['delete'], title: 'Are you sure?', onConfirm: this.handleOnDelete, onAlertDismiss: this.handleOnAlertDismiss })
+            )
+        );
+    }
+});
+
+var BoardListPanel = React.createClass({
+    displayName: 'BoardListPanel',
+
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'BoardListPanel box-shadow--3dp' },
+            React.createElement(
+                'div',
+                { className: 'panel panel-primary' },
+                React.createElement(
+                    'div',
+                    { className: 'panel-heading' },
+                    React.createElement(BoardListToolbar, { onSearch: this.props.onBoardEvents.handleOnSearch })
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'panel-body' },
+                    React.createElement(BoardList, { baseLink: this.props.baseLink, user: this.props.user, boards: this.props.boards, onBoardEvents: this.props.onBoardEvents })
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'panel-footer' },
+                    React.createElement(
+                        'button',
+                        { type: 'button', className: 'btn btn-info btn-xs', onClick: this.handleOnClick },
+                        'Show more'
+                    )
+                )
+            )
+        );
+    }
+});
+
+var BoardListToolbar = React.createClass({
+    displayName: 'BoardListToolbar',
+
+    handleOnChange: function handleOnChange(e) {
+        this.props.onSearch({
+            keyword: e
+        });
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'container-fluid' },
+            React.createElement(
+                'div',
+                { className: 'row' },
+                React.createElement(
+                    'div',
+                    { className: 'col-xs-4' },
+                    React.createElement(SearchTextBox, { onChange: this.handleOnChange })
+                )
+            )
+        );
+    }
+});
+
+var SearchTextBox = React.createClass({
+    displayName: 'SearchTextBox',
+
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'inner-addon left-addon' },
+            React.createElement('i', { className: 'glyphicon glyphicon-search' }),
+            React.createElement(Input, { placeholder: 'Search Boards', onChange: this.props.onChange })
+        );
+    }
+});
+
+var BoardList = React.createClass({
+    displayName: 'BoardList',
+
+    getBoards: function getBoards() {
+        var rows = [];
+        var boards = this.props.boards;
+        for (var i in boards) {
+            if (boards[i].show) {
+                rows.push(React.createElement(
+                    'div',
+                    { key: i, className: 'col-xs-4' },
+                    React.createElement(Board, { baseLink: this.props.baseLink, user: this.props.user, board: boards[i], onBoardEvents: this.props.onBoardEvents })
+                ));
+            }
+        }
+        return rows;
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'container-fluid' },
+            React.createElement(
+                'div',
+                { className: 'row' },
+                this.getBoards()
+            )
+        );
+    }
+});
+
+var Board = React.createClass({
+    displayName: 'Board',
+
+    handleOnClick: function handleOnClick() {
+        window.open(this.props.baseLink + "board/" + this.props.board.id);
+    },
+    render: function render() {
+        var board = this.props.board;
+        var link;
+        if (board.last_post_id) {
+            link = React.createElement(
+                'div',
+                { className: 'pull-right HalfTitle' },
+                React.createElement(
+                    'a',
+                    { className: 'Link', href: "get_post/" + board.last_post_id },
+                    board.last_post_title
+                ),
+                ';'
+            );
+        } else {
+            link = React.createElement(
+                'span',
+                { className: 'label label-info LabelFont pull-right' },
+                'None'
+            );
+        }
+        return React.createElement(
+            'div',
+            { className: 'Board box-shadow--3dp' },
+            React.createElement(
+                'div',
+                { className: 'panel panel-primary' },
+                React.createElement(
+                    'div',
+                    { className: 'panel-heading' },
+                    React.createElement(BoardToolbar, { board: board, user: this.props.user, onBoardEvents: this.props.onBoardEvents })
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'panel-body' },
+                    React.createElement(
+                        'b',
+                        null,
+                        'Recent Post',
+                        link
+                    ),
+                    React.createElement('hr', { className: 'Separator' }),
+                    React.createElement(
+                        'b',
+                        null,
+                        'Today Posts',
+                        React.createElement(
+                            'span',
+                            { className: 'label label-info LabelFont pull-right' },
+                            board.today_posts_number
+                        )
+                    ),
+                    React.createElement(
+                        'b',
+                        null,
+                        React.createElement('hr', { className: 'Separator' }),
+                        'All Posts',
+                        React.createElement(
+                            'span',
+                            { className: 'label label-info LabelFont pull-right' },
+                            board.all_posts_number
+                        )
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'panel-footer' },
+                    React.createElement(
+                        'button',
+                        { type: 'button', className: 'btn btn-info btn-xs', onClick: this.handleOnClick },
+                        'View Board'
+                    )
+                )
+            )
+        );
+    }
+});
+
+var BoardToolbar = React.createClass({
+    displayName: 'BoardToolbar',
+
+    handleOnEdit: function handleOnEdit() {
+        this.props.onBoardEvents.handleOnEdit(this.props.board);
+    },
+    handleOnDelete: function handleOnDelete() {
+        this.props.onBoardEvents.handleOnDelete(this.props.board);
+    },
+    getTitle: function getTitle() {
+        if (this.props.user) {
+            if (this.props.board.email) {
+                if (this.props.user.email === this.props.board.email) {
+                    return React.createElement(
+                        'div',
+                        { className: 'HalfTitle' },
+                        this.props.board.title
+                    );
+                }
+            }
+        }
+        return React.createElement(
+            'div',
+            { className: 'FullTitle' },
+            this.props.board.title
+        );
+    },
+    getButtons: function getButtons() {
+        if (this.props.user) {
+            if (this.props.board.email) {
+                if (this.props.user.email === this.props.board.email) {
+                    return React.createElement(
+                        'div',
+                        { className: 'pull-right' },
+                        React.createElement(
+                            'button',
+                            { ref: 'edit', type: 'button', className: 'btn btn-info btn-xs', onClick: this.handleOnEdit },
+                            React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+                        ),
+                        React.createElement(
+                            'button',
+                            { ref: 'delete', type: 'button', className: 'btn btn-info btn-xs', onClick: this.handleOnDelete },
+                            React.createElement('span', { className: 'glyphicon glyphicon-trash' })
+                        )
+                    );
+                }
+            }
+        }
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'BoardToolbar' },
+            this.getTitle(),
+            this.getButtons()
+        );
+    }
+});
+
+var BoardForm = React.createClass({
+    displayName: 'BoardForm',
+
+    handleOnKeyDown: function handleOnKeyDown(e) {
+        if (e.keyCode === 13) {
+            var title = ReactDOM.findDOMNode(this.refs.title);
+            if (e.target === title) {
+                this.submit();
+            }
+        }
+    },
+    handleOnClick: function handleOnClick() {
+        this.submit();
+    },
+    submit: function submit() {
+        if (this.props.workInfo && this.props.workInfo.working) {
+            return;
+        }
+        var title = ReactDOM.findDOMNode(this.refs.title).value;
+        if (this.props.board && this.props.board.title === title) {
+            this.props.onClick(null);
+            return;
+        }
+        this.props.onClick(title);
+    },
+    getError: function getError() {
+        if (this.props.error) {
+            return React.createElement(Alert, { style: 'warning', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
+        }
+    },
+    getButton: function getButton() {
+        if (this.props.workInfo && this.props.workInfo.working) {
+            return React.createElement(
+                'button',
+                { className: 'btn btn-info btn-block disabled', onClick: this.handleOnClick },
+                this.props.workInfo.message
+            );
+        }
+        return React.createElement(
+            'button',
+            { className: 'btn btn-info btn-block', onClick: this.handleOnClick },
+            this.props.button
+        );
+    },
+    render: function render() {
+        var board = {};
+        if (this.props.board) {
+            board = this.props.board;
+        }
+        return React.createElement(
+            'div',
+            { className: 'UserInfoModal' },
+            React.createElement(
+                'div',
+                { className: 'panel panel-primary' },
+                React.createElement(
+                    'div',
+                    { className: 'panel-heading' },
+                    React.createElement(
+                        'h3',
+                        { className: 'panel-title' },
+                        React.createElement(
+                            'div',
+                            { className: 'Overflow' },
+                            this.props.title
+                        )
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'panel-body' },
+                    React.createElement(
+                        'div',
+                        { className: 'form center-block' },
+                        this.getError(),
+                        React.createElement(
+                            'div',
+                            { className: 'form-group' },
+                            React.createElement(
+                                Input,
+                                { ref: 'title', placeholder: 'Board Title', size: 'input-md', onKeyDown: this.handleOnKeyDown },
+                                board.title
+                            )
+                        ),
+                        React.createElement(
+                            'div',
+                            { className: 'UserInfoFormButton' },
+                            React.createElement(
+                                'div',
+                                { className: 'form-group' },
+                                this.getButton()
+                            )
+                        )
+                    )
+                )
+            )
+        );
+    }
+});
+
+var Create = React.createClass({
+    displayName: 'Create',
+
+    render: function render() {
+        return React.createElement(BoardForm, { title: 'Create', workInfo: this.props.workInfo, button: 'Create', error: this.props.error, onClick: this.props.onCreate, onAlertDismiss: this.props.onAlertDismiss });
+    }
+});
+
+var Edit = React.createClass({
+    displayName: 'Edit',
+
+    render: function render() {
+        return React.createElement(BoardForm, { board: this.props.board, title: 'Edit', workInfo: this.props.workInfo, button: 'Save', error: this.props.error, onClick: this.props.onCreate, onAlertDismiss: this.props.onAlertDismiss });
+    }
+});
+
+ReactDOM.render(React.createElement(Index, { pollInterval: 3500 }), document.getElementById("body"));
+
+},{"./common":409,"react":407,"react-dom":252}],409:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var ReactDOM = require('react-dom');
 var Boron = require('boron');
 var Alert = require('react-bootstrap').Alert;
 
@@ -35234,12 +35930,7 @@ var Navbar = React.createClass({
     getInitialState: function getInitialState() {
         return {
             error: {},
-            work_info: {},
-            APIs: {
-                login: "login.json",
-                signup: "signup.json",
-                logout: "logout"
-            }
+            work_info: {}
         };
     },
     handleOnAlertDismiss: function handleOnAlertDismiss() {
@@ -35325,7 +36016,7 @@ var Navbar = React.createClass({
         var delay = (function () {
             $.ajax({
                 type: 'POST',
-                url: this.state.APIs.login,
+                url: this.props.APIs.login,
                 data: data,
                 success: callback
             });
@@ -35353,7 +36044,7 @@ var Navbar = React.createClass({
         var delay = (function () {
             $.ajax({
                 type: 'POST',
-                url: this.state.APIs.signup,
+                url: this.props.APIs.signup,
                 data: data,
                 success: callback
             });
@@ -35372,7 +36063,7 @@ var Navbar = React.createClass({
         var delay = (function () {
             $.ajax({
                 type: 'POST',
-                url: this.state.APIs.logout,
+                url: this.props.APIs.logout,
                 success: callback
             });
         }).bind(this);
@@ -35823,6 +36514,14 @@ var ConfirmWindow = React.createClass({
     }
 });
 
+var PostViewer = React.createClass({
+    displayName: 'PostViewer',
+
+    render: function render() {
+        return React.createElement('div', null);
+    }
+});
+
 var Utils = {
     validateEmail: function validateEmail(email) {
         var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
@@ -35840,520 +36539,7 @@ module.exports = {
     ConfirmWindow: ConfirmWindow
 };
 
-},{"boron":1,"react":407,"react-bootstrap":85,"react-dom":252}],409:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-var ReactDOM = require('react-dom');
-var Navbar = require('./common').Navbar;
-var Modal = require('./common').Modal;
-var Input = require('./common').Input;
-var Switch = require('./common').Switch;
-
-var Dashboard = React.createClass({
-    displayName: 'Dashboard',
-
-    getInitialState: function getInitialState() {
-        return {
-            addresses: [{
-                show: true,
-                id: 0,
-                first_name: "Xu",
-                last_name: "ZHANG",
-                company: "",
-                area: "831",
-                phone: "2950944",
-                street: "700 Koshland Way",
-                apt: "A",
-                city: "Santa Cruz",
-                state: "CA",
-                zip: "95060"
-            }, {
-                show: true,
-                id: 1,
-                first_name: "Han",
-                last_name: "Bai",
-                company: "Zenefits",
-                area: "831",
-                phone: "2950944",
-                street: "701 Koshland Way",
-                apt: "B",
-                city: "Santa Cruz",
-                state: "CA",
-                zip: "95061"
-            }, {
-                show: true,
-                id: 2,
-                first_name: "Yue",
-                last_name: "Tian",
-                company: "Zenefits",
-                area: "831",
-                phone: "2950944",
-                street: "702 Koshland Way",
-                apt: "C",
-                city: "Santa Cruz",
-                state: "CA",
-                zip: "95062"
-            }],
-            editing: null,
-            keyword: ""
-        };
-    },
-    getButtons: function getButtons() {
-        return {
-            left: [{
-                onClick: (function () {
-                    this.refs.create.toggle();
-                }).bind(this),
-                text: "Create"
-            }, {
-                onClick: (function () {
-                    console.log("Settings.");
-                }).bind(this),
-                text: "Settings"
-            }],
-            right: [{
-                onClick: (function () {
-                    console.log("Logging out.");
-                }).bind(this),
-                text: "Log out"
-            }]
-        };
-    },
-    getEventHandlers: function getEventHandlers() {
-        return {
-            handleSearch: (function (e) {
-                this.setState(e);
-            }).bind(this),
-            handleEdit: (function (e) {
-                this.setState({
-                    editing: e
-                });
-                this.refs.edit.toggle();
-            }).bind(this)
-        };
-    },
-    handleOnSave: function handleOnSave(e) {},
-    handleOnDelete: function handleOnDelete(e) {},
-    getAddresses: function getAddresses() {
-        var addresses = this.state.addresses;
-        for (var i in addresses) {
-            var address = addresses[i];
-            address.show = false;
-
-            if (this.state.keyword.trim() !== "") {
-                var content = address.first_name + " ";
-                content += address.last_name + " ";
-                content += address.company + " ";
-                content += address.area + " ";
-                content += address.phone + " ";
-                content += address.street + " ";
-                content += address.apt + " ";
-                content += address.city + " ";
-                content += address.state + " ";
-                content += address.zip + " ";
-                if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
-                    continue;
-                }
-            }
-
-            address.show = true;
-        }
-        return addresses;
-    },
-    render: function render() {
-        return React.createElement(
-            'div',
-            null,
-            React.createElement(Modal, { ref: 'create', type: 'WaveModal', content: React.createElement(Create, { onSave: this.handleOnSave }) }),
-            React.createElement(Modal, { ref: 'edit', type: 'WaveModal', content: React.createElement(Edit, { onSave: this.handleOnSave, onDelete: this.handleOnDelete, address: this.state.editing }) }),
-            React.createElement(Navbar, { ref: 'navbar', buttons: this.getButtons() }),
-            React.createElement(AddressListPanel, { addresses: this.getAddresses(), eventHandlers: this.getEventHandlers() })
-        );
-    }
-});
-
-var AddressListPanel = React.createClass({
-    displayName: 'AddressListPanel',
-
-    render: function render() {
-        return React.createElement(
-            'div',
-            null,
-            React.createElement(
-                'div',
-                { className: 'AddressListPanel box-shadow--3dp' },
-                React.createElement(
-                    'div',
-                    { className: 'panel panel-primary' },
-                    React.createElement(
-                        'div',
-                        { className: 'panel-heading' },
-                        React.createElement(AddressListToolbar, { onSearch: this.props.eventHandlers.handleSearch })
-                    ),
-                    React.createElement(
-                        'div',
-                        { className: 'panel-body' },
-                        React.createElement(AddressList, { addresses: this.props.addresses, onEdit: this.props.eventHandlers.handleEdit })
-                    )
-                )
-            )
-        );
-    }
-});
-
-var AddressListToolbar = React.createClass({
-    displayName: 'AddressListToolbar',
-
-    handleOnChange: function handleOnChange(e) {
-        this.props.onSearch({
-            keyword: e
-        });
-    },
-    render: function render() {
-        return React.createElement(
-            'div',
-            null,
-            React.createElement(SearchTextBox, { onChange: this.handleOnChange })
-        );
-    }
-});
-
-var SearchTextBox = React.createClass({
-    displayName: 'SearchTextBox',
-
-    render: function render() {
-        return React.createElement(
-            'div',
-            { className: 'inner-addon left-addon' },
-            React.createElement('i', { className: 'glyphicon glyphicon-search' }),
-            React.createElement(Input, { placeholder: 'Search Addresses', onChange: this.props.onChange })
-        );
-    }
-});
-
-var AddressList = React.createClass({
-    displayName: 'AddressList',
-
-    getAddresses: function getAddresses() {
-        var rows = [];
-        var addresses = this.props.addresses;
-        for (var i in addresses) {
-            if (addresses[i].show) {
-                rows.push(React.createElement(Address, { key: i, address: addresses[i], onEdit: this.props.onEdit }));
-            }
-        }
-        return rows;
-    },
-    render: function render() {
-        return React.createElement(
-            'div',
-            null,
-            this.getAddresses()
-        );
-    }
-});
-
-var Address = React.createClass({
-    displayName: 'Address',
-
-    getCompany: function getCompany() {
-        var company = this.props.address.company;
-        if (company) {
-            return React.createElement(
-                'div',
-                null,
-                React.createElement('hr', { className: 'Separator' }),
-                company
-            );
-        }
-        return null;
-    },
-    render: function render() {
-        var address = this.props.address;
-        var company = "";
-        if (address.company) {
-            company = address.company + ", ";
-        }
-        return React.createElement(
-            'div',
-            { className: 'Address box-shadow--2dp' },
-            React.createElement(
-                'div',
-                { className: 'panel panel-primary' },
-                React.createElement(
-                    'div',
-                    { className: 'panel-heading' },
-                    React.createElement(AddressToolbar, { address: this.props.address, onEdit: this.props.onEdit })
-                ),
-                React.createElement(
-                    'div',
-                    { className: 'panel-body' },
-                    React.createElement(
-                        'b',
-                        null,
-                        address.first_name + " " + address.last_name,
-                        React.createElement(
-                            'span',
-                            { className: 'pull-right' },
-                            address.area + address.phone
-                        )
-                    ),
-                    this.getCompany(),
-                    React.createElement('hr', { className: 'Separator' }),
-                    address.street + ", " + address.apt,
-                    React.createElement('hr', { className: 'Separator' }),
-                    address.city + ", " + address.state + ", " + address.zip
-                )
-            )
-        );
-    }
-});
-
-var AddressToolbar = React.createClass({
-    displayName: 'AddressToolbar',
-
-    handleOnClick: function handleOnClick() {
-        this.props.onEdit(this.props.address);
-    },
-    handleOnSwitch: function handleOnSwitch() {},
-    render: function render() {
-        return React.createElement(
-            'div',
-            null,
-            React.createElement(
-                'button',
-                { type: 'button', className: 'btn btn-info btn-xs', onClick: this.handleOnClick },
-                'Edit'
-            ),
-            React.createElement(
-                'div',
-                { className: 'pull-right' },
-                React.createElement(Switch, { address: this.props.address, state: true, onSwitch: this.handleOnSwitch })
-            )
-        );
-    }
-});
-
-var AddressEditModal = React.createClass({
-    displayName: 'AddressEditModal',
-
-    handleOnSave: function handleOnSave() {
-        this.props.onSave(this.getAddress());
-    },
-    handleOnDelete: function handleOnDelete() {
-        this.props.onDelete(this.props.address);
-    },
-    getAddress: function getAddress() {
-        return null;
-    },
-    getButtons: function getButtons() {
-        if (this.props['delete']) {
-            return React.createElement(
-                'div',
-                { className: 'row' },
-                React.createElement(
-                    'div',
-                    { className: 'col-xs-6 RightExtend' },
-                    React.createElement(
-                        'button',
-                        { className: 'btn btn-danger btn-block', onClick: this.props.handleOnDelete },
-                        'Delete'
-                    )
-                ),
-                React.createElement(
-                    'div',
-                    { className: 'col-xs-6 LeftExtend' },
-                    React.createElement(
-                        'button',
-                        { className: 'btn btn-info btn-block', onClick: this.props.handleOnSave },
-                        'Save'
-                    )
-                )
-            );
-        } else {
-            return React.createElement(
-                'button',
-                { className: 'btn btn-info btn-block', onClick: this.props.handleOnSave },
-                'Save'
-            );
-        }
-    },
-    render: function render() {
-        var address = {};
-        if (this.props.address) {
-            address = this.props.address;
-        }
-        return React.createElement(
-            'div',
-            { className: 'AddressEditModal' },
-            React.createElement(
-                'div',
-                { className: 'panel panel-primary' },
-                React.createElement(
-                    'div',
-                    { className: 'panel-heading' },
-                    React.createElement(
-                        'div',
-                        null,
-                        React.createElement(
-                            'h3',
-                            { className: 'panel-title' },
-                            this.props.title
-                        )
-                    )
-                ),
-                React.createElement(
-                    'div',
-                    { className: 'panel-body' },
-                    React.createElement(
-                        'form',
-                        { className: 'form center-block' },
-                        React.createElement(
-                            'div',
-                            { className: 'form-group' },
-                            React.createElement(
-                                'div',
-                                { className: 'row' },
-                                React.createElement(
-                                    'div',
-                                    { className: 'col-xs-6 RightExtend' },
-                                    React.createElement(
-                                        Input,
-                                        { placeholder: 'First Name' },
-                                        address.first_name
-                                    )
-                                ),
-                                React.createElement(
-                                    'div',
-                                    { className: 'col-xs-6 LeftExtend' },
-                                    React.createElement(
-                                        Input,
-                                        { placeholder: 'Last Name' },
-                                        address.last_name
-                                    )
-                                )
-                            )
-                        ),
-                        React.createElement(
-                            'div',
-                            { className: 'form-group' },
-                            React.createElement(
-                                Input,
-                                { placeholder: 'Company Name (optional)' },
-                                address.company
-                            )
-                        ),
-                        React.createElement(
-                            'div',
-                            { className: 'form-group' },
-                            React.createElement(
-                                'div',
-                                { className: 'row' },
-                                React.createElement(
-                                    'div',
-                                    { className: 'col-xs-6 RightExtend' },
-                                    React.createElement(
-                                        Input,
-                                        { placeholder: 'Area Code' },
-                                        address.area
-                                    )
-                                ),
-                                React.createElement(
-                                    'div',
-                                    { className: 'col-xs-6 LeftExtend' },
-                                    React.createElement(
-                                        Input,
-                                        { placeholder: 'Primary Phone' },
-                                        address.phone
-                                    )
-                                )
-                            )
-                        ),
-                        React.createElement(
-                            'div',
-                            { className: 'form-group' },
-                            React.createElement(
-                                Input,
-                                { placeholder: 'Street Address' },
-                                address.street
-                            )
-                        ),
-                        React.createElement(
-                            'div',
-                            { className: 'form-group' },
-                            React.createElement(
-                                Input,
-                                { placeholder: 'Apt, Suite, Bldg. (optional)' },
-                                address.apt
-                            )
-                        ),
-                        React.createElement(
-                            'div',
-                            { className: 'form-group' },
-                            React.createElement(
-                                'div',
-                                { className: 'row' },
-                                React.createElement(
-                                    'div',
-                                    { className: 'col-xs-4 RightExtend' },
-                                    React.createElement(
-                                        Input,
-                                        { placeholder: 'City' },
-                                        address.city
-                                    )
-                                ),
-                                React.createElement(
-                                    'div',
-                                    { className: 'col-xs-4 Extend' },
-                                    React.createElement(
-                                        Input,
-                                        { placeholder: 'State' },
-                                        address.state
-                                    )
-                                ),
-                                React.createElement(
-                                    'div',
-                                    { className: 'col-xs-4 LeftExtend' },
-                                    React.createElement(
-                                        Input,
-                                        { placeholder: 'ZIP Code' },
-                                        address.zip
-                                    )
-                                )
-                            )
-                        ),
-                        React.createElement(
-                            'div',
-                            { className: 'form-group' },
-                            this.getButtons()
-                        )
-                    )
-                )
-            )
-        );
-    }
-});
-
-var Create = React.createClass({
-    displayName: 'Create',
-
-    render: function render() {
-        return React.createElement(AddressEditModal, { title: 'Create' });
-    }
-});
-
-var Edit = React.createClass({
-    displayName: 'Edit',
-
-    render: function render() {
-        return React.createElement(AddressEditModal, { title: 'Edit', address: this.props.address, 'delete': true });
-    }
-});
-
-ReactDOM.render(React.createElement(Dashboard, null), document.getElementById("body"));
-
-},{"./common":408,"react":407,"react-dom":252}],410:[function(require,module,exports){
+},{"boron":1,"react":407,"react-bootstrap":85,"react-dom":252}],410:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -36446,4 +36632,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[409]);
+},{}]},{},[408]);

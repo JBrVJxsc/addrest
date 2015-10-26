@@ -7,7 +7,8 @@
 ## - user is required for authentication and authorization
 ## - download is for downloading files uploaded in the db (does streaming)
 #########################################################################
-import time
+from datetime import date
+
 
 def index():
     """
@@ -59,10 +60,6 @@ def call():
     return service()
 
 
-def dashboard():
-    return dict()
-
-
 def login():
     result = Auth(db=db).login_bare(request.vars.email, request.vars.password)
     return locals()
@@ -78,20 +75,36 @@ def logout():
     return locals()
 
 
+def board():
+    return dict()
+
+
 def get_boards():
     rows = db().select(db.board.ALL, orderby=~db.board.last_active_time)
     boards = []
+    today = date.today()
     for row in rows:
-        board = {
+        all_posts = db(db.post.board == row.id).select(orderby=~db.post.create_time)
+        today_post = db(
+            (db.post.board == row.id) &
+            (db.post.create_time.year() == today.year) &
+            (db.post.create_time.month() == today.month) &
+            (db.post.create_time.day() == today.day)
+        ).select(orderby=~db.post.create_time)
+        last_post = all_posts.first()
+        b = {
             'id': row.id,
             'title': row.title,
             'email': row.email,
             'create_time': row.create_time,
-            'last_active_post': row.last_active_post,
             'last_active_time': row.last_active_time,
+            'last_post_id': last_post.id if last_post else '',
+            'last_post_title': last_post.title if last_post else '',
+            'all_posts_number': len(all_posts),
+            'today_posts_number': len(today_post),
             'show': True
         }
-        boards.append(board)
+        boards.append(b)
     return {
         'result': {
             'boards': boards,
@@ -111,7 +124,7 @@ def delete_board():
 
 def create_board_num():
     for i in xrange(int(request.vars.num)):
-        db.board.insert()
+        db.board.insert(**dict(title=i))
 
 
 def create_board():
@@ -122,11 +135,11 @@ def create_board():
                 'state': False,
             }
         }
-    board = {
+    b = {
         'title': request.vars.title,
         'email': auth.user.email
     }
-    db.board.insert(**board)
+    db.board.insert(**b)
     return {
         'result': {
             'state': True,
@@ -156,7 +169,7 @@ def create_post():
         'title': str(request.now),
         'email': auth.user.email,
         'post_content': str(request.now),
-        'board': 6,
+        'board': 3,
     }
     db.post.insert(**post)
     return {
@@ -169,3 +182,8 @@ def create_post():
 def get_posts():
     rows = db(db.post.board == '1').select()
     print rows
+
+
+def get_post():
+    print request.args
+    pass

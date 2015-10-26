@@ -7,12 +7,7 @@ var Navbar = React.createClass({
     getInitialState: function() {
         return {
             error: {},
-            work_info: {},
-            APIs: {
-                login: "login.json",
-                signup: "signup.json",
-                logout: "logout"
-            }
+            work_info: {}
         };
     },
     handleOnAlertDismiss: function() {
@@ -98,7 +93,7 @@ var Navbar = React.createClass({
         var delay = function() {
             $.ajax({
                 type: 'POST',
-                url: this.state.APIs.login,
+                url: this.props.APIs.login,
                 data: data,
                 success: callback
             });
@@ -126,7 +121,7 @@ var Navbar = React.createClass({
         var delay = function() {
             $.ajax({
                 type: 'POST',
-                url: this.state.APIs.signup,
+                url: this.props.APIs.signup,
                 data: data,
                 success: callback
             });
@@ -145,7 +140,7 @@ var Navbar = React.createClass({
         var delay = function() {
             $.ajax({
                 type: 'POST',
-                url: this.state.APIs.logout,
+                url: this.props.APIs.logout,
                 success: callback
             });
         }.bind(this);
@@ -489,6 +484,14 @@ var ConfirmWindow = React.createClass({
                     </div>
                 </div>
             </div>
+        );
+    }
+});
+
+var PostViewer = React.createClass({
+    render: function() {
+        return (
+            <div></div>
         );
     }
 });

@@ -11,11 +11,13 @@ var Index = React.createClass({
     getInitialState: function() {
         var app = document.getElementById("APPLICATION").textContent;
         var controller = document.getElementById("CONTROLLER").textContent;
+        var board_id = document.getElementById("BOARD_ID").textContent;
         var base_link = window.location.origin + "/" + app + "/" + controller + "/";
         return {
             user: null,
             boards: [],
             keyword: "",
+            board_id: board_id,
             base_link: base_link,
             APIs: {
                 boards: base_link + "get_boards.json",

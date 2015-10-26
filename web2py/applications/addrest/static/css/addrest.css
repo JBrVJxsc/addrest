@@ -165,21 +165,28 @@ body {
 .Board > .panel-primary > .panel-heading {
   background-color: #50AFE2;
   border-color: #50AFE2;
+  cursor: hand;
 }
 
-/* line 140, ../sass/_main.scss */
+/* line 141, ../sass/_main.scss */
+.Board > .panel > .panel-footer {
+  background-color: #50AFE2;
+  border-color: #50AFE2;
+}
+
+/* line 146, ../sass/_main.scss */
 .Separator {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-/* line 145, ../sass/_main.scss */
+/* line 151, ../sass/_main.scss */
 .Address {
   width: 80%;
   margin: 5px auto;
 }
 
-/* line 150, ../sass/_main.scss */
+/* line 156, ../sass/_main.scss */
 .BoardListPanel {
   position: relative;
   top: 80px;
@@ -187,31 +194,31 @@ body {
   margin: 0 auto;
 }
 
-/* line 157, ../sass/_main.scss */
+/* line 163, ../sass/_main.scss */
 .BoardToolbar .btn {
   margin-left: 13px;
   margin-right: -6px;
 }
 
-/* line 162, ../sass/_main.scss */
+/* line 168, ../sass/_main.scss */
 .ConfirmWindow {
   position: relative;
   width: 325px;
   right: 162.5px;
 }
 
-/* line 168, ../sass/_main.scss */
+/* line 174, ../sass/_main.scss */
 .ConfirmWindow .panel .panel-body {
   position: relative;
   top: 6px;
 }
 
-/* line 173, ../sass/_main.scss */
+/* line 179, ../sass/_main.scss */
 .UserInfoFormButton .form-group {
   margin-bottom: 8px;
 }
 
-/* line 177, ../sass/_main.scss */
+/* line 183, ../sass/_main.scss */
 .FullTitle {
   white-space: nowrap;
   display: inline-block;
@@ -220,7 +227,7 @@ body {
   text-overflow: ellipsis;
 }
 
-/* line 185, ../sass/_main.scss */
+/* line 191, ../sass/_main.scss */
 .HalfTitle {
   white-space: nowrap;
   display: inline-block;
@@ -229,12 +236,27 @@ body {
   text-overflow: ellipsis;
 }
 
-/* line 193, ../sass/_main.scss */
+/* line 199, ../sass/_main.scss */
 .Right {
   float: right;
 }
 
-/* line 197, ../sass/_main.scss */
+/* line 203, ../sass/_main.scss */
 .Left {
   float: left;
+}
+
+/* line 207, ../sass/_main.scss */
+.LabelFont {
+  font-size: medium;
+}
+
+/* line 211, ../sass/_main.scss */
+.Link {
+  color: #3498DB;
+}
+
+/* line 215, ../sass/_main.scss */
+.HalfTitle .a:hover {
+  color: #3498DB;
 }

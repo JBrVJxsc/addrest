@@ -1,0 +1,5 @@
+{{extend 'main.html'}}
+<body>
+    <div id="BOARD_ID" hidden>{{=request.args(0)}}</div>
+    <script type="text/javascript" src="{{=URL('static','js/dist/board.js')}}"></script>
+</body>

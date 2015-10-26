@@ -135,6 +135,12 @@ body {
 .Board > .panel-primary > .panel-heading {
   background-color: #50AFE2;
   border-color: #50AFE2;
+  cursor: hand;
+}
+
+.Board > .panel > .panel-footer {
+  background-color: #50AFE2;
+  border-color: #50AFE2;
 }
 
 .Separator {
@@ -196,4 +202,16 @@ body {
 
 .Left {
   float: left;
+}
+
+.LabelFont {
+  font-size: medium;
+}
+
+.Link {
+  color: $Info;
+}
+
+.HalfTitle .a:hover {
+  color: $Info;
 }

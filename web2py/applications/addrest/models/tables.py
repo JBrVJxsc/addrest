@@ -3,7 +3,6 @@ db.define_table(
 	Field('title'),
 	Field('email'),
 	Field('create_time', 'datetime', default=request.now),
-	Field('last_active_post'),
 	Field('last_active_time', 'datetime', default=request.now),
 )
 
