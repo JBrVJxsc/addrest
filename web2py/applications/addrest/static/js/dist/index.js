@@ -35859,26 +35859,16 @@ var Index = React.createClass({
         return {
             user: null,
             boards: [],
-            error: {},
-            work_info: {},
-            deleting: null,
-            editing: null,
             keyword: ""
         };
     },
     getBoardEventHandlers: function getBoardEventHandlers() {
         return {
             handleOnEdit: (function (e) {
-                this.setState({
-                    editing: e
-                });
-                this.refs.edit.show();
+                this.refs.editor.edit(e);
             }).bind(this),
             handleOnDelete: (function (e) {
-                this.setState({
-                    deleting: e
-                });
-                this.refs['delete'].show();
+                this.refs.editor['delete'](e);
             }).bind(this),
             handleOnSearch: (function (e) {
                 this.setState({
@@ -35887,143 +35877,11 @@ var Index = React.createClass({
             }).bind(this)
         };
     },
-    handleOnAlertDismiss: function handleOnAlertDismiss() {
-        this.clearError();
-    },
-    handleOnDelete: function handleOnDelete(e) {
-        if (e) {
-            this['delete'](this.state.deleting);
-        } else {
-            this.refs['delete'].hide();
-        }
-    },
-    handleOnCreate: function handleOnCreate(title) {
-        this.clearError();
-
-        if (title.trim().length === 0) {
-            this.setError("create", "Please enter a valid title.");
-            return;
-        }
-
-        this.create(title);
-    },
-    handleOnEdit: function handleOnEdit(title) {
-        this.clearError();
-
-        if (title === null) {
-            this.refs.edit.hide();
-            return;
-        }
-
-        if (title.trim().length === 0) {
-            this.setError("edit", "Please enter a valid title.");
-            return;
-        }
-
-        this.edit(title);
+    handleOnBoardEdit: function handleOnBoardEdit() {
+        this.getBoards();
     },
     handleOnUserChanged: function handleOnUserChanged() {
         this.getBoards();
-    },
-    create: function create(title) {
-        this.work("create", true, "Creating...");
-
-        var callback = (function (data) {
-            this.stopWork();
-            if (data.result.state === false) {
-                this.setError("create", "Board title has been used.");
-            } else {
-                this.refs.create.hide();
-                this.getBoards();
-            }
-        }).bind(this);
-
-        var error = (function () {
-            this.stopWork();
-            this.setError("create", "Something was wrong...");
-        }).bind(this);
-
-        var delay = (function () {
-            $.ajax({
-                type: 'POST',
-                url: this.props.APIs.create,
-                data: {
-                    title: title
-                },
-                error: error,
-                success: callback,
-                timeout: 3000
-            });
-        }).bind(this);
-
-        setTimeout(delay, 800);
-    },
-    edit: function edit(title) {
-        this.work("edit", true, "Saving...");
-
-        var callback = (function (data) {
-            this.stopWork();
-            if (data.result.state === false) {
-                this.setError("edit", "Board title has been used.");
-            } else {
-                this.refs.edit.hide();
-                this.getBoards();
-            }
-        }).bind(this);
-
-        var error = (function () {
-            this.stopWork();
-            this.setError("edit", "Something was wrong...");
-        }).bind(this);
-
-        var data = {
-            id: this.state.editing.id,
-            title: title
-        };
-
-        var delay = (function () {
-            $.ajax({
-                type: 'POST',
-                url: this.props.APIs.edit,
-                data: data,
-                error: error,
-                success: callback,
-                timeout: 3000
-            });
-        }).bind(this);
-
-        setTimeout(delay, 800);
-    },
-    'delete': function _delete(board) {
-        this.work("delete", true, "Deleting...");
-
-        var callback = (function (data) {
-            this.stopWork();
-            if (data.result.state === false) {
-                this.setError("delete", "Something was wrong...");
-            } else {
-                this.refs['delete'].hide();
-                this.getBoards();
-            }
-        }).bind(this);
-
-        var error = (function () {
-            this.stopWork();
-            this.setError("delete", "Something was wrong...");
-        }).bind(this);
-
-        var delay = (function () {
-            $.ajax({
-                type: 'POST',
-                url: this.props.APIs['delete'],
-                data: board,
-                error: error,
-                success: callback,
-                timeout: 3000
-            });
-        }).bind(this);
-
-        setTimeout(delay, 800);
     },
     getBoards: function getBoards() {
         $.ajax({
@@ -36057,6 +35915,201 @@ var Index = React.createClass({
         }
         return boards;
     },
+    getButtons: function getButtons() {
+        return [{
+            onClick: (function () {
+                this.refs.editor.create();
+            }).bind(this),
+            text: "Create"
+        }];
+    },
+    componentDidMount: function componentDidMount() {
+        this.getBoards();
+        this.interval = setInterval(this.getBoards, this.props.pollInterval);
+    },
+    componentWillUnmount: function componentWillUnmount() {
+        clearInterval(this.interval);
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            null,
+            React.createElement(BoardEditor, { ref: 'editor', onBoardEdit: this.handleOnBoardEdit }),
+            React.createElement(Navbar, { user: this.state.user, title: 'Boards', buttons: this.getButtons(), onUserChanged: this.handleOnUserChanged }),
+            React.createElement(BoardListPanel, { user: this.state.user, boards: this.getFilteredBoards(), onBoardEvents: this.getBoardEventHandlers() })
+        );
+    }
+});
+
+var BoardEditor = React.createClass({
+    displayName: 'BoardEditor',
+
+    getInitialState: function getInitialState() {
+        return {
+            error: {},
+            work_info: {},
+            editing: null,
+            deleting: null,
+            APIs: {
+                'delete': "delete_board.json",
+                create: "create_board.json",
+                edit: "edit_board.json"
+            }
+        };
+    },
+    handleOnAlertDismiss: function handleOnAlertDismiss() {
+        this.clearError();
+    },
+    handleOnCreate: function handleOnCreate(title) {
+        this.clearError();
+
+        if (title.trim().length === 0) {
+            this.setError("create", "Please enter a valid title.");
+            return;
+        }
+
+        this._create(title);
+    },
+    handleOnEdit: function handleOnEdit(title) {
+        this.clearError();
+
+        if (title === null) {
+            this.refs.edit.hide();
+            return;
+        }
+
+        if (title.trim().length === 0) {
+            this.setError("edit", "Please enter a valid title.");
+            return;
+        }
+
+        this._edit(title);
+    },
+    handleOnDelete: function handleOnDelete(e) {
+        if (e) {
+            this._delete(this.state.deleting);
+        } else {
+            this.refs['delete'].hide();
+        }
+    },
+    create: function create() {
+        this.clearError();
+        this.refs.create.show();
+    },
+    edit: function edit(board) {
+        this.setState({
+            editing: board
+        });
+        this.clearError();
+        this.refs.edit.show();
+    },
+    'delete': function _delete(board) {
+        this.setState({
+            deleting: board
+        });
+        this.clearError();
+        this.refs['delete'].show();
+    },
+    _create: function _create(title) {
+        this.work("create", true, "Creating...");
+
+        var callback = (function (data) {
+            this.stopWork();
+            if (data.result.state === false) {
+                this.setError("create", "Board title has been used.");
+            } else {
+                this.refs.create.hide();
+                this.props.onBoardEdit();
+            }
+        }).bind(this);
+
+        var error = (function () {
+            this.stopWork();
+            this.setError("create", "Something was wrong...");
+        }).bind(this);
+
+        var delay = (function () {
+            $.ajax({
+                type: 'POST',
+                url: this.state.APIs.create,
+                data: {
+                    title: title
+                },
+                error: error,
+                success: callback,
+                timeout: 3000
+            });
+        }).bind(this);
+
+        setTimeout(delay, 800);
+    },
+    _edit: function _edit(title) {
+        this.work("edit", true, "Saving...");
+
+        var callback = (function (data) {
+            this.stopWork();
+            if (data.result.state === false) {
+                this.setError("edit", "Board title has been used.");
+            } else {
+                this.refs.edit.hide();
+                this.props.onBoardEdit();
+            }
+        }).bind(this);
+
+        var error = (function () {
+            this.stopWork();
+            this.setError("edit", "Something was wrong...");
+        }).bind(this);
+
+        var data = {
+            id: this.state.editing.id,
+            title: title
+        };
+
+        var delay = (function () {
+            $.ajax({
+                type: 'POST',
+                url: this.state.APIs.edit,
+                data: data,
+                error: error,
+                success: callback,
+                timeout: 3000
+            });
+        }).bind(this);
+
+        setTimeout(delay, 800);
+    },
+    _delete: function _delete(board) {
+        this.work("delete", true, "Deleting...");
+
+        var callback = (function (data) {
+            this.stopWork();
+            if (data.result.state === false) {
+                this.setError("delete", "Something was wrong...");
+            } else {
+                this.refs['delete'].hide();
+                this.props.onBoardEdit();
+            }
+        }).bind(this);
+
+        var error = (function () {
+            this.stopWork();
+            this.setError("delete", "Something was wrong...");
+        }).bind(this);
+
+        var delay = (function () {
+            $.ajax({
+                type: 'POST',
+                url: this.state.APIs['delete'],
+                data: board,
+                error: error,
+                success: callback,
+                timeout: 3000
+            });
+        }).bind(this);
+
+        setTimeout(delay, 800);
+    },
     work: function work(worker, working, message) {
         var info = {};
         info[worker] = {
@@ -36086,22 +36139,6 @@ var Index = React.createClass({
             error: {}
         });
     },
-    getButtons: function getButtons() {
-        return [{
-            onClick: (function () {
-                this.clearError();
-                this.refs.create.show();
-            }).bind(this),
-            text: "Create"
-        }];
-    },
-    componentDidMount: function componentDidMount() {
-        this.getBoards();
-        this.interval = setInterval(this.getBoards, this.props.pollInterval);
-    },
-    componentWillUnmount: function componentWillUnmount() {
-        clearInterval(this.interval);
-    },
     render: function render() {
         return React.createElement(
             'div',
@@ -36120,9 +36157,7 @@ var Index = React.createClass({
                 Modal,
                 { ref: 'delete', type: 'WaveModal' },
                 React.createElement(ConfirmWindow, { workInfo: this.state.work_info['delete'], error: this.state.error['delete'], title: 'Are you sure?', onConfirm: this.handleOnDelete, onAlertDismiss: this.handleOnAlertDismiss })
-            ),
-            React.createElement(Navbar, { user: this.state.user, title: 'Boards', buttons: this.getButtons(), onUserChanged: this.handleOnUserChanged }),
-            React.createElement(BoardListPanel, { user: this.state.user, boards: this.getFilteredBoards(), onBoardEvents: this.getBoardEventHandlers() })
+            )
         );
     }
 });
@@ -36443,10 +36478,7 @@ var Edit = React.createClass({
 });
 
 var APIs = {
-    boards: "get_boards.json",
-    'delete': "delete_board.json",
-    create: "create_board.json",
-    edit: "edit_board.json"
+    boards: "get_boards.json"
 };
 
 ReactDOM.render(React.createElement(Index, { APIs: APIs, pollInterval: 3500 }), document.getElementById("body"));
