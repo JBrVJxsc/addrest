@@ -157,8 +157,8 @@ body {
 /* line 129, ../sass/_main.scss */
 .BoardEditModal .panel {
   position: relative;
-  width: 400px;
-  right: 200px;
+  width: 1200px;
+  right: 600px;
 }
 
 /* line 135, ../sass/_main.scss */
@@ -259,4 +259,9 @@ body {
 /* line 215, ../sass/_main.scss */
 .HalfTitle .a:hover {
   color: #3498DB;
+}
+
+/* line 219, ../sass/_main.scss */
+.PreLine {
+  white-space: pre-line;
 }

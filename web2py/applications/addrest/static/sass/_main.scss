@@ -128,8 +128,8 @@ body {
 
 .BoardEditModal .panel {
   position: relative;
-  width: $addressEditModal;
-  right: $addressEditModal / 2;
+  width: $boardEditModal;
+  right: $boardEditModal / 2;
 }
 
 .Board > .panel-primary > .panel-heading {
@@ -214,4 +214,8 @@ body {
 
 .HalfTitle .a:hover {
   color: $Info;
+}
+
+.PreLine {
+  white-space: pre-line;
 }

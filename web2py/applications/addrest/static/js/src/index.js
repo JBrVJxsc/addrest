@@ -248,7 +248,7 @@ var BoardEditor = React.createClass({
                     <Create workInfo={this.state.work_info.create} error={this.state.error.create} onCreate={this.handleOnCreate} onAlertDismiss={this.handleOnAlertDismiss} />
                 </Modal>
 				<Modal ref="edit" type="WaveModal">
-                    <Edit board={this.state.editing} workInfo={this.state.work_info.edit} error={this.state.error.edit} onCreate={this.handleOnEdit} onAlertDismiss={this.handleOnAlertDismiss} />
+                    <Edit board={this.state.editing} workInfo={this.state.work_info.edit} error={this.state.error.edit} onEdit={this.handleOnEdit} onAlertDismiss={this.handleOnAlertDismiss} />
                 </Modal>
 				<Modal ref="delete" type="WaveModal">
                     <ConfirmWindow workInfo={this.state.work_info.delete} error={this.state.error.delete} title="Are you sure?" onConfirm={this.handleOnDelete} onAlertDismiss={this.handleOnAlertDismiss} />
@@ -414,7 +414,7 @@ var Board = React.createClass({
         if (board.last_post_id) {
             link = (
                  <div className="pull-right HalfTitle">
-                     <a className="Link" href={"get_post/" + board.last_post_id}>{board.last_post_title}</a>;
+                     <a className="pull-right Link" href={this.props.baseLink + "board/" + this.props.board.id} target="_blank">{board.last_post_title}</a>
                  </div>
             );
         } else {
@@ -577,7 +577,7 @@ var BoardForm = React.createClass({
 var Create = React.createClass({
     render: function() {
         return (
-            <BoardForm title="Create" workInfo={this.props.workInfo} button="Create" error={this.props.error} onClick={this.props.onCreate} onAlertDismiss={this.props.onAlertDismiss} />
+            <BoardForm title="Create Board" workInfo={this.props.workInfo} button="Create" error={this.props.error} onClick={this.props.onCreate} onAlertDismiss={this.props.onAlertDismiss} />
         );
     }
 });
@@ -585,7 +585,7 @@ var Create = React.createClass({
 var Edit = React.createClass({
     render: function() {
         return (
-            <BoardForm board={this.props.board} title="Edit" workInfo={this.props.workInfo} button="Save" error={this.props.error} onClick={this.props.onCreate} onAlertDismiss={this.props.onAlertDismiss} />
+            <BoardForm board={this.props.board} title="Edit" workInfo={this.props.workInfo} button="Save" error={this.props.error} onClick={this.props.onEdit} onAlertDismiss={this.props.onAlertDismiss} />
         );
     }
 });

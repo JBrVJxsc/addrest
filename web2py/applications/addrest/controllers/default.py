@@ -76,7 +76,8 @@ def logout():
 
 
 def board():
-    return dict()
+    b = db(db.board.id == request.args(0)).select().first()
+    return dict(board_title=b.title)
 
 
 def get_boards():
@@ -113,20 +114,6 @@ def get_boards():
     }
 
 
-def delete_board():
-    db(db.board.id == request.vars.id).delete()
-    return {
-        'result': {
-            'state': True,
-        }
-    }
-
-
-def create_board_num():
-    for i in xrange(int(request.vars.num)):
-        db.board.insert(**dict(title=i))
-
-
 def create_board():
     rows = db(db.board.title == request.vars.title).select()
     if len(rows) > 0:
@@ -155,35 +142,82 @@ def edit_board():
                 'state': False,
             }
         }
-    info = request.vars
-    db(db.board.id == info.id).update(title=info.title)
+    db(db.board.id == request.vars.id).update(title=request.vars.title)
     return {
         'result': {
             'state': True,
+        }
+    }
+
+
+def delete_board():
+    db(db.board.id == request.vars.id).delete()
+    return {
+        'result': {
+            'state': True,
+        },
+    }
+
+
+def get_posts():
+    print request.vars
+    rows = db(db.post.board == request.vars.board).select(db.post.ALL, orderby=~db.post.last_active_time)
+    posts = []
+    for row in rows:
+        p = {
+            'id': row.id,
+            'title': row.title,
+            'post_content': row.post_content,
+            'email': row.email,
+            'board': row.board,
+            'create_time': row.create_time,
+            'last_active_time': row.last_active_time,
+            'show': True
+        }
+        posts.append(p)
+    return {
+        'result': {
+            'posts': posts,
+            'user': auth.user,
         }
     }
 
 
 def create_post():
-    post = {
-        'title': str(request.now),
+    b = {
+        'title': request.vars.title,
+        'post_content': request.vars.post_content,
         'email': auth.user.email,
-        'post_content': str(request.now),
-        'board': 3,
+        'board': request.vars.board,
     }
-    db.post.insert(**post)
+    db.post.insert(**b)
+    db(db.board.id == request.vars.board).update(last_active_time=request.now)
     return {
         'result': {
             'state': True,
-        }
+        },
     }
 
 
-def get_posts():
-    rows = db(db.post.board == '1').select()
-    print rows
+def edit_post():
+    p = {
+        'title': request.vars.title,
+        'post_content': request.vars.post_content,
+        'last_active_time': request.now
+    }
+    db(db.post.id == request.vars.id).update(**p)
+    db(db.board.id == request.vars.board).update(last_active_time=request.now)
+    return {
+        'result': {
+            'state': True,
+        },
+    }
 
 
-def get_post():
-    print request.args
-    pass
+def delete_post():
+    db(db.post.id == request.vars.id).delete()
+    return {
+        'result': {
+            'state': True,
+        },
+    }

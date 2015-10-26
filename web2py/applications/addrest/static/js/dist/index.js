@@ -36123,7 +36123,7 @@ var BoardEditor = React.createClass({
             React.createElement(
                 Modal,
                 { ref: 'edit', type: 'WaveModal' },
-                React.createElement(Edit, { board: this.state.editing, workInfo: this.state.work_info.edit, error: this.state.error.edit, onCreate: this.handleOnEdit, onAlertDismiss: this.handleOnAlertDismiss })
+                React.createElement(Edit, { board: this.state.editing, workInfo: this.state.work_info.edit, error: this.state.error.edit, onEdit: this.handleOnEdit, onAlertDismiss: this.handleOnAlertDismiss })
             ),
             React.createElement(
                 Modal,
@@ -36321,10 +36321,9 @@ var Board = React.createClass({
                 { className: 'pull-right HalfTitle' },
                 React.createElement(
                     'a',
-                    { className: 'Link', href: "get_post/" + board.last_post_id },
+                    { className: 'pull-right Link', href: this.props.baseLink + "board/" + this.props.board.id, target: '_blank' },
                     board.last_post_title
-                ),
-                ';'
+                )
             );
         } else {
             link = React.createElement(
@@ -36553,7 +36552,7 @@ var Create = React.createClass({
     displayName: 'Create',
 
     render: function render() {
-        return React.createElement(BoardForm, { title: 'Create', workInfo: this.props.workInfo, button: 'Create', error: this.props.error, onClick: this.props.onCreate, onAlertDismiss: this.props.onAlertDismiss });
+        return React.createElement(BoardForm, { title: 'Create Board', workInfo: this.props.workInfo, button: 'Create', error: this.props.error, onClick: this.props.onCreate, onAlertDismiss: this.props.onAlertDismiss });
     }
 });
 
@@ -36561,7 +36560,7 @@ var Edit = React.createClass({
     displayName: 'Edit',
 
     render: function render() {
-        return React.createElement(BoardForm, { board: this.props.board, title: 'Edit', workInfo: this.props.workInfo, button: 'Save', error: this.props.error, onClick: this.props.onCreate, onAlertDismiss: this.props.onAlertDismiss });
+        return React.createElement(BoardForm, { board: this.props.board, title: 'Edit', workInfo: this.props.workInfo, button: 'Save', error: this.props.error, onClick: this.props.onEdit, onAlertDismiss: this.props.onAlertDismiss });
     }
 });
 
