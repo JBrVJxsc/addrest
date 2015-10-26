@@ -35238,14 +35238,11 @@ var Index = React.createClass({
     getInitialState: function getInitialState() {
         var app = document.getElementById("APPLICATION").textContent;
         var controller = document.getElementById("CONTROLLER").textContent;
-        var board_id = document.getElementById("BOARD_ID").textContent;
         var base_link = window.location.origin + "/" + app + "/" + controller + "/";
         return {
             user: null,
-            boards: [],
-            keyword: "",
-            board_id: board_id,
             base_link: base_link,
+            board_id: document.getElementById("BOARD_ID").textContent,
             APIs: {
                 boards: base_link + "get_boards.json",
                 create: base_link + "create_board.json",
@@ -35257,82 +35254,26 @@ var Index = React.createClass({
             }
         };
     },
-    getBoardEventHandlers: function getBoardEventHandlers() {
-        return {
-            handleOnEdit: (function (e) {
-                this.refs.editor.edit(e);
-            }).bind(this),
-            handleOnDelete: (function (e) {
-                this.refs.editor['delete'](e);
-            }).bind(this),
-            handleOnSearch: (function (e) {
-                this.setState({
-                    keyword: e.keyword
-                });
-            }).bind(this)
-        };
+    handleNavbarEvents: function handleNavbarEvents() {
+        this.refs.boardListPanel.getBoards();
     },
-    handleOnBoardEdit: function handleOnBoardEdit() {
-        this.getBoards();
-    },
-    handleOnUserChanged: function handleOnUserChanged() {
-        this.getBoards();
-    },
-    getBoards: function getBoards() {
-        $.ajax({
-            type: 'POST',
-            url: this.state.APIs.boards,
-            success: (function (data) {
-                if (this.isMounted()) {
-                    this.setState({
-                        boards: data.result.boards,
-                        user: data.result.user
-                    });
-                }
-            }).bind(this)
-        });
-    },
-    getFilteredBoards: function getFilteredBoards() {
-        var boards = this.state.boards;
-        for (var i in boards) {
-            var board = boards[i];
-            board.show = false;
-
-            if (this.state.keyword.trim() !== "") {
-                var content = board.title + " ";
-                content += board.email;
-                if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
-                    continue;
-                }
-            }
-
-            board.show = true;
-        }
-        return boards;
+    handleOnUserChanged: function handleOnUserChanged(user) {
+        this.refs.navbar.setUser(user);
     },
     getButtons: function getButtons() {
         return [{
             onClick: (function () {
-                this.refs.editor.create();
+                this.refs.boardListPanel.create();
             }).bind(this),
             text: "Create"
         }];
-    },
-    componentDidMount: function componentDidMount() {
-        console.log(this.state);
-        this.getBoards();
-        this.interval = setInterval(this.getBoards, this.props.pollInterval);
-    },
-    componentWillUnmount: function componentWillUnmount() {
-        clearInterval(this.interval);
     },
     render: function render() {
         return React.createElement(
             'div',
             null,
-            React.createElement(BoardEditor, { APIs: this.state.APIs, ref: 'editor', onBoardEdit: this.handleOnBoardEdit }),
-            React.createElement(Navbar, { APIs: this.state.APIs, user: this.state.user, title: 'Boards', buttons: this.getButtons(), onUserChanged: this.handleOnUserChanged }),
-            React.createElement(BoardListPanel, { baseLink: this.state.base_link, user: this.state.user, boards: this.getFilteredBoards(), onBoardEvents: this.getBoardEventHandlers() })
+            React.createElement(Navbar, { ref: 'navbar', APIs: this.state.APIs, title: 'Boards', buttons: this.getButtons(), onNavbarEvents: this.handleNavbarEvents }),
+            React.createElement(BoardListPanel, { ref: 'boardListPanel', pollInterval: this.props.pollInterval, APIs: this.state.APIs, baseLink: this.state.base_link, onUserChanged: this.handleOnUserChanged })
         );
     }
 });
@@ -35556,22 +35497,92 @@ var BoardEditor = React.createClass({
 var BoardListPanel = React.createClass({
     displayName: 'BoardListPanel',
 
+    getInitialState: function getInitialState() {
+        return {
+            user: null,
+            boards: [],
+            keyword: ""
+        };
+    },
+    create: function create() {
+        this.refs.editor.create();
+    },
+    handleOnBoardEdit: function handleOnBoardEdit() {
+        this.getBoards();
+    },
+    getBoardEventHandlers: function getBoardEventHandlers() {
+        return {
+            handleOnEdit: (function (e) {
+                this.refs.editor.edit(e);
+            }).bind(this),
+            handleOnDelete: (function (e) {
+                this.refs.editor['delete'](e);
+            }).bind(this),
+            handleOnSearch: (function (e) {
+                this.setState({
+                    keyword: e.keyword
+                });
+            }).bind(this)
+        };
+    },
+    getBoards: function getBoards() {
+        $.ajax({
+            type: 'POST',
+            url: this.props.APIs.boards,
+            success: (function (data) {
+                if (this.isMounted()) {
+                    this.setState({
+                        boards: data.result.boards,
+                        user: data.result.user
+                    });
+                    this.props.onUserChanged(this.state.user);
+                }
+            }).bind(this)
+        });
+    },
+    getFilteredBoards: function getFilteredBoards() {
+        var boards = this.state.boards;
+        for (var i in boards) {
+            var board = boards[i];
+            board.show = false;
+
+            if (this.state.keyword.trim() !== "") {
+                var content = board.title + " ";
+                content += board.email;
+                if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
+                    continue;
+                }
+            }
+
+            board.show = true;
+        }
+        return boards;
+    },
+    componentDidMount: function componentDidMount() {
+        this.getBoards();
+        this.interval = setInterval(this.getBoards, this.props.pollInterval);
+    },
+    componentWillUnmount: function componentWillUnmount() {
+        clearInterval(this.interval);
+    },
     render: function render() {
+        var handlers = this.getBoardEventHandlers();
         return React.createElement(
             'div',
             { className: 'BoardListPanel box-shadow--3dp' },
+            React.createElement(BoardEditor, { APIs: this.props.APIs, ref: 'editor', onBoardEdit: this.handleOnBoardEdit }),
             React.createElement(
                 'div',
                 { className: 'panel panel-primary' },
                 React.createElement(
                     'div',
                     { className: 'panel-heading' },
-                    React.createElement(BoardListToolbar, { onSearch: this.props.onBoardEvents.handleOnSearch })
+                    React.createElement(BoardListToolbar, { onSearch: handlers.handleOnSearch })
                 ),
                 React.createElement(
                     'div',
                     { className: 'panel-body' },
-                    React.createElement(BoardList, { baseLink: this.props.baseLink, user: this.props.user, boards: this.props.boards, onBoardEvents: this.props.onBoardEvents })
+                    React.createElement(BoardList, { baseLink: this.props.baseLink, user: this.state.user, boards: this.getFilteredBoards(), onBoardEvents: handlers })
                 ),
                 React.createElement(
                     'div',

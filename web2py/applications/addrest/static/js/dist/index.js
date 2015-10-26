@@ -36200,7 +36200,7 @@ var BoardListPanel = React.createClass({
     },
     componentDidMount: function componentDidMount() {
         this.getBoards();
-        //this.interval = setInterval(this.getBoards, this.props.pollInterval);
+        this.interval = setInterval(this.getBoards, this.props.pollInterval);
     },
     componentWillUnmount: function componentWillUnmount() {
         clearInterval(this.interval);
