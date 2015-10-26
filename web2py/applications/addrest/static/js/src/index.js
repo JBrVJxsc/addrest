@@ -431,7 +431,7 @@ var Board = React.createClass({
                         </b>
                     </div>
                     <div className="panel-footer">
-                        <button type="button" className="btn btn-info btn-xs" onClick={this.handleOnClick}>View Board</button>
+                        <button type="button" className="btn btn-info btn-xs" onClick={this.handleOnClick}>Open</button>
                     </div>
 				</div>
             </div>

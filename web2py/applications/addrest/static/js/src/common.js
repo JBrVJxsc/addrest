@@ -328,7 +328,14 @@ var Modal = React.createClass({
 		this.refs.dialog.show();
         var callback = function() {
             var input = $('#Modal-Content').find('input[type=text]');
-            input.focus();
+            if (input.length > 0) {
+                input.focus();
+            } else {
+                var button = $('#Modal-Content').find('button');
+                if (button.length > 0) {
+                    button.focus();
+                }
+            }
         };
         setTimeout(callback, 200);
 	},

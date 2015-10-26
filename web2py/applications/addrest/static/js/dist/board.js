@@ -35731,7 +35731,7 @@ var Board = React.createClass({
                     React.createElement(
                         'button',
                         { type: 'button', className: 'btn btn-info btn-xs', onClick: this.handleOnClick },
-                        'View Board'
+                        'Open'
                     )
                 )
             )
@@ -36308,7 +36308,14 @@ var Modal = React.createClass({
         this.refs.dialog.show();
         var callback = function callback() {
             var input = $('#Modal-Content').find('input[type=text]');
-            input.focus();
+            if (input.length > 0) {
+                input.focus();
+            } else {
+                var button = $('#Modal-Content').find('button');
+                if (button.length > 0) {
+                    button.focus();
+                }
+            }
         };
         setTimeout(callback, 200);
     },
