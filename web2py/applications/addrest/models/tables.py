@@ -11,7 +11,7 @@ db.define_table(
 	Field('title'),
 	Field('post_content', 'text'),
 	Field('email'),
-	Field('board', db.board, ondelete='CASCADE'),
+	Field('board', db.board, ondelete='SET NULL'),
 	Field('create_time', 'datetime', default=request.now),
 	Field('last_active_time', 'datetime', default=request.now),
 )

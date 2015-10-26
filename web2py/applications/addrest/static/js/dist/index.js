@@ -36147,6 +36147,10 @@ var BoardListPanel = React.createClass({
     create: function create() {
         this.refs.editor.create();
     },
+    handleOnClick: function handleOnClick() {
+        this.board_number += 10;
+        this.getBoards();
+    },
     handleOnBoardEdit: function handleOnBoardEdit() {
         this.getBoards();
     },
@@ -36169,6 +36173,9 @@ var BoardListPanel = React.createClass({
         $.ajax({
             type: 'POST',
             url: this.props.APIs.boards,
+            data: {
+                number: this.board_number
+            },
             success: (function (data) {
                 if (this.isMounted()) {
                     this.setState({
@@ -36199,6 +36206,7 @@ var BoardListPanel = React.createClass({
         return boards;
     },
     componentDidMount: function componentDidMount() {
+        this.board_number = 20;
         this.getBoards();
         this.interval = setInterval(this.getBoards, this.props.pollInterval);
     },

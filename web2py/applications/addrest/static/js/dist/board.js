@@ -35556,6 +35556,10 @@ var PostListPanel = React.createClass({
     create: function create() {
         this.refs.editor.create();
     },
+    handleOnClick: function handleOnClick() {
+        this.post_number += 10;
+        this.getPosts();
+    },
     handleOnPostEdit: function handleOnPostEdit() {
         this.getPosts();
     },
@@ -35579,7 +35583,8 @@ var PostListPanel = React.createClass({
             type: 'POST',
             url: this.props.APIs.posts,
             data: {
-                board: this.state.board_id
+                board: this.state.board_id,
+                number: this.post_number
             },
             success: (function (data) {
                 if (this.isMounted()) {
@@ -35611,6 +35616,7 @@ var PostListPanel = React.createClass({
         return posts;
     },
     componentDidMount: function componentDidMount() {
+        this.post_number = 20;
         this.getPosts();
         this.interval = setInterval(this.getPosts, this.props.pollInterval);
     },
@@ -35698,7 +35704,7 @@ var PostList = React.createClass({
             if (posts[i].show) {
                 rows.push(React.createElement(
                     'div',
-                    { key: i, className: 'col-xs-12' },
+                    { key: i, className: 'col-xs-4' },
                     React.createElement(Post, { baseLink: this.props.baseLink, user: this.props.user, post: posts[i], onPostEvents: this.props.onPostEvents })
                 ));
             }

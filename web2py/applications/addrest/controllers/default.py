@@ -77,11 +77,33 @@ def logout():
 
 def board():
     b = db(db.board.id == request.args(0)).select().first()
-    return dict(board_title=b.title)
+    if b:
+        return dict(board_title=b.title)
+    else:
+        redirect(URL('default', 'index'))
+
+
+def create_demo():
+    boards_number = 50
+    posts_number = 50
+    for i in xrange(boards_number):
+        db.board.insert(title="Pagination Demo #%d" % i)
+    rows = db().select(db.board.ALL, orderby=~db.board.last_active_time)
+    for row in rows:
+        for i in xrange(posts_number):
+            db.post.insert(
+                title="Pagination Demo #%d" % i,
+                post_content='These posts are for demonstrating pagination.\n'
+                             'Please click "Show more" at bottom :)\n'
+                             'You cannot modify these demo posts since you are not author. '
+                             'Please sign up and create yours :)',
+                board=row.id
+            )
+    redirect(URL('default', 'index'))
 
 
 def get_boards():
-    rows = db().select(db.board.ALL, orderby=~db.board.last_active_time)
+    rows = db().select(db.board.ALL, limitby=(0, int(request.vars.number)), orderby=~db.board.last_active_time)
     boards = []
     today = date.today()
     for row in rows:
@@ -160,8 +182,7 @@ def delete_board():
 
 
 def get_posts():
-    print request.vars
-    rows = db(db.post.board == request.vars.board).select(db.post.ALL, orderby=~db.post.last_active_time)
+    rows = db(db.post.board == request.vars.board).select(db.post.ALL, limitby=(0, int(request.vars.number)), orderby=~db.post.last_active_time)
     posts = []
     for row in rows:
         p = {
