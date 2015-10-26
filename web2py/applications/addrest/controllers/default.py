@@ -109,6 +109,11 @@ def delete_board():
     }
 
 
+def create_board_num():
+    for i in xrange(int(request.vars.num)):
+        db.board.insert()
+
+
 def create_board():
     rows = db(db.board.title == request.vars.title).select()
     if len(rows) > 0:
