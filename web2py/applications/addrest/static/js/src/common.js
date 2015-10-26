@@ -4,24 +4,189 @@ var Boron = require('boron');
 var Alert = require('react-bootstrap').Alert;
 
 var Navbar = React.createClass({
-    getTitle: function() {
-        // Here we can show user's email as title if
-        // user has been logged in. I comment this
-        // because sometimes the graders' test-email
-        // is not formal and will ruin the uniform
-        // of the page.
-        //if (this.props.user) {
-        //    return this.props.user.email;
-        //}
-        return this.props.defaultTitle;
+    getInitialState: function() {
+        return {
+            error: {},
+            work_info: {},
+            APIs: {
+                login: "login.json",
+                signup: "signup.json",
+                logout: "logout"
+            }
+        };
+    },
+    handleOnAlertDismiss: function() {
+        this.clearError();
+    },
+    handleOnLogin: function(email, password) {
+        this.clearError();
+
+        if (!Utils.validateEmail(email)) {
+            this.setError("login", "Please enter a valid email address.");
+            return;
+        }
+
+        this.login(email, password, false);
+    },
+    handleOnSignup: function(email, password) {
+        this.clearError();
+
+        if (!Utils.validateEmail(email)) {
+            this.setError("signup", "Please enter a valid email address.");
+            return;
+        }
+
+        if (password.length < 4) {
+            this.setError("signup", "Password is too short.");
+            return;
+        }
+
+        this.signup(email, password);
+    },
+    setError: function(worker, message) {
+        var error = {};
+        error[worker] = {
+            message: message
+        };
+        this.setState({
+            error: error
+        });
+    },
+    clearError: function() {
+        this.setState({
+            error: {}
+        });
+    },
+    work: function(worker, working, message) {
+        var info = {};
+        info[worker] = {
+            working: working,
+            message: message
+        };
+        this.setState({
+            work_info: info
+        });
+    },
+    stopWork: function() {
+        this.setState({
+            work_info: {}
+        });
+    },
+    login: function(email, password, signup) {
+        if (signup) {
+            this.work("signup", true, "Logging...");
+        } else {
+            this.work("login", true, "Logging...");
+        }
+
+        var data = {
+            email: email,
+            password: password
+        };
+
+        var callback = function(data) {
+            this.stopWork();
+            if (data.result === false) {
+                this.setError("login", "Email and password do not match.");
+            } else {
+                this.refs.signup.hide();
+                this.refs.login.hide();
+                this.props.onUserChanged();
+            }
+        }.bind(this);
+
+        var delay = function() {
+            $.ajax({
+                type: 'POST',
+                url: this.state.APIs.login,
+                data: data,
+                success: callback
+            });
+        }.bind(this);
+
+        setTimeout(delay, 800);
+    },
+    signup: function(email, password) {
+        this.work("signup", true, "Signing...");
+
+        var data = {
+            email: email,
+            password: password
+        };
+
+        var callback = function(data) {
+            this.stopWork();
+            if (data.result === false) {
+                this.setError("signup", "Email address has been used.");
+            } else {
+                this.login(email, password, true);
+            }
+        }.bind(this);
+
+        var delay = function() {
+            $.ajax({
+                type: 'POST',
+                url: this.state.APIs.signup,
+                data: data,
+                success: callback
+            });
+        }.bind(this);
+
+        setTimeout(delay, 800);
+    },
+    logout: function() {
+        this.work("logout", true, "Goodbye...");
+
+        var callback = function(data) {
+            this.stopWork();
+            this.props.onUserChanged();
+        }.bind(this);
+
+        var delay = function() {
+            $.ajax({
+                type: 'POST',
+                url: this.state.APIs.logout,
+                success: callback
+            });
+        }.bind(this);
+
+        setTimeout(delay, 800);
+    },
+    getDefaultButton: function() {
+        if (this.props.user) {
+            return [{
+                onClick: function() {
+                    this.logout();
+                }.bind(this),
+                text: "Log out",
+                worker: true
+            }];
+        } else {
+            return [
+                {
+                    onClick: function () {
+                        this.clearError();
+                        this.refs.signup.show();
+                    }.bind(this),
+                    text: "Sign up"
+                },
+                {
+                    onClick: function () {
+                        this.clearError();
+                        this.refs.login.show();
+                    }.bind(this),
+                    text: "Log In"
+                }
+            ];
+        }
     },
     getButtons: function(buttons) {
         var buttonList = [];
         for (var i in buttons) {
             var button = buttons[i];
             var navbarButton;
-            if (button.working) {
-                navbarButton = <NavbarButton key={i} workInfo={this.props.workInfo} onClick={button.onClick}>{button.text}</NavbarButton>;
+            if (button.worker) {
+                navbarButton = <NavbarButton key={i} workInfo={this.state.work_info.logout} onClick={button.onClick}>{button.text}</NavbarButton>;
             } else {
                 navbarButton = <NavbarButton key={i} onClick={button.onClick}>{button.text}</NavbarButton>
             }
@@ -30,19 +195,26 @@ var Navbar = React.createClass({
         return buttonList;
     },
 	render: function() {
+        var defaultButtons = this.getDefaultButton();
 		return (
 			<div>
+				<Modal ref="login" type="WaveModal">
+                    <Login workInfo={this.state.work_info.login} error={this.state.error.login} onLogin={this.handleOnLogin} onAlertDismiss={this.handleOnAlertDismiss} />
+                </Modal>
+				<Modal ref="signup" type="WaveModal">
+                    <Signup workInfo={this.state.work_info.signup} error={this.state.error.signup} onSignup={this.handleOnSignup} onAlertDismiss={this.handleOnAlertDismiss} />
+                </Modal>
                 <nav className="navbar navbar-default navbar-fixed-top">
                     <div className="container-fluid">
                         <div className="navbar-header">
-                            <div className="navbar-brand">{this.getTitle()}</div>
+                            <div className="navbar-brand">{this.props.title}</div>
                         </div>
                         <div className="collapse navbar-collapse">
                             <div className="navbar-form navbar-left">
-                                {this.getButtons(this.props.buttons.left)}
+                                {this.props.user ? this.getButtons(this.props.buttons) : null}
                             </div>
                             <div className="navbar-form navbar-right">
-                                {this.getButtons(this.props.buttons.right)}
+                                {this.getButtons(defaultButtons)}
                             </div>
                         </div>
                     </div>
@@ -66,6 +238,91 @@ var NavbarButton = React.createClass({
     render: function() {
         return this.getButton();
     }
+});
+
+var UserInfoForm = React.createClass({
+    handleOnKeyDown: function(e) {
+        if (e.keyCode === 13) {
+            var email = ReactDOM.findDOMNode(this.refs.email);
+            var password = ReactDOM.findDOMNode(this.refs.password);
+            if (e.target === email) {
+                password.focus();
+            } else if (e.target === password) {
+                this.submit();
+            }
+        }
+    },
+    handleOnClick: function() {
+        this.submit();
+    },
+    submit: function() {
+        if (this.props.workInfo && this.props.workInfo.working) {
+            return;
+        }
+        var email = ReactDOM.findDOMNode(this.refs.email).value;
+        var password = ReactDOM.findDOMNode(this.refs.password).value;
+        this.props.onClick(email, password);
+    },
+    getError: function() {
+        if (this.props.error) {
+            return (
+                <DismissibleAlert style="warning" onDismiss={this.props.onAlertDismiss} title={this.props.error.title} message={this.props.error.message} />
+            );
+        }
+    },
+    getButton: function() {
+        if (this.props.workInfo && this.props.workInfo.working) {
+            return (
+                <button className="btn btn-info btn-block disabled" onClick={this.handleOnClick}>{this.props.workInfo.message}</button>
+            );
+        }
+        return (
+            <button className="btn btn-info btn-block" onClick={this.handleOnClick}>{this.props.button}</button>
+        );
+    },
+	render: function() {
+		return (
+			<div className="UserInfoModal">
+				<div className="panel panel-primary">
+                    <div className="panel-heading">
+                        <h3 className="panel-title">{this.props.title}</h3>
+                    </div>
+                    <div className="panel-body">
+                        <div className="form center-block">
+                            {this.getError()}
+                            <div className="form-group">
+                                <Input ref="email" placeholder="Email" size="input-md" onKeyDown={this.handleOnKeyDown}></Input>
+                            </div>
+                            <div className="form-group">
+                                <Input ref="password" placeholder="Password" type="password" size="input-md" onKeyDown={this.handleOnKeyDown}></Input>
+                            </div>
+                            <div className="UserInfoFormButton">
+                                <div className="form-group">
+                                    {this.getButton()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+				</div>
+			</div>
+		);
+	}
+});
+
+var Login = React.createClass({
+	render: function() {
+		return (
+            <UserInfoForm title="Log In" workInfo={this.props.workInfo} button="Log In" error={this.props.error} onClick={this.props.onLogin} onAlertDismiss={this.props.onAlertDismiss} />
+		);
+	}
+});
+
+var Signup = React.createClass({
+	render: function() {
+		return (
+            <UserInfoForm title="Sign up" workInfo={this.props.workInfo} button="Sign up" error={this.props.error} onClick={this.props.onSignup} onAlertDismiss={this.props.onAlertDismiss} />
+		);
+	}
 });
 
 var Modal = React.createClass({
