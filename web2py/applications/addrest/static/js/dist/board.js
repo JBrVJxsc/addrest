@@ -35929,6 +35929,7 @@ var Navbar = React.createClass({
 
     getInitialState: function getInitialState() {
         return {
+            user: null,
             error: {},
             work_info: {}
         };
@@ -35960,6 +35961,16 @@ var Navbar = React.createClass({
         }
 
         this.signup(email, password);
+    },
+    setUser: function setUser(user) {
+        if (user === null && this.state.user === null || user !== null && this.state.user !== null) {
+            return;
+        }
+        if (user !== null || this.state.user !== null) {
+            this.setState({
+                user: user
+            });
+        }
     },
     setError: function setError(worker, message) {
         var error = {};
@@ -36009,7 +36020,7 @@ var Navbar = React.createClass({
             } else {
                 this.refs.signup.hide();
                 this.refs.login.hide();
-                this.props.onUserChanged();
+                this.props.onNavbarEvents();
             }
         }).bind(this);
 
@@ -36057,7 +36068,7 @@ var Navbar = React.createClass({
 
         var callback = (function (data) {
             this.stopWork();
-            this.props.onUserChanged();
+            this.props.onNavbarEvents();
         }).bind(this);
 
         var delay = (function () {
@@ -36071,7 +36082,7 @@ var Navbar = React.createClass({
         setTimeout(delay, 800);
     },
     getDefaultButton: function getDefaultButton() {
-        if (this.props.user) {
+        if (this.state.user) {
             return [{
                 onClick: (function () {
                     this.logout();
@@ -36153,7 +36164,7 @@ var Navbar = React.createClass({
                         React.createElement(
                             'div',
                             { className: 'navbar-form navbar-left' },
-                            this.props.user ? this.getButtons(this.props.buttons) : null
+                            this.state.user ? this.getButtons(this.props.buttons) : null
                         ),
                         React.createElement(
                             'div',

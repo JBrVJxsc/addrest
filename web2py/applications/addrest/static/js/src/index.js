@@ -14,8 +14,6 @@ var Index = React.createClass({
         var base_link = window.location.origin + "/" + app + "/" + controller + "/";
         return {
             user: null,
-            boards: [],
-            keyword: "",
             base_link: base_link,
             APIs: {
                 boards: base_link + "get_boards.json",
@@ -28,81 +26,25 @@ var Index = React.createClass({
             }
         };
     },
-    getBoardEventHandlers: function() {
-        return {
-            handleOnEdit: function(e) {
-                this.refs.editor.edit(e);
-            }.bind(this),
-            handleOnDelete: function(e) {
-                this.refs.editor.delete(e);
-            }.bind(this),
-            handleOnSearch: function(e) {
-                this.setState({
-                    keyword: e.keyword
-                });
-            }.bind(this)
-        };
+    handleNavbarEvents: function() {
+        this.refs.boardListPanel.getBoards();
     },
-    handleOnBoardEdit: function() {
-        this.getBoards();
-    },
-    handleOnUserChanged: function() {
-        this.getBoards();
-    },
-    getBoards: function() {
-        $.ajax({
-            type: 'POST',
-            url: this.state.APIs.boards,
-            success: function(data) {
-                if (this.isMounted()) {
-                    this.setState({
-                        boards: data.result.boards,
-                        user: data.result.user
-                    });
-                }
-            }.bind(this)
-        });
-    },
-    getFilteredBoards: function() {
-        var boards = this.state.boards;
-        for (var i in boards) {
-            var board = boards[i];
-            board.show = false;
-
-            if (this.state.keyword.trim() !== "") {
-                var content = board.title + " ";
-                content += board.email;
-                if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
-                    continue;
-                }
-            }
-
-            board.show = true;
-        }
-        return boards;
+    handleOnUserChanged: function(user) {
+        this.refs.navbar.setUser(user);
     },
     getButtons: function() {
         return [{
             onClick: function () {
-                this.refs.editor.create();
+                this.refs.boardListPanel.create();
             }.bind(this),
             text: "Create"
         }]
     },
-	componentDidMount: function() {
-        console.log(this.state);
-        this.getBoards();
-        this.interval = setInterval(this.getBoards, this.props.pollInterval);
-	},
-    componentWillUnmount: function() {
-        clearInterval(this.interval);
-    },
 	render: function() {
 		return (
 			<div>
-                <BoardEditor APIs={this.state.APIs} ref="editor" onBoardEdit={this.handleOnBoardEdit} />
-				<Navbar APIs={this.state.APIs} user={this.state.user} title="Boards" buttons={this.getButtons()} onUserChanged={this.handleOnUserChanged} />
-                <BoardListPanel baseLink={this.state.base_link} user={this.state.user} boards={this.getFilteredBoards()} onBoardEvents={this.getBoardEventHandlers()} />
+				<Navbar ref="navbar" APIs={this.state.APIs} title="Boards" buttons={this.getButtons()} onNavbarEvents={this.handleNavbarEvents} />
+                <BoardListPanel ref="boardListPanel" pollInterval={this.props.pollInterval} APIs={this.state.APIs} baseLink={this.state.base_link} onUserChanged={this.handleOnUserChanged} />
 			</div>
 		);
 	}
@@ -317,15 +259,85 @@ var BoardEditor = React.createClass({
 });
 
 var BoardListPanel = React.createClass({
+    getInitialState: function() {
+        return {
+            user: null,
+            boards: [],
+            keyword: ""
+        };
+    },
+    create: function() {
+        this.refs.editor.create();
+    },
+    handleOnBoardEdit: function() {
+        this.getBoards();
+    },
+    getBoardEventHandlers: function() {
+        return {
+            handleOnEdit: function(e) {
+                this.refs.editor.edit(e);
+            }.bind(this),
+            handleOnDelete: function(e) {
+                this.refs.editor.delete(e);
+            }.bind(this),
+            handleOnSearch: function(e) {
+                this.setState({
+                    keyword: e.keyword
+                });
+            }.bind(this)
+        };
+    },
+    getBoards: function() {
+        $.ajax({
+            type: 'POST',
+            url: this.props.APIs.boards,
+            success: function(data) {
+                if (this.isMounted()) {
+                    this.setState({
+                        boards: data.result.boards,
+                        user: data.result.user
+                    });
+                    this.props.onUserChanged(this.state.user);
+                }
+            }.bind(this)
+        });
+    },
+    getFilteredBoards: function() {
+        var boards = this.state.boards;
+        for (var i in boards) {
+            var board = boards[i];
+            board.show = false;
+
+            if (this.state.keyword.trim() !== "") {
+                var content = board.title + " ";
+                content += board.email;
+                if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
+                    continue;
+                }
+            }
+
+            board.show = true;
+        }
+        return boards;
+    },
+	componentDidMount: function() {
+        this.getBoards();
+        //this.interval = setInterval(this.getBoards, this.props.pollInterval);
+	},
+    componentWillUnmount: function() {
+        clearInterval(this.interval);
+    },
     render: function() {
+        var handlers = this.getBoardEventHandlers();
         return (
             <div className="BoardListPanel box-shadow--3dp">
+                <BoardEditor APIs={this.props.APIs} ref="editor" onBoardEdit={this.handleOnBoardEdit} />
                 <div className="panel panel-primary">
                     <div className="panel-heading">
-                        <BoardListToolbar onSearch={this.props.onBoardEvents.handleOnSearch} />
+                        <BoardListToolbar onSearch={handlers.handleOnSearch} />
                     </div>
                     <div className="panel-body">
-                        <BoardList baseLink={this.props.baseLink} user={this.props.user} boards={this.props.boards} onBoardEvents={this.props.onBoardEvents} />
+                        <BoardList baseLink={this.props.baseLink} user={this.state.user} boards={this.getFilteredBoards()} onBoardEvents={handlers} />
                     </div>
                     <div className="panel-footer">
                         <button type="button" className="btn btn-info btn-xs" onClick={this.handleOnClick}>Show more</button>
