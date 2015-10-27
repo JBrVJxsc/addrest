@@ -223,4 +223,10 @@ body {
 .ParagraphOverflow {
   max-height: 136.5px;
   overflow: scroll;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+p {
+  word-break: break-all
 }

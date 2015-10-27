@@ -270,4 +270,11 @@ body {
 .ParagraphOverflow {
   max-height: 136.5px;
   overflow: scroll;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* line 230, ../sass/_main.scss */
+p {
+  word-break: break-all;
 }
