@@ -35881,17 +35881,14 @@ var Index = React.createClass({
         var controller = document.getElementById("CONTROLLER").textContent;
         var base_link = window.location.origin + "/" + app + "/" + controller + "/";
         return {
-            user: null,
             base_link: base_link,
-            APIs: {
-                boards: base_link + "get_boards.json",
-                create: base_link + "create_board.json",
-                edit: base_link + "edit_board.json",
-                'delete': base_link + "delete_board.json",
+            get_api_api: base_link + "get_board_api.json",
+            navbar_api: {
                 login: base_link + "login.json",
                 signup: base_link + "signup.json",
                 logout: base_link + "logout"
-            }
+            },
+            APIs: {}
         };
     },
     handleNavbarEvents: function handleNavbarEvents() {
@@ -35899,6 +35896,29 @@ var Index = React.createClass({
     },
     handleOnUserChanged: function handleOnUserChanged(user) {
         this.refs.navbar.setUser(user);
+        if (user === null) {
+            this.user = null;
+            return;
+        }
+        if (this.user === null || this.user.email !== user.email) {
+            this.user = user;
+            this.getAPIs();
+        }
+    },
+    getAPIs: function getAPIs() {
+        $.ajax({
+            type: 'POST',
+            url: this.state.get_api_api,
+            success: (function (data) {
+                Object.keys(data).map((function (value, index) {
+                    data[value] = window.location.origin + data[value];
+                }).bind(this));
+                this.setState({
+                    APIs: data
+                });
+                console.log(data);
+            }).bind(this)
+        });
     },
     getButtons: function getButtons() {
         return [{
@@ -35908,11 +35928,14 @@ var Index = React.createClass({
             text: "Create"
         }];
     },
+    componentDidMount: function componentDidMount() {
+        this.user = null;
+    },
     render: function render() {
         return React.createElement(
             'div',
             null,
-            React.createElement(Navbar, { ref: 'navbar', APIs: this.state.APIs, title: 'Boards', buttons: this.getButtons(), onNavbarEvents: this.handleNavbarEvents }),
+            React.createElement(Navbar, { ref: 'navbar', APIs: this.state.navbar_api, title: 'Boards', buttons: this.getButtons(), onNavbarEvents: this.handleNavbarEvents }),
             React.createElement(BoardListPanel, { ref: 'boardListPanel', pollInterval: this.props.pollInterval, APIs: this.state.APIs, baseLink: this.state.base_link, onUserChanged: this.handleOnUserChanged })
         );
     }
@@ -36141,7 +36164,8 @@ var BoardListPanel = React.createClass({
         return {
             user: null,
             boards: [],
-            keyword: ""
+            keyword: "",
+            boards_api: this.props.baseLink + "get_boards.json"
         };
     },
     create: function create() {
@@ -36172,7 +36196,7 @@ var BoardListPanel = React.createClass({
     getBoards: function getBoards() {
         $.ajax({
             type: 'POST',
-            url: this.props.APIs.boards,
+            url: this.state.boards_api,
             data: {
                 number: this.board_number
             },

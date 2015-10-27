@@ -136,6 +136,7 @@ def get_boards():
     }
 
 
+@auth.requires_signature()
 def create_board():
     rows = db(db.board.title == request.vars.title).select()
     if len(rows) > 0:
@@ -156,6 +157,7 @@ def create_board():
     }
 
 
+@auth.requires_signature()
 def edit_board():
     rows = db(db.board.title == request.vars.title).select()
     if len(rows) > 0:
@@ -172,6 +174,7 @@ def edit_board():
     }
 
 
+@auth.requires_signature()
 def delete_board():
     db(db.board.id == request.vars.id).delete()
     return {
@@ -204,6 +207,7 @@ def get_posts():
     }
 
 
+@auth.requires_signature()
 def create_post():
     b = {
         'title': request.vars.title,
@@ -220,6 +224,7 @@ def create_post():
     }
 
 
+@auth.requires_signature()
 def edit_post():
     p = {
         'title': request.vars.title,
@@ -235,6 +240,7 @@ def edit_post():
     }
 
 
+@auth.requires_signature()
 def delete_post():
     db(db.post.id == request.vars.id).delete()
     return {
@@ -242,3 +248,19 @@ def delete_post():
             'state': True,
         },
     }
+
+
+@auth.requires_login()
+def get_post_api():
+    create = URL('default', 'create_post.json', user_signature=True)
+    edit = URL('default', 'edit_post.json', user_signature=True)
+    delete = URL('default', 'delete_post.json', user_signature=True)
+    return locals()
+
+
+@auth.requires_login()
+def get_board_api():
+    create = URL('default', 'create_board.json', user_signature=True)
+    edit = URL('default', 'edit_board.json', user_signature=True)
+    delete = URL('default', 'delete_board.json', user_signature=True)
+    return locals()

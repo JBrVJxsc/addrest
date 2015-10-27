@@ -35275,18 +35275,15 @@ var Index = React.createClass({
         var controller = document.getElementById("CONTROLLER").textContent;
         var base_link = window.location.origin + "/" + app + "/" + controller + "/";
         return {
-            user: null,
-            base_link: base_link,
             board_title: document.getElementById("BOARD_TITLE").textContent,
-            APIs: {
-                posts: base_link + "get_posts.json",
-                create: base_link + "create_post.json",
-                edit: base_link + "edit_post.json",
-                'delete': base_link + "delete_post.json",
+            base_link: base_link,
+            get_api_api: base_link + "get_post_api.json",
+            navbar_api: {
                 login: base_link + "login.json",
                 signup: base_link + "signup.json",
                 logout: base_link + "logout"
-            }
+            },
+            APIs: {}
         };
     },
     handleNavbarEvents: function handleNavbarEvents() {
@@ -35294,6 +35291,29 @@ var Index = React.createClass({
     },
     handleOnUserChanged: function handleOnUserChanged(user) {
         this.refs.navbar.setUser(user);
+        if (user === null) {
+            this.user = null;
+            return;
+        }
+        if (this.user === null || this.user.email !== user.email) {
+            this.user = user;
+            this.getAPIs();
+        }
+    },
+    getAPIs: function getAPIs() {
+        $.ajax({
+            type: 'POST',
+            url: this.state.get_api_api,
+            success: (function (data) {
+                Object.keys(data).map((function (value, index) {
+                    data[value] = window.location.origin + data[value];
+                }).bind(this));
+                this.setState({
+                    APIs: data
+                });
+                console.log(data);
+            }).bind(this)
+        });
     },
     getButtons: function getButtons() {
         return [{
@@ -35303,11 +35323,15 @@ var Index = React.createClass({
             text: "Create"
         }];
     },
+    componentDidMount: function componentDidMount() {
+        this.user = null;
+        document.title = this.state.board_title;
+    },
     render: function render() {
         return React.createElement(
             'div',
             null,
-            React.createElement(Navbar, { ref: 'navbar', APIs: this.state.APIs, title: this.state.board_title, buttons: this.getButtons(), onNavbarEvents: this.handleNavbarEvents }),
+            React.createElement(Navbar, { ref: 'navbar', APIs: this.state.navbar_api, title: this.state.board_title, buttons: this.getButtons(), onNavbarEvents: this.handleNavbarEvents }),
             React.createElement(PostListPanel, { ref: 'postListPanel', pollInterval: this.props.pollInterval, APIs: this.state.APIs, baseLink: this.state.base_link, onUserChanged: this.handleOnUserChanged })
         );
     }
@@ -35550,6 +35574,7 @@ var PostListPanel = React.createClass({
             user: null,
             posts: [],
             keyword: "",
+            posts_api: this.props.baseLink + "get_posts.json",
             board_id: document.getElementById("BOARD_ID").textContent
         };
     },
@@ -35581,7 +35606,7 @@ var PostListPanel = React.createClass({
     getPosts: function getPosts() {
         $.ajax({
             type: 'POST',
-            url: this.props.APIs.posts,
+            url: this.state.posts_api,
             data: {
                 board: this.state.board_id,
                 number: this.post_number
@@ -35745,9 +35770,13 @@ var Post = React.createClass({
                     'div',
                     { className: 'panel-body' },
                     React.createElement(
-                        'p',
-                        { className: 'PreLine' },
-                        post.post_content
+                        'div',
+                        { className: 'ParagraphOverflow' },
+                        React.createElement(
+                            'p',
+                            { className: 'PreLine' },
+                            post.post_content
+                        )
                     )
                 ),
                 React.createElement(
@@ -35918,11 +35947,7 @@ var PostForm = React.createClass({
                         React.createElement(
                             'div',
                             { className: 'form-group' },
-                            React.createElement(
-                                'textarea',
-                                { ref: 'content', className: 'form-control', placeholder: 'Write something...', rows: '5' },
-                                post.post_content
-                            )
+                            React.createElement('textarea', { ref: 'content', className: 'form-control', placeholder: 'Write something...', rows: '5', defaultValue: post.post_content })
                         ),
                         React.createElement(
                             'div',

@@ -265,3 +265,9 @@ body {
 .PreLine {
   white-space: pre-line;
 }
+
+/* line 223, ../sass/_main.scss */
+.ParagraphOverflow {
+  max-height: 136.5px;
+  overflow: scroll;
+}

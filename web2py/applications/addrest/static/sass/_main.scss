@@ -219,3 +219,8 @@ body {
 .PreLine {
   white-space: pre-line;
 }
+
+.ParagraphOverflow {
+  max-height: 136.5px;
+  overflow: scroll;
+}
