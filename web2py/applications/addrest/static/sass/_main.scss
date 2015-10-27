@@ -230,3 +230,15 @@ body {
 p {
   word-break: normal;
 }
+
+a:hover {
+  color: $Info;
+}
+
+a:active {
+  color: $Info;
+}
+
+a:focus {
+  color: $Info;
+}

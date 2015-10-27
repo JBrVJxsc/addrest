@@ -1,4 +1,7 @@
 {{extend 'main.html'}}
 <body>
+    <div id="body"></div>
+    <div id="APPLICATION" hidden>{{=request.application}}</div>
+    <div id="CONTROLLER" hidden>{{=request.controller}}</div>
     <script type="text/javascript" src="{{=URL('static','js/dist/index.js')}}"></script>
 </body>

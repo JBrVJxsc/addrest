@@ -278,3 +278,18 @@ body {
 p {
   word-break: normal;
 }
+
+/* line 234, ../sass/_main.scss */
+a:hover {
+  color: #3498DB;
+}
+
+/* line 238, ../sass/_main.scss */
+a:active {
+  color: #3498DB;
+}
+
+/* line 242, ../sass/_main.scss */
+a:focus {
+  color: #3498DB;
+}
