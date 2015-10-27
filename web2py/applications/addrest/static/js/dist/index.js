@@ -35892,7 +35892,7 @@ var Index = React.createClass({
         };
     },
     handleNavbarEvents: function handleNavbarEvents() {
-        this.refs.boardListPanel.getBoards();
+        this.refs.listPanel.getList();
     },
     handleOnUserChanged: function handleOnUserChanged(user) {
         this.refs.navbar.setUser(user);
@@ -35916,14 +35916,13 @@ var Index = React.createClass({
                 this.setState({
                     APIs: data
                 });
-                console.log(data);
             }).bind(this)
         });
     },
     getButtons: function getButtons() {
         return [{
             onClick: (function () {
-                this.refs.boardListPanel.create();
+                this.refs.listPanel.create();
             }).bind(this),
             text: "Create"
         }];
@@ -35936,13 +35935,13 @@ var Index = React.createClass({
             'div',
             null,
             React.createElement(Navbar, { ref: 'navbar', APIs: this.state.navbar_api, title: 'Boards', buttons: this.getButtons(), onNavbarEvents: this.handleNavbarEvents }),
-            React.createElement(BoardListPanel, { ref: 'boardListPanel', pollInterval: this.props.pollInterval, APIs: this.state.APIs, baseLink: this.state.base_link, onUserChanged: this.handleOnUserChanged })
+            React.createElement(ListPanel, { ref: 'listPanel', pollInterval: this.props.pollInterval, APIs: this.state.APIs, baseLink: this.state.base_link, onUserChanged: this.handleOnUserChanged })
         );
     }
 });
 
-var BoardEditor = React.createClass({
-    displayName: 'BoardEditor',
+var Editor = React.createClass({
+    displayName: 'Editor',
 
     getInitialState: function getInitialState() {
         return {
@@ -35991,16 +35990,16 @@ var BoardEditor = React.createClass({
         this.clearError();
         this.refs.create.show();
     },
-    edit: function edit(board) {
+    edit: function edit(entity) {
         this.setState({
-            editing: board
+            editing: entity
         });
         this.clearError();
         this.refs.edit.show();
     },
-    'delete': function _delete(board) {
+    'delete': function _delete(entity) {
         this.setState({
-            deleting: board
+            deleting: entity
         });
         this.clearError();
         this.refs['delete'].show();
@@ -36014,7 +36013,7 @@ var BoardEditor = React.createClass({
                 this.setError("create", "Board title has been used.");
             } else {
                 this.refs.create.hide();
-                this.props.onBoardEdit();
+                this.props.onEntityEdit();
             }
         }).bind(this);
 
@@ -36047,7 +36046,7 @@ var BoardEditor = React.createClass({
                 this.setError("edit", "Board title has been used.");
             } else {
                 this.refs.edit.hide();
-                this.props.onBoardEdit();
+                this.props.onEntityEdit();
             }
         }).bind(this);
 
@@ -36074,7 +36073,7 @@ var BoardEditor = React.createClass({
 
         setTimeout(delay, 800);
     },
-    _delete: function _delete(board) {
+    _delete: function _delete(entity) {
         this.work("delete", true, "Deleting...");
 
         var callback = (function (data) {
@@ -36083,7 +36082,7 @@ var BoardEditor = React.createClass({
                 this.setError("delete", "Something was wrong...");
             } else {
                 this.refs['delete'].hide();
-                this.props.onBoardEdit();
+                this.props.onEntityEdit();
             }
         }).bind(this);
 
@@ -36096,7 +36095,7 @@ var BoardEditor = React.createClass({
             $.ajax({
                 type: 'POST',
                 url: this.props.APIs['delete'],
-                data: board,
+                data: entity,
                 error: error,
                 success: callback,
                 timeout: 3000
@@ -36146,7 +36145,7 @@ var BoardEditor = React.createClass({
             React.createElement(
                 Modal,
                 { ref: 'edit', type: 'WaveModal' },
-                React.createElement(Edit, { board: this.state.editing, workInfo: this.state.work_info.edit, error: this.state.error.edit, onEdit: this.handleOnEdit, onAlertDismiss: this.handleOnAlertDismiss })
+                React.createElement(Edit, { entity: this.state.editing, workInfo: this.state.work_info.edit, error: this.state.error.edit, onEdit: this.handleOnEdit, onAlertDismiss: this.handleOnAlertDismiss })
             ),
             React.createElement(
                 Modal,
@@ -36157,28 +36156,28 @@ var BoardEditor = React.createClass({
     }
 });
 
-var BoardListPanel = React.createClass({
-    displayName: 'BoardListPanel',
+var ListPanel = React.createClass({
+    displayName: 'ListPanel',
 
     getInitialState: function getInitialState() {
         return {
             user: null,
-            boards: [],
+            entities: [],
             keyword: "",
-            boards_api: this.props.baseLink + "get_boards.json"
+            get_list_api: this.props.baseLink + "get_boards.json"
         };
     },
     create: function create() {
         this.refs.editor.create();
     },
     handleOnClick: function handleOnClick() {
-        this.board_number += 10;
-        this.getBoards();
+        this.list_size += 10;
+        this.getList();
     },
-    handleOnBoardEdit: function handleOnBoardEdit() {
-        this.getBoards();
+    handleOnEntityEdit: function handleOnEntityEdit() {
+        this.getList();
     },
-    getBoardEventHandlers: function getBoardEventHandlers() {
+    getEventHandlers: function getEventHandlers() {
         return {
             handleOnEdit: (function (e) {
                 this.refs.editor.edit(e);
@@ -36193,17 +36192,17 @@ var BoardListPanel = React.createClass({
             }).bind(this)
         };
     },
-    getBoards: function getBoards() {
+    getList: function getList() {
         $.ajax({
             type: 'POST',
-            url: this.state.boards_api,
+            url: this.state.get_list_api,
             data: {
-                number: this.board_number
+                number: this.list_size
             },
             success: (function (data) {
                 if (this.isMounted()) {
                     this.setState({
-                        boards: data.result.boards,
+                        entities: data.result.boards,
                         user: data.result.user
                     });
                     this.props.onUserChanged(this.state.user);
@@ -36211,50 +36210,50 @@ var BoardListPanel = React.createClass({
             }).bind(this)
         });
     },
-    getFilteredBoards: function getFilteredBoards() {
-        var boards = this.state.boards;
-        for (var i in boards) {
-            var board = boards[i];
-            board.show = false;
+    getFilteredList: function getFilteredList() {
+        var entities = this.state.entities;
+        for (var i in entities) {
+            var entity = entities[i];
+            entity.show = false;
 
             if (this.state.keyword.trim() !== "") {
-                var content = board.title + " ";
-                content += board.email;
+                var content = entity.title + " ";
+                content += entity.email;
                 if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
                     continue;
                 }
             }
 
-            board.show = true;
+            entity.show = true;
         }
-        return boards;
+        return entities;
     },
     componentDidMount: function componentDidMount() {
-        this.board_number = 20;
-        this.getBoards();
-        this.interval = setInterval(this.getBoards, this.props.pollInterval);
+        this.list_size = 20;
+        this.getList();
+        this.interval = setInterval(this.getList, this.props.pollInterval);
     },
     componentWillUnmount: function componentWillUnmount() {
         clearInterval(this.interval);
     },
     render: function render() {
-        var handlers = this.getBoardEventHandlers();
+        var handlers = this.getEventHandlers();
         return React.createElement(
             'div',
             { className: 'BoardListPanel box-shadow--3dp' },
-            React.createElement(BoardEditor, { APIs: this.props.APIs, ref: 'editor', onBoardEdit: this.handleOnBoardEdit }),
+            React.createElement(Editor, { APIs: this.props.APIs, ref: 'editor', onEntityEdit: this.handleOnEntityEdit }),
             React.createElement(
                 'div',
                 { className: 'panel panel-primary' },
                 React.createElement(
                     'div',
                     { className: 'panel-heading' },
-                    React.createElement(BoardListToolbar, { onSearch: handlers.handleOnSearch })
+                    React.createElement(ListToolbar, { onSearch: handlers.handleOnSearch })
                 ),
                 React.createElement(
                     'div',
                     { className: 'panel-body' },
-                    React.createElement(BoardList, { baseLink: this.props.baseLink, user: this.state.user, boards: this.getFilteredBoards(), onBoardEvents: handlers })
+                    React.createElement(List, { baseLink: this.props.baseLink, user: this.state.user, entities: this.getFilteredList(), onEntityEvents: handlers })
                 ),
                 React.createElement(
                     'div',
@@ -36270,8 +36269,8 @@ var BoardListPanel = React.createClass({
     }
 });
 
-var BoardListToolbar = React.createClass({
-    displayName: 'BoardListToolbar',
+var ListToolbar = React.createClass({
+    displayName: 'ListToolbar',
 
     handleOnChange: function handleOnChange(e) {
         this.props.onSearch({
@@ -36308,18 +36307,18 @@ var SearchTextBox = React.createClass({
     }
 });
 
-var BoardList = React.createClass({
-    displayName: 'BoardList',
+var List = React.createClass({
+    displayName: 'List',
 
-    getBoards: function getBoards() {
+    getEntities: function getEntities() {
         var rows = [];
-        var boards = this.props.boards;
-        for (var i in boards) {
-            if (boards[i].show) {
+        var entities = this.props.entities;
+        for (var i in entities) {
+            if (entities[i].show) {
                 rows.push(React.createElement(
                     'div',
                     { key: i, className: 'col-xs-4' },
-                    React.createElement(Board, { baseLink: this.props.baseLink, user: this.props.user, board: boards[i], onBoardEvents: this.props.onBoardEvents })
+                    React.createElement(Entity, { baseLink: this.props.baseLink, user: this.props.user, entity: entities[i], onEntityEvents: this.props.onEntityEvents })
                 ));
             }
         }
@@ -36332,29 +36331,29 @@ var BoardList = React.createClass({
             React.createElement(
                 'div',
                 { className: 'row' },
-                this.getBoards()
+                this.getEntities()
             )
         );
     }
 });
 
-var Board = React.createClass({
-    displayName: 'Board',
+var Entity = React.createClass({
+    displayName: 'Entity',
 
     handleOnClick: function handleOnClick() {
-        window.open(this.props.baseLink + "board/" + this.props.board.id);
+        window.open(this.props.baseLink + "board/" + this.props.entity.id);
     },
     render: function render() {
-        var board = this.props.board;
+        var entity = this.props.entity;
         var link;
-        if (board.last_post_id) {
+        if (entity.last_post_id) {
             link = React.createElement(
                 'div',
                 { className: 'pull-right HalfTitle' },
                 React.createElement(
                     'a',
-                    { className: 'pull-right Link', href: this.props.baseLink + "board/" + this.props.board.id, target: '_blank' },
-                    board.last_post_title
+                    { className: 'pull-right Link', href: this.props.baseLink + "board/" + this.props.entity.id, target: '_blank' },
+                    entity.last_post_title
                 )
             );
         } else {
@@ -36373,7 +36372,7 @@ var Board = React.createClass({
                 React.createElement(
                     'div',
                     { className: 'panel-heading' },
-                    React.createElement(BoardToolbar, { board: board, user: this.props.user, onBoardEvents: this.props.onBoardEvents })
+                    React.createElement(Toolbar, { entity: entity, user: this.props.user, onEntityEvents: this.props.onEntityEvents })
                 ),
                 React.createElement(
                     'div',
@@ -36392,7 +36391,7 @@ var Board = React.createClass({
                         React.createElement(
                             'span',
                             { className: 'label label-info LabelFont pull-right' },
-                            board.today_posts_number
+                            entity.today_posts_number
                         )
                     ),
                     React.createElement(
@@ -36403,7 +36402,7 @@ var Board = React.createClass({
                         React.createElement(
                             'span',
                             { className: 'label label-info LabelFont pull-right' },
-                            board.all_posts_number
+                            entity.all_posts_number
                         )
                     )
                 ),
@@ -36421,23 +36420,23 @@ var Board = React.createClass({
     }
 });
 
-var BoardToolbar = React.createClass({
-    displayName: 'BoardToolbar',
+var Toolbar = React.createClass({
+    displayName: 'Toolbar',
 
     handleOnEdit: function handleOnEdit() {
-        this.props.onBoardEvents.handleOnEdit(this.props.board);
+        this.props.onEntityEvents.handleOnEdit(this.props.entity);
     },
     handleOnDelete: function handleOnDelete() {
-        this.props.onBoardEvents.handleOnDelete(this.props.board);
+        this.props.onEntityEvents.handleOnDelete(this.props.entity);
     },
     getTitle: function getTitle() {
         if (this.props.user) {
-            if (this.props.board.email) {
-                if (this.props.user.email === this.props.board.email) {
+            if (this.props.entity.email) {
+                if (this.props.user.email === this.props.entity.email) {
                     return React.createElement(
                         'div',
                         { className: 'HalfTitle' },
-                        this.props.board.title
+                        this.props.entity.title
                     );
                 }
             }
@@ -36445,13 +36444,13 @@ var BoardToolbar = React.createClass({
         return React.createElement(
             'div',
             { className: 'FullTitle' },
-            this.props.board.title
+            this.props.entity.title
         );
     },
     getButtons: function getButtons() {
         if (this.props.user) {
-            if (this.props.board.email) {
-                if (this.props.user.email === this.props.board.email) {
+            if (this.props.entity.email) {
+                if (this.props.user.email === this.props.entity.email) {
                     return React.createElement(
                         'div',
                         { className: 'pull-right' },
@@ -36480,8 +36479,8 @@ var BoardToolbar = React.createClass({
     }
 });
 
-var BoardForm = React.createClass({
-    displayName: 'BoardForm',
+var Form = React.createClass({
+    displayName: 'Form',
 
     handleOnKeyDown: function handleOnKeyDown(e) {
         if (e.keyCode === 13) {
@@ -36499,7 +36498,7 @@ var BoardForm = React.createClass({
             return;
         }
         var title = ReactDOM.findDOMNode(this.refs.title).value;
-        if (this.props.board && this.props.board.title === title) {
+        if (this.props.entity && this.props.entity.title === title) {
             this.props.onClick(null);
             return;
         }
@@ -36525,9 +36524,9 @@ var BoardForm = React.createClass({
         );
     },
     render: function render() {
-        var board = {};
-        if (this.props.board) {
-            board = this.props.board;
+        var entity = {};
+        if (this.props.entity) {
+            entity = this.props.entity;
         }
         return React.createElement(
             'div',
@@ -36561,7 +36560,7 @@ var BoardForm = React.createClass({
                             React.createElement(
                                 Input,
                                 { ref: 'title', placeholder: 'Board Title', size: 'input-md', onKeyDown: this.handleOnKeyDown },
-                                board.title
+                                entity.title
                             )
                         ),
                         React.createElement(
@@ -36584,7 +36583,7 @@ var Create = React.createClass({
     displayName: 'Create',
 
     render: function render() {
-        return React.createElement(BoardForm, { title: 'Create Board', workInfo: this.props.workInfo, button: 'Create', error: this.props.error, onClick: this.props.onCreate, onAlertDismiss: this.props.onAlertDismiss });
+        return React.createElement(Form, { title: 'Create Board', workInfo: this.props.workInfo, button: 'Create', error: this.props.error, onClick: this.props.onCreate, onAlertDismiss: this.props.onAlertDismiss });
     }
 });
 
@@ -36592,7 +36591,7 @@ var Edit = React.createClass({
     displayName: 'Edit',
 
     render: function render() {
-        return React.createElement(BoardForm, { board: this.props.board, title: 'Edit', workInfo: this.props.workInfo, button: 'Save', error: this.props.error, onClick: this.props.onEdit, onAlertDismiss: this.props.onAlertDismiss });
+        return React.createElement(Form, { entity: this.props.entity, title: 'Edit', workInfo: this.props.workInfo, button: 'Save', error: this.props.error, onClick: this.props.onEdit, onAlertDismiss: this.props.onAlertDismiss });
     }
 });
 

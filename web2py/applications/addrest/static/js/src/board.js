@@ -1,6 +1,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
-var PrettyDate = require("pretty-date");
+var Moment = require('moment');
 var Utils = require('./common').Utils;
 var Navbar = require('./common').Navbar;
 var Modal = require('./common').Modal;
@@ -26,7 +26,7 @@ var Index = React.createClass({
         };
     },
     handleNavbarEvents: function() {
-        this.refs.postListPanel.getPosts();
+        this.refs.listPanel.getList();
     },
     handleOnUserChanged: function(user) {
         this.refs.navbar.setUser(user);
@@ -50,14 +50,13 @@ var Index = React.createClass({
                 this.setState({
                     APIs: data
                 });
-                console.log(data);
             }.bind(this)
         });
     },
     getButtons: function() {
         return [{
             onClick: function () {
-                this.refs.postListPanel.create();
+                this.refs.listPanel.create();
             }.bind(this),
             text: "Create"
         }]
@@ -70,13 +69,13 @@ var Index = React.createClass({
 		return (
 			<div>
 				<Navbar ref="navbar" APIs={this.state.navbar_api} title={this.state.board_title} buttons={this.getButtons()} onNavbarEvents={this.handleNavbarEvents} />
-                <PostListPanel ref="postListPanel" pollInterval={this.props.pollInterval} APIs={this.state.APIs} baseLink={this.state.base_link} onUserChanged={this.handleOnUserChanged} />
+                <ListPanel ref="listPanel" pollInterval={this.props.pollInterval} APIs={this.state.APIs} baseLink={this.state.base_link} onUserChanged={this.handleOnUserChanged} />
 			</div>
 		);
 	}
 });
 
-var PostEditor = React.createClass({
+var Editor = React.createClass({
     getInitialState: function() {
         return {
             error: {},
@@ -134,16 +133,16 @@ var PostEditor = React.createClass({
         this.clearError();
         this.refs.create.show();
     },
-    edit: function(post) {
+    edit: function(entity) {
         this.setState({
-            editing: post
+            editing: entity
         });
         this.clearError();
         this.refs.edit.show();
     },
-    delete: function(post) {
+    delete: function(entity) {
         this.setState({
-            deleting: post
+            deleting: entity
         });
         this.clearError();
         this.refs.delete.show();
@@ -157,7 +156,7 @@ var PostEditor = React.createClass({
                 this.setError("create", "Something was wrong...");
             } else {
                 this.refs.create.hide();
-                this.props.onPostEdit();
+                this.props.onEntityEdit();
             }
         }.bind(this);
 
@@ -192,7 +191,7 @@ var PostEditor = React.createClass({
                 this.setError("edit", "Something was wrong...");
             } else {
                 this.refs.edit.hide();
-                this.props.onPostEdit();
+                this.props.onEntityEdit();
             }
         }.bind(this);
 
@@ -220,7 +219,7 @@ var PostEditor = React.createClass({
 
         setTimeout(delay, 800);
     },
-    _delete: function(post) {
+    _delete: function(entity) {
         this.work("delete", true, "Deleting...");
 
         var callback = function(data) {
@@ -229,7 +228,7 @@ var PostEditor = React.createClass({
                 this.setError("delete", "Something was wrong...");
             } else {
                 this.refs.delete.hide();
-                this.props.onPostEdit();
+                this.props.onEntityEdit();
             }
         }.bind(this);
 
@@ -242,7 +241,7 @@ var PostEditor = React.createClass({
             $.ajax({
                 type: 'POST',
                 url: this.props.APIs.delete,
-                data: post,
+                data: entity,
                 error: error,
                 success: callback,
                 timeout: 3000
@@ -287,7 +286,7 @@ var PostEditor = React.createClass({
                     <Create workInfo={this.state.work_info.create} error={this.state.error.create} onCreate={this.handleOnCreate} onAlertDismiss={this.handleOnAlertDismiss} />
                 </Modal>
 				<Modal ref="edit" type="WaveModal">
-                    <Edit post={this.state.editing} workInfo={this.state.work_info.edit} error={this.state.error.edit} onEdit={this.handleOnEdit} onAlertDismiss={this.handleOnAlertDismiss} />
+                    <Edit entity={this.state.editing} workInfo={this.state.work_info.edit} error={this.state.error.edit} onEdit={this.handleOnEdit} onAlertDismiss={this.handleOnAlertDismiss} />
                 </Modal>
 				<Modal ref="delete" type="WaveModal">
                     <ConfirmWindow workInfo={this.state.work_info.delete} error={this.state.error.delete} title="Are you sure?" onConfirm={this.handleOnDelete} onAlertDismiss={this.handleOnAlertDismiss} />
@@ -297,13 +296,13 @@ var PostEditor = React.createClass({
     }
 });
 
-var PostListPanel = React.createClass({
+var ListPanel = React.createClass({
     getInitialState: function() {
         return {
             user: null,
-            posts: [],
+            entities: [],
             keyword: "",
-            posts_api: this.props.baseLink + "get_posts.json",
+            get_list_api: this.props.baseLink + "get_posts.json",
             board_id: document.getElementById("BOARD_ID").textContent
         };
     },
@@ -311,13 +310,13 @@ var PostListPanel = React.createClass({
         this.refs.editor.create();
     },
     handleOnClick: function() {
-        this.post_number += 10;
-        this.getPosts();
+        this.list_size += 10;
+        this.getList();
     },
-    handleOnPostEdit: function() {
-        this.getPosts();
+    handleOnEntityEdit: function() {
+        this.getList();
     },
-    getPostEventHandlers: function() {
+    getEventHandlers: function() {
         return {
             handleOnEdit: function(e) {
                 this.refs.editor.edit(e);
@@ -332,18 +331,18 @@ var PostListPanel = React.createClass({
             }.bind(this)
         };
     },
-    getPosts: function() {
+    getList: function() {
         $.ajax({
             type: 'POST',
-            url: this.state.posts_api,
+            url: this.state.get_list_api,
             data: {
                 board: this.state.board_id,
-                number: this.post_number
+                number: this.list_size
             },
             success: function(data) {
                 if (this.isMounted()) {
                     this.setState({
-                        posts: data.result.posts,
+                        entities: data.result.posts,
                         user: data.result.user
                     });
                     this.props.onUserChanged(this.state.user);
@@ -351,44 +350,44 @@ var PostListPanel = React.createClass({
             }.bind(this)
         });
     },
-    getFilteredPosts: function() {
-        var posts = this.state.posts;
-        for (var i in posts) {
-            var post = posts[i];
-            post.show = false;
+    getFilteredList: function() {
+        var entities = this.state.entities;
+        for (var i in entities) {
+            var entity = entities[i];
+            entity.show = false;
 
             if (this.state.keyword.trim() !== "") {
-                var content = post.title + " ";
-                content += post.post_content + " ";
-                content += post.email;
+                var content = entity.title + " ";
+                content += entity.email + " ";
+                content += entity.post_content;
                 if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
                     continue;
                 }
             }
 
-            post.show = true;
+            entity.show = true;
         }
-        return posts;
+        return entities;
     },
 	componentDidMount: function() {
-        this.post_number = 20;
-        this.getPosts();
-        this.interval = setInterval(this.getPosts, this.props.pollInterval);
+        this.list_size = 20;
+        this.getList();
+        this.interval = setInterval(this.getList, this.props.pollInterval);
 	},
     componentWillUnmount: function() {
         clearInterval(this.interval);
     },
     render: function() {
-        var handlers = this.getPostEventHandlers();
+        var handlers = this.getEventHandlers();
         return (
             <div className="BoardListPanel box-shadow--3dp">
-                <PostEditor boardID={this.state.board_id} APIs={this.props.APIs} ref="editor" onPostEdit={this.handleOnPostEdit} />
+                <Editor boardID={this.state.board_id} APIs={this.props.APIs} ref="editor" onEntityEdit={this.handleOnEntityEdit} />
                 <div className="panel panel-primary">
                     <div className="panel-heading">
-                        <PostListToolbar onSearch={handlers.handleOnSearch} />
+                        <ListToolbar onSearch={handlers.handleOnSearch} />
                     </div>
                     <div className="panel-body">
-                        <PostList baseLink={this.props.baseLink} user={this.state.user} posts={this.getFilteredPosts()} onPostEvents={handlers} />
+                        <List baseLink={this.props.baseLink} user={this.state.user} entities={this.getFilteredList()} onEntityEvents={handlers} />
                     </div>
                     <div className="panel-footer">
                         <button type="button" className="btn btn-info btn-xs" onClick={this.handleOnClick}>Show more</button>
@@ -399,7 +398,7 @@ var PostListPanel = React.createClass({
     }
 });
 
-var PostListToolbar = React.createClass({
+var ListToolbar = React.createClass({
     handleOnChange: function(e) {
         this.props.onSearch({
             keyword: e
@@ -423,21 +422,21 @@ var SearchTextBox = React.createClass({
         return (
             <div className="inner-addon left-addon">
                 <i className="glyphicon glyphicon-search"></i>
-                <Input placeholder="Search Posts" onChange={this.props.onChange}></Input>
+                <Input placeholder="Search Boards" onChange={this.props.onChange}></Input>
             </div>
         );
     }
 });
 
-var PostList = React.createClass({
-    getPosts: function() {
+var List = React.createClass({
+    getEntities: function() {
         var rows = [];
-        var posts = this.props.posts;
-        for (var i in posts) {
-            if (posts[i].show) {
+        var entities = this.props.entities;
+        for (var i in entities) {
+            if (entities[i].show) {
                 rows.push(
                     <div key={i} className="col-xs-4">
-                        <Post baseLink={this.props.baseLink} user={this.props.user} post={posts[i]} onPostEvents={this.props.onPostEvents} />
+                        <Entity baseLink={this.props.baseLink} user={this.props.user} entity={entities[i]} onEntityEvents={this.props.onEntityEvents} />
                     </div>
                 );
             }
@@ -448,30 +447,31 @@ var PostList = React.createClass({
         return (
             <div className="container-fluid">
                 <div className="row">
-                    {this.getPosts()}
+                    {this.getEntities()}
                 </div>
             </div>
         );
     }
 });
 
-var Post = React.createClass({
+var Entity = React.createClass({
     render: function() {
-        var post = this.props.post;
+        var entity = this.props.entity;
+        var time = Moment(entity.create_time).fromNow();
         return (
             <div className="Board box-shadow--3dp">
 				<div className="panel panel-primary">
                     <div className="panel-heading">
-                        <PostToolbar post={post} user={this.props.user} onPostEvents={this.props.onPostEvents} />
+                        <Toolbar entity={entity} user={this.props.user} onEntityEvents={this.props.onEntityEvents} />
                     </div>
                     <div className="panel-body">
                         <div className="ParagraphOverflow">
-                            <p className="PreLine">{post.post_content}</p>
+                            <p className="PreLine">{entity.post_content}</p>
                         </div>
                     </div>
                     <div className="panel-footer">
                         <div>
-                            <span className="LabelFont label label-info">Posted on {PrettyDate.format(new Date(post.create_time))}</span>
+                            <span className="LabelFont label label-info">Posted on {time}</span>
                         </div>
                     </div>
 				</div>
@@ -480,20 +480,20 @@ var Post = React.createClass({
     }
 });
 
-var PostToolbar = React.createClass({
+var Toolbar = React.createClass({
     handleOnEdit: function() {
-        this.props.onPostEvents.handleOnEdit(this.props.post);
+        this.props.onEntityEvents.handleOnEdit(this.props.entity);
     },
     handleOnDelete: function() {
-        this.props.onPostEvents.handleOnDelete(this.props.post);
+        this.props.onEntityEvents.handleOnDelete(this.props.entity);
     },
     getTitle: function() {
         if (this.props.user) {
-            if (this.props.post.email) {
-                if (this.props.user.email === this.props.post.email) {
+            if (this.props.entity.email) {
+                if (this.props.user.email === this.props.entity.email) {
                     return (
                         <div className="HalfTitle">
-                            {this.props.post.title}
+                            {this.props.entity.title}
                         </div>
                     );
                 }
@@ -501,14 +501,14 @@ var PostToolbar = React.createClass({
         }
         return (
             <div className="FullTitle">
-                {this.props.post.title}
+                {this.props.entity.title}
             </div>
         );
     },
     getButtons: function() {
         if (this.props.user) {
-            if (this.props.post.email) {
-                if (this.props.user.email === this.props.post.email) {
+            if (this.props.entity.email) {
+                if (this.props.user.email === this.props.entity.email) {
                     return (
                         <div className="pull-right">
                             <button ref="edit" type="button" className="btn btn-info btn-xs" onClick={this.handleOnEdit}>
@@ -533,7 +533,7 @@ var PostToolbar = React.createClass({
     }
 });
 
-var PostForm = React.createClass({
+var Form = React.createClass({
     handleOnKeyDown: function(e) {
         if (e.keyCode === 13) {
             var title = ReactDOM.findDOMNode(this.refs.title);
@@ -553,7 +553,7 @@ var PostForm = React.createClass({
         }
         var title = ReactDOM.findDOMNode(this.refs.title).value;
         var content = ReactDOM.findDOMNode(this.refs.content).value;
-        if (this.props.post && this.props.post.title === title && this.props.post.post_content === content) {
+        if (this.props.entity && this.props.entity.title === title && this.props.entity.post_content === content) {
             this.props.onClick(null);
             return;
         }
@@ -577,9 +577,9 @@ var PostForm = React.createClass({
         );
     },
     render: function() {
-        var post = {};
-        if (this.props.post) {
-            post = this.props.post;
+        var entity = {};
+        if (this.props.entity) {
+            entity = this.props.entity;
         }
         return (
 			<div className="UserInfoModal">
@@ -591,10 +591,10 @@ var PostForm = React.createClass({
                         <div className="form center-block">
                             {this.getError()}
                             <div className="form-group">
-                                <Input ref="title" placeholder="Post Title" size="input-md" onKeyDown={this.handleOnKeyDown}>{post.title}</Input>
+                                <Input ref="title" placeholder="Post Title" size="input-md" onKeyDown={this.handleOnKeyDown}>{entity.title}</Input>
                             </div>
                             <div className="form-group">
-                                <textarea ref="content" className="form-control" placeholder="Write something..." rows="5" defaultValue={post.post_content}></textarea>
+                                <textarea ref="content" className="form-control" placeholder="Write something..." rows="5" defaultValue={entity.post_content}></textarea>
                             </div>
                             <div className="UserInfoFormButton">
                                 <div className="form-group">
@@ -612,7 +612,7 @@ var PostForm = React.createClass({
 var Create = React.createClass({
     render: function() {
         return (
-            <PostForm title="Create Post" workInfo={this.props.workInfo} button="Create" error={this.props.error} onClick={this.props.onCreate} onAlertDismiss={this.props.onAlertDismiss} />
+            <Form title="Create Post" workInfo={this.props.workInfo} button="Create" error={this.props.error} onClick={this.props.onCreate} onAlertDismiss={this.props.onAlertDismiss} />
         );
     }
 });
@@ -620,7 +620,7 @@ var Create = React.createClass({
 var Edit = React.createClass({
     render: function() {
         return (
-            <PostForm post={this.props.post} title="Edit" workInfo={this.props.workInfo} button="Save" error={this.props.error} onClick={this.props.onEdit} onAlertDismiss={this.props.onAlertDismiss} />
+            <Form entity={this.props.entity} title="Edit" workInfo={this.props.workInfo} button="Save" error={this.props.error} onClick={this.props.onEdit} onAlertDismiss={this.props.onAlertDismiss} />
         );
     }
 });
