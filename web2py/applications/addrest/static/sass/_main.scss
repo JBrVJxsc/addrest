@@ -143,6 +143,10 @@ body {
   border-color: #50AFE2;
 }
 
+.BoardContent {
+  height: 110px;
+}
+
 .Separator {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -221,7 +225,7 @@ body {
 }
 
 .ParagraphOverflow {
-  max-height: 136.5px;
+  max-height: 150.5px;
   overflow: scroll;
   max-width: 100%;
   overflow-x: hidden;
@@ -229,16 +233,9 @@ body {
 
 p {
   word-break: normal;
+  line-height: 160%;
 }
 
-a:hover {
-  color: $Info;
-}
-
-a:active {
-  color: $Info;
-}
-
-a:focus {
+a:hover, a:active, a:focus {
   color: $Info;
 }

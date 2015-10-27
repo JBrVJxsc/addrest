@@ -444,12 +444,19 @@ var Entity = React.createClass({
         var link;
         if (entity.last_post_id) {
             link = (
-                 <div className="pull-right HalfTitle">
-                     <a className="pull-right Link" href={this.props.baseLink + "board/" + this.props.entity.id} target="_blank">{entity.last_post_title}</a>
+                 <div className="FullTitle">
+                     <a className="Link" href={this.props.baseLink + "board/" + this.props.entity.id + "?post=" + entity.last_post_id} target="_blank">{entity.last_post_title}</a>
                  </div>
             );
         } else {
-            link = <span className="label label-info LabelFont pull-right">None</span>;
+            link = (
+                <div>
+                <b>
+                    Recent Post
+                    <span className="label label-info LabelFont pull-right">None</span>
+                </b>
+                    </div>
+            );
         }
         return (
             <div className="Board box-shadow--3dp">
@@ -458,20 +465,19 @@ var Entity = React.createClass({
                         <Toolbar entity={entity} user={this.props.user} onEntityEvents={this.props.onEntityEvents} />
                     </div>
                     <div className="panel-body">
-                        <b>
-                            Recent Post
+                        <div className="BoardContent">
                             {link}
-                        </b>
-                        <hr className="Separator" />
-                        <b>
-                            Today Posts
-                            <span className="label label-info LabelFont pull-right">{entity.today_posts_number}</span>
-                        </b>
-                        <b>
-                        <hr className="Separator" />
-                            All Posts
-                            <span className="label label-info LabelFont pull-right">{entity.all_posts_number}</span>
-                        </b>
+                            <hr className="Separator" />
+                            <b>
+                                Today Posts
+                                <span className="label label-info LabelFont pull-right">{entity.today_posts_number}</span>
+                            </b>
+                            <b>
+                            <hr className="Separator" />
+                                All Posts
+                                <span className="label label-info LabelFont pull-right">{entity.all_posts_number}</span>
+                            </b>
+                        </div>
                     </div>
                     <div className="panel-footer">
                         <button type="button" className="btn btn-info btn-xs" onClick={this.handleOnClick}>Open</button>

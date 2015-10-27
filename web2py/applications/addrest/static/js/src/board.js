@@ -180,7 +180,7 @@ var Editor = React.createClass({
             });
         }.bind(this);
 
-        setTimeout(delay, 800);
+        setTimeout(delay, 1100);
     },
     _edit: function(title, content) {
         this.work("edit", true, "Saving...");
@@ -217,7 +217,7 @@ var Editor = React.createClass({
             });
         }.bind(this);
 
-        setTimeout(delay, 800);
+        setTimeout(delay, 1100);
     },
     _delete: function(entity) {
         this.work("delete", true, "Deleting...");
@@ -248,7 +248,7 @@ var Editor = React.createClass({
             });
         }.bind(this);
 
-        setTimeout(delay, 800);
+        setTimeout(delay, 1100);
     },
     work: function(worker, working, message) {
         var info = {};
@@ -303,7 +303,8 @@ var ListPanel = React.createClass({
             entities: [],
             keyword: "",
             get_list_api: this.props.baseLink + "get_posts.json",
-            board_id: document.getElementById("BOARD_ID").textContent
+            board_id: document.getElementById("BOARD_ID").textContent,
+            post_id: document.getElementById("POST_ID").textContent
         };
     },
     create: function() {
@@ -365,6 +366,12 @@ var ListPanel = React.createClass({
                 }
             }
 
+            if (!this.highlighted) {
+                if (entity.id == this.state.post_id) {
+                    entity.highlight = true;
+                    this.highlighted = true;
+                }
+            }
             entity.show = true;
         }
         return entities;
@@ -458,8 +465,10 @@ var Entity = React.createClass({
     render: function() {
         var entity = this.props.entity;
         var time = Moment(entity.create_time).fromNow();
+        var className = entity.highlight ? "animated shake Board box-shadow--3dp" : "Board box-shadow--3dp";
+        console.log(className);
         return (
-            <div className="Board box-shadow--3dp">
+            <div className={className}>
 				<div className="panel panel-primary">
                     <div className="panel-heading">
                         <Toolbar entity={entity} user={this.props.user} onEntityEvents={this.props.onEntityEvents} />

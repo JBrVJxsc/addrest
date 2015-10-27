@@ -35,6 +35,7 @@
 'appadmin': '应用管理',
 'appadmin is disabled because insecure channel': '应用管理因非法通道失效',
 'application "%s" uninstalled': '应用"%s" 已被卸载',
+'application %(appname)s installed with md5sum: %(digest)s': 'application %(appname)s installed with md5sum: %(digest)s',
 'application compiled': '应用已编译完',
 'application is compiled and cannot be designed': '应用已编译完无法设计',
 'Application name:': 'Application name:',

@@ -92,7 +92,7 @@ def create_demo():
     for row in rows:
         for i in xrange(posts_number):
             db.post.insert(
-                title="Pagination Demo #%d" % i,
+                title="Demo Post for Pagination #%d" % i,
                 post_content='These posts are for demonstrating pagination.\n'
                              'Please click "Show more" at bottom :)\n'
                              'You cannot modify these demo posts since you are not author. '
@@ -149,7 +149,18 @@ def create_board():
         'title': request.vars.title,
         'email': auth.user.email
     }
-    db.board.insert(**b)
+    board_id = db.board.insert(**b)
+    b = {
+        'title': "Welcome!",
+        'post_content': "Hello, %s!\n"
+                        "You are the creator of this board!\n"
+                        "Now create your first post :)" % auth.user.email,
+        'email': auth.user.email,
+        'board': board_id,
+    }
+    db.post.insert(**b)
+    print "inserting boards"
+    print board_id, auth.user
     return {
         'result': {
             'state': True,
@@ -209,13 +220,13 @@ def get_posts():
 
 @auth.requires_signature()
 def create_post():
-    b = {
+    p = {
         'title': request.vars.title,
         'post_content': request.vars.post_content,
         'email': auth.user.email,
         'board': request.vars.board,
     }
-    db.post.insert(**b)
+    db.post.insert(**p)
     db(db.board.id == request.vars.board).update(last_active_time=request.now)
     return {
         'result': {

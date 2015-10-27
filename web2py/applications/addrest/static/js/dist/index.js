@@ -36349,18 +36349,27 @@ var Entity = React.createClass({
         if (entity.last_post_id) {
             link = React.createElement(
                 'div',
-                { className: 'pull-right HalfTitle' },
+                { className: 'FullTitle' },
                 React.createElement(
                     'a',
-                    { className: 'pull-right Link', href: this.props.baseLink + "board/" + this.props.entity.id, target: '_blank' },
+                    { className: 'Link', href: this.props.baseLink + "board/" + this.props.entity.id + "?post=" + entity.last_post_id, target: '_blank' },
                     entity.last_post_title
                 )
             );
         } else {
             link = React.createElement(
-                'span',
-                { className: 'label label-info LabelFont pull-right' },
-                'None'
+                'div',
+                null,
+                React.createElement(
+                    'b',
+                    null,
+                    'Recent Post',
+                    React.createElement(
+                        'span',
+                        { className: 'label label-info LabelFont pull-right' },
+                        'None'
+                    )
+                )
             );
         }
         return React.createElement(
@@ -36378,31 +36387,30 @@ var Entity = React.createClass({
                     'div',
                     { className: 'panel-body' },
                     React.createElement(
-                        'b',
-                        null,
-                        'Recent Post',
-                        link
-                    ),
-                    React.createElement('hr', { className: 'Separator' }),
-                    React.createElement(
-                        'b',
-                        null,
-                        'Today Posts',
-                        React.createElement(
-                            'span',
-                            { className: 'label label-info LabelFont pull-right' },
-                            entity.today_posts_number
-                        )
-                    ),
-                    React.createElement(
-                        'b',
-                        null,
+                        'div',
+                        { className: 'BoardContent' },
+                        link,
                         React.createElement('hr', { className: 'Separator' }),
-                        'All Posts',
                         React.createElement(
-                            'span',
-                            { className: 'label label-info LabelFont pull-right' },
-                            entity.all_posts_number
+                            'b',
+                            null,
+                            'Today Posts',
+                            React.createElement(
+                                'span',
+                                { className: 'label label-info LabelFont pull-right' },
+                                entity.today_posts_number
+                            )
+                        ),
+                        React.createElement(
+                            'b',
+                            null,
+                            React.createElement('hr', { className: 'Separator' }),
+                            'All Posts',
+                            React.createElement(
+                                'span',
+                                { className: 'label label-info LabelFont pull-right' },
+                                entity.all_posts_number
+                            )
                         )
                     )
                 ),

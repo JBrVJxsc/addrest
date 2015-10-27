@@ -175,18 +175,23 @@ body {
 }
 
 /* line 146, ../sass/_main.scss */
+.BoardContent {
+  height: 110px;
+}
+
+/* line 150, ../sass/_main.scss */
 .Separator {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-/* line 151, ../sass/_main.scss */
+/* line 155, ../sass/_main.scss */
 .Address {
   width: 80%;
   margin: 5px auto;
 }
 
-/* line 156, ../sass/_main.scss */
+/* line 160, ../sass/_main.scss */
 .BoardListPanel {
   position: relative;
   top: 80px;
@@ -194,31 +199,31 @@ body {
   margin: 0 auto;
 }
 
-/* line 163, ../sass/_main.scss */
+/* line 167, ../sass/_main.scss */
 .BoardToolbar .btn {
   margin-left: 13px;
   margin-right: -6px;
 }
 
-/* line 168, ../sass/_main.scss */
+/* line 172, ../sass/_main.scss */
 .ConfirmWindow {
   position: relative;
   width: 325px;
   right: 162.5px;
 }
 
-/* line 174, ../sass/_main.scss */
+/* line 178, ../sass/_main.scss */
 .ConfirmWindow .panel .panel-body {
   position: relative;
   top: 6px;
 }
 
-/* line 179, ../sass/_main.scss */
+/* line 183, ../sass/_main.scss */
 .UserInfoFormButton .form-group {
   margin-bottom: 8px;
 }
 
-/* line 183, ../sass/_main.scss */
+/* line 187, ../sass/_main.scss */
 .FullTitle {
   white-space: nowrap;
   display: inline-block;
@@ -227,7 +232,7 @@ body {
   text-overflow: ellipsis;
 }
 
-/* line 191, ../sass/_main.scss */
+/* line 195, ../sass/_main.scss */
 .HalfTitle {
   white-space: nowrap;
   display: inline-block;
@@ -236,60 +241,51 @@ body {
   text-overflow: ellipsis;
 }
 
-/* line 199, ../sass/_main.scss */
+/* line 203, ../sass/_main.scss */
 .Right {
   float: right;
 }
 
-/* line 203, ../sass/_main.scss */
+/* line 207, ../sass/_main.scss */
 .Left {
   float: left;
 }
 
-/* line 207, ../sass/_main.scss */
+/* line 211, ../sass/_main.scss */
 .LabelFont {
   font-size: small;
 }
 
-/* line 211, ../sass/_main.scss */
+/* line 215, ../sass/_main.scss */
 .Link {
   color: #3498DB;
 }
 
-/* line 215, ../sass/_main.scss */
+/* line 219, ../sass/_main.scss */
 .HalfTitle .a:hover {
   color: #3498DB;
 }
 
-/* line 219, ../sass/_main.scss */
+/* line 223, ../sass/_main.scss */
 .PreLine {
   white-space: pre-line;
 }
 
-/* line 223, ../sass/_main.scss */
+/* line 227, ../sass/_main.scss */
 .ParagraphOverflow {
-  max-height: 136.5px;
+  max-height: 150.5px;
   overflow: scroll;
   max-width: 100%;
   overflow-x: hidden;
 }
 
-/* line 230, ../sass/_main.scss */
+/* line 234, ../sass/_main.scss */
 p {
   word-break: normal;
+  line-height: 160%;
 }
 
-/* line 234, ../sass/_main.scss */
-a:hover {
-  color: #3498DB;
-}
-
-/* line 238, ../sass/_main.scss */
-a:active {
-  color: #3498DB;
-}
-
-/* line 242, ../sass/_main.scss */
-a:focus {
+/* line 239, ../sass/_main.scss */
+a:hover, a:active, a:focus {
   color: #3498DB;
 }
