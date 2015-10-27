@@ -159,8 +159,6 @@ def create_board():
         'board': board_id,
     }
     db.post.insert(**b)
-    print "inserting boards"
-    print board_id, auth.user
     return {
         'result': {
             'state': True,

@@ -38917,7 +38917,6 @@ var Entity = React.createClass({
         var entity = this.props.entity;
         var time = Moment(entity.create_time).fromNow();
         var className = entity.highlight ? "animated shake Board box-shadow--3dp" : "Board box-shadow--3dp";
-        console.log(className);
         return React.createElement(
             'div',
             { className: className },
@@ -39664,13 +39663,17 @@ var DismissibleAlert = React.createClass({
     },
     render: function render() {
         return React.createElement(
-            Alert,
-            { bsStyle: this.props.style, onDismiss: this.props.onDismiss },
-            this.getTitle(),
+            'div',
+            { ref: 'box', className: 'animated shake' },
             React.createElement(
-                'p',
-                null,
-                this.props.message
+                Alert,
+                { bsStyle: this.props.style, onDismiss: this.props.onDismiss },
+                this.getTitle(),
+                React.createElement(
+                    'p',
+                    null,
+                    this.props.message
+                )
             )
         );
     }

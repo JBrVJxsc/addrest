@@ -35738,13 +35738,17 @@ var DismissibleAlert = React.createClass({
     },
     render: function render() {
         return React.createElement(
-            Alert,
-            { bsStyle: this.props.style, onDismiss: this.props.onDismiss },
-            this.getTitle(),
+            'div',
+            { ref: 'box', className: 'animated shake' },
             React.createElement(
-                'p',
-                null,
-                this.props.message
+                Alert,
+                { bsStyle: this.props.style, onDismiss: this.props.onDismiss },
+                this.getTitle(),
+                React.createElement(
+                    'p',
+                    null,
+                    this.props.message
+                )
             )
         );
     }

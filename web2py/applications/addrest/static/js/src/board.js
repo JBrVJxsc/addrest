@@ -458,7 +458,6 @@ var Entity = React.createClass({
         var entity = this.props.entity;
         var time = Moment(entity.create_time).fromNow();
         var className = entity.highlight ? "animated shake Board box-shadow--3dp" : "Board box-shadow--3dp";
-        console.log(className);
         return (
             <div className={className}>
 				<div className="panel panel-primary">
