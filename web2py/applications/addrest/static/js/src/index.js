@@ -24,7 +24,7 @@ var Index = React.createClass({
         };
     },
     handleNavbarEvents: function() {
-        this.refs.boardListPanel.getBoards();
+        this.refs.listPanel.getList();
     },
     handleOnUserChanged: function(user) {
         this.refs.navbar.setUser(user);
@@ -48,14 +48,13 @@ var Index = React.createClass({
                 this.setState({
                     APIs: data
                 });
-                console.log(data);
             }.bind(this)
         });
     },
     getButtons: function() {
         return [{
             onClick: function () {
-                this.refs.boardListPanel.create();
+                this.refs.listPanel.create();
             }.bind(this),
             text: "Create"
         }]
@@ -67,13 +66,13 @@ var Index = React.createClass({
 		return (
 			<div>
 				<Navbar ref="navbar" APIs={this.state.navbar_api} title="Boards" buttons={this.getButtons()} onNavbarEvents={this.handleNavbarEvents} />
-                <BoardListPanel ref="boardListPanel" pollInterval={this.props.pollInterval} APIs={this.state.APIs} baseLink={this.state.base_link} onUserChanged={this.handleOnUserChanged} />
+                <ListPanel ref="listPanel" pollInterval={this.props.pollInterval} APIs={this.state.APIs} baseLink={this.state.base_link} onUserChanged={this.handleOnUserChanged} />
 			</div>
 		);
 	}
 });
 
-var BoardEditor = React.createClass({
+var Editor = React.createClass({
     getInitialState: function() {
         return {
             error: {},
@@ -121,16 +120,16 @@ var BoardEditor = React.createClass({
         this.clearError();
         this.refs.create.show();
     },
-    edit: function(board) {
+    edit: function(entity) {
         this.setState({
-            editing: board
+            editing: entity
         });
         this.clearError();
         this.refs.edit.show();
     },
-    delete: function(board) {
+    delete: function(entity) {
         this.setState({
-            deleting: board
+            deleting: entity
         });
         this.clearError();
         this.refs.delete.show();
@@ -144,7 +143,7 @@ var BoardEditor = React.createClass({
                 this.setError("create", "Board title has been used.");
             } else {
                 this.refs.create.hide();
-                this.props.onBoardEdit();
+                this.props.onEntityEdit();
             }
         }.bind(this);
 
@@ -177,7 +176,7 @@ var BoardEditor = React.createClass({
                 this.setError("edit", "Board title has been used.");
             } else {
                 this.refs.edit.hide();
-                this.props.onBoardEdit();
+                this.props.onEntityEdit();
             }
         }.bind(this);
 
@@ -204,7 +203,7 @@ var BoardEditor = React.createClass({
 
         setTimeout(delay, 800);
     },
-    _delete: function(board) {
+    _delete: function(entity) {
         this.work("delete", true, "Deleting...");
 
         var callback = function(data) {
@@ -213,7 +212,7 @@ var BoardEditor = React.createClass({
                 this.setError("delete", "Something was wrong...");
             } else {
                 this.refs.delete.hide();
-                this.props.onBoardEdit();
+                this.props.onEntityEdit();
             }
         }.bind(this);
 
@@ -226,7 +225,7 @@ var BoardEditor = React.createClass({
             $.ajax({
                 type: 'POST',
                 url: this.props.APIs.delete,
-                data: board,
+                data: entity,
                 error: error,
                 success: callback,
                 timeout: 3000
@@ -271,7 +270,7 @@ var BoardEditor = React.createClass({
                     <Create workInfo={this.state.work_info.create} error={this.state.error.create} onCreate={this.handleOnCreate} onAlertDismiss={this.handleOnAlertDismiss} />
                 </Modal>
 				<Modal ref="edit" type="WaveModal">
-                    <Edit board={this.state.editing} workInfo={this.state.work_info.edit} error={this.state.error.edit} onEdit={this.handleOnEdit} onAlertDismiss={this.handleOnAlertDismiss} />
+                    <Edit entity={this.state.editing} workInfo={this.state.work_info.edit} error={this.state.error.edit} onEdit={this.handleOnEdit} onAlertDismiss={this.handleOnAlertDismiss} />
                 </Modal>
 				<Modal ref="delete" type="WaveModal">
                     <ConfirmWindow workInfo={this.state.work_info.delete} error={this.state.error.delete} title="Are you sure?" onConfirm={this.handleOnDelete} onAlertDismiss={this.handleOnAlertDismiss} />
@@ -281,26 +280,26 @@ var BoardEditor = React.createClass({
     }
 });
 
-var BoardListPanel = React.createClass({
+var ListPanel = React.createClass({
     getInitialState: function() {
         return {
             user: null,
-            boards: [],
+            entities: [],
             keyword: "",
-            boards_api: this.props.baseLink + "get_boards.json"
+            get_list_api: this.props.baseLink + "get_boards.json"
         };
     },
     create: function() {
         this.refs.editor.create();
     },
     handleOnClick: function() {
-        this.board_number += 10;
-        this.getBoards();
+        this.list_size += 10;
+        this.getList();
     },
-    handleOnBoardEdit: function() {
-        this.getBoards();
+    handleOnEntityEdit: function() {
+        this.getList();
     },
-    getBoardEventHandlers: function() {
+    getEventHandlers: function() {
         return {
             handleOnEdit: function(e) {
                 this.refs.editor.edit(e);
@@ -315,17 +314,17 @@ var BoardListPanel = React.createClass({
             }.bind(this)
         };
     },
-    getBoards: function() {
+    getList: function() {
         $.ajax({
             type: 'POST',
-            url: this.state.boards_api,
+            url: this.state.get_list_api,
             data: {
-                number: this.board_number
+                number: this.list_size
             },
             success: function(data) {
                 if (this.isMounted()) {
                     this.setState({
-                        boards: data.result.boards,
+                        entities: data.result.boards,
                         user: data.result.user
                     });
                     this.props.onUserChanged(this.state.user);
@@ -333,43 +332,43 @@ var BoardListPanel = React.createClass({
             }.bind(this)
         });
     },
-    getFilteredBoards: function() {
-        var boards = this.state.boards;
-        for (var i in boards) {
-            var board = boards[i];
-            board.show = false;
+    getFilteredList: function() {
+        var entities = this.state.entities;
+        for (var i in entities) {
+            var entity = entities[i];
+            entity.show = false;
 
             if (this.state.keyword.trim() !== "") {
-                var content = board.title + " ";
-                content += board.email;
+                var content = entity.title + " ";
+                content += entity.email;
                 if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
                     continue;
                 }
             }
 
-            board.show = true;
+            entity.show = true;
         }
-        return boards;
+        return entities;
     },
 	componentDidMount: function() {
-        this.board_number = 20;
-        this.getBoards();
-        this.interval = setInterval(this.getBoards, this.props.pollInterval);
+        this.list_size = 20;
+        this.getList();
+        this.interval = setInterval(this.getList, this.props.pollInterval);
 	},
     componentWillUnmount: function() {
         clearInterval(this.interval);
     },
     render: function() {
-        var handlers = this.getBoardEventHandlers();
+        var handlers = this.getEventHandlers();
         return (
             <div className="BoardListPanel box-shadow--3dp">
-                <BoardEditor APIs={this.props.APIs} ref="editor" onBoardEdit={this.handleOnBoardEdit} />
+                <Editor APIs={this.props.APIs} ref="editor" onEntityEdit={this.handleOnEntityEdit} />
                 <div className="panel panel-primary">
                     <div className="panel-heading">
-                        <BoardListToolbar onSearch={handlers.handleOnSearch} />
+                        <ListToolbar onSearch={handlers.handleOnSearch} />
                     </div>
                     <div className="panel-body">
-                        <BoardList baseLink={this.props.baseLink} user={this.state.user} boards={this.getFilteredBoards()} onBoardEvents={handlers} />
+                        <List baseLink={this.props.baseLink} user={this.state.user} entities={this.getFilteredList()} onEntityEvents={handlers} />
                     </div>
                     <div className="panel-footer">
                         <button type="button" className="btn btn-info btn-xs" onClick={this.handleOnClick}>Show more</button>
@@ -380,7 +379,7 @@ var BoardListPanel = React.createClass({
     }
 });
 
-var BoardListToolbar = React.createClass({
+var ListToolbar = React.createClass({
     handleOnChange: function(e) {
         this.props.onSearch({
             keyword: e
@@ -410,15 +409,15 @@ var SearchTextBox = React.createClass({
     }
 });
 
-var BoardList = React.createClass({
-    getBoards: function() {
+var List = React.createClass({
+    getEntities: function() {
         var rows = [];
-        var boards = this.props.boards;
-        for (var i in boards) {
-            if (boards[i].show) {
+        var entities = this.props.entities;
+        for (var i in entities) {
+            if (entities[i].show) {
                 rows.push(
                     <div key={i} className="col-xs-4">
-                        <Board baseLink={this.props.baseLink} user={this.props.user} board={boards[i]} onBoardEvents={this.props.onBoardEvents} />
+                        <Entity baseLink={this.props.baseLink} user={this.props.user} entity={entities[i]} onEntityEvents={this.props.onEntityEvents} />
                     </div>
                 );
             }
@@ -429,24 +428,24 @@ var BoardList = React.createClass({
         return (
             <div className="container-fluid">
                 <div className="row">
-                    {this.getBoards()}
+                    {this.getEntities()}
                 </div>
             </div>
         );
     }
 });
 
-var Board = React.createClass({
+var Entity = React.createClass({
     handleOnClick: function() {
-        window.open(this.props.baseLink + "board/" + this.props.board.id);
+        window.open(this.props.baseLink + "board/" + this.props.entity.id);
     },
     render: function() {
-        var board = this.props.board;
+        var entity = this.props.entity;
         var link;
-        if (board.last_post_id) {
+        if (entity.last_post_id) {
             link = (
                  <div className="pull-right HalfTitle">
-                     <a className="pull-right Link" href={this.props.baseLink + "board/" + this.props.board.id} target="_blank">{board.last_post_title}</a>
+                     <a className="pull-right Link" href={this.props.baseLink + "board/" + this.props.entity.id} target="_blank">{entity.last_post_title}</a>
                  </div>
             );
         } else {
@@ -456,7 +455,7 @@ var Board = React.createClass({
             <div className="Board box-shadow--3dp">
 				<div className="panel panel-primary">
                     <div className="panel-heading">
-                        <BoardToolbar board={board} user={this.props.user} onBoardEvents={this.props.onBoardEvents} />
+                        <Toolbar entity={entity} user={this.props.user} onEntityEvents={this.props.onEntityEvents} />
                     </div>
                     <div className="panel-body">
                         <b>
@@ -466,12 +465,12 @@ var Board = React.createClass({
                         <hr className="Separator" />
                         <b>
                             Today Posts
-                            <span className="label label-info LabelFont pull-right">{board.today_posts_number}</span>
+                            <span className="label label-info LabelFont pull-right">{entity.today_posts_number}</span>
                         </b>
                         <b>
                         <hr className="Separator" />
                             All Posts
-                            <span className="label label-info LabelFont pull-right">{board.all_posts_number}</span>
+                            <span className="label label-info LabelFont pull-right">{entity.all_posts_number}</span>
                         </b>
                     </div>
                     <div className="panel-footer">
@@ -483,20 +482,20 @@ var Board = React.createClass({
     }
 });
 
-var BoardToolbar = React.createClass({
+var Toolbar = React.createClass({
     handleOnEdit: function() {
-        this.props.onBoardEvents.handleOnEdit(this.props.board);
+        this.props.onEntityEvents.handleOnEdit(this.props.entity);
     },
     handleOnDelete: function() {
-        this.props.onBoardEvents.handleOnDelete(this.props.board);
+        this.props.onEntityEvents.handleOnDelete(this.props.entity);
     },
     getTitle: function() {
         if (this.props.user) {
-            if (this.props.board.email) {
-                if (this.props.user.email === this.props.board.email) {
+            if (this.props.entity.email) {
+                if (this.props.user.email === this.props.entity.email) {
                     return (
                         <div className="HalfTitle">
-                            {this.props.board.title}
+                            {this.props.entity.title}
                         </div>
                     );
                 }
@@ -504,14 +503,14 @@ var BoardToolbar = React.createClass({
         }
         return (
             <div className="FullTitle">
-                {this.props.board.title}
+                {this.props.entity.title}
             </div>
         );
     },
     getButtons: function() {
         if (this.props.user) {
-            if (this.props.board.email) {
-                if (this.props.user.email === this.props.board.email) {
+            if (this.props.entity.email) {
+                if (this.props.user.email === this.props.entity.email) {
                     return (
                         <div className="pull-right">
                             <button ref="edit" type="button" className="btn btn-info btn-xs" onClick={this.handleOnEdit}>
@@ -536,7 +535,7 @@ var BoardToolbar = React.createClass({
     }
 });
 
-var BoardForm = React.createClass({
+var Form = React.createClass({
     handleOnKeyDown: function(e) {
         if (e.keyCode === 13) {
             var title = ReactDOM.findDOMNode(this.refs.title);
@@ -553,7 +552,7 @@ var BoardForm = React.createClass({
             return;
         }
         var title = ReactDOM.findDOMNode(this.refs.title).value;
-        if (this.props.board && this.props.board.title === title) {
+        if (this.props.entity && this.props.entity.title === title) {
             this.props.onClick(null);
             return;
         }
@@ -577,9 +576,9 @@ var BoardForm = React.createClass({
         );
     },
     render: function() {
-        var board = {};
-        if (this.props.board) {
-            board = this.props.board;
+        var entity = {};
+        if (this.props.entity) {
+            entity = this.props.entity;
         }
         return (
 			<div className="UserInfoModal">
@@ -591,7 +590,7 @@ var BoardForm = React.createClass({
                         <div className="form center-block">
                             {this.getError()}
                             <div className="form-group">
-                                <Input ref="title" placeholder="Board Title" size="input-md" onKeyDown={this.handleOnKeyDown}>{board.title}</Input>
+                                <Input ref="title" placeholder="Board Title" size="input-md" onKeyDown={this.handleOnKeyDown}>{entity.title}</Input>
                             </div>
                             <div className="UserInfoFormButton">
                                 <div className="form-group">
@@ -609,7 +608,7 @@ var BoardForm = React.createClass({
 var Create = React.createClass({
     render: function() {
         return (
-            <BoardForm title="Create Board" workInfo={this.props.workInfo} button="Create" error={this.props.error} onClick={this.props.onCreate} onAlertDismiss={this.props.onAlertDismiss} />
+            <Form title="Create Board" workInfo={this.props.workInfo} button="Create" error={this.props.error} onClick={this.props.onCreate} onAlertDismiss={this.props.onAlertDismiss} />
         );
     }
 });
@@ -617,7 +616,7 @@ var Create = React.createClass({
 var Edit = React.createClass({
     render: function() {
         return (
-            <BoardForm board={this.props.board} title="Edit" workInfo={this.props.workInfo} button="Save" error={this.props.error} onClick={this.props.onEdit} onAlertDismiss={this.props.onAlertDismiss} />
+            <Form entity={this.props.entity} title="Edit" workInfo={this.props.workInfo} button="Save" error={this.props.error} onClick={this.props.onEdit} onAlertDismiss={this.props.onAlertDismiss} />
         );
     }
 });
