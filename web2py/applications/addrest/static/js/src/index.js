@@ -390,20 +390,12 @@ var ListToolbar = React.createClass({
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-xs-4">
-                        <SearchTextBox onChange={this.handleOnChange}/>
+                        <div className="inner-addon left-addon">
+                            <i className="glyphicon glyphicon-search"></i>
+                            <Input placeholder="Search Boards" onChange={this.handleOnChange}></Input>
+                        </div>
                     </div>
                 </div>
-            </div>
-        );
-    }
-});
-
-var SearchTextBox = React.createClass({
-    render: function() {
-        return (
-            <div className="inner-addon left-addon">
-                <i className="glyphicon glyphicon-search"></i>
-                <Input placeholder="Search Boards" onChange={this.props.onChange}></Input>
             </div>
         );
     }

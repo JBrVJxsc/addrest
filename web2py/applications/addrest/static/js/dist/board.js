@@ -38868,22 +38868,14 @@ var ListToolbar = React.createClass({
                 React.createElement(
                     'div',
                     { className: 'col-xs-4' },
-                    React.createElement(SearchTextBox, { onChange: this.handleOnChange })
+                    React.createElement(
+                        'div',
+                        { className: 'inner-addon left-addon' },
+                        React.createElement('i', { className: 'glyphicon glyphicon-search' }),
+                        React.createElement(Input, { placeholder: 'Search Boards', onChange: this.handleOnChange })
+                    )
                 )
             )
-        );
-    }
-});
-
-var SearchTextBox = React.createClass({
-    displayName: 'SearchTextBox',
-
-    render: function render() {
-        return React.createElement(
-            'div',
-            { className: 'inner-addon left-addon' },
-            React.createElement('i', { className: 'glyphicon glyphicon-search' }),
-            React.createElement(Input, { placeholder: 'Search Boards', onChange: this.props.onChange })
         );
     }
 });
