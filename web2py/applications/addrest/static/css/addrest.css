@@ -276,5 +276,5 @@ body {
 
 /* line 230, ../sass/_main.scss */
 p {
-  word-break: break-all;
+  word-break: normal;
 }
