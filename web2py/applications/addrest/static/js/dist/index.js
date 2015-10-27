@@ -36017,7 +36017,7 @@ var Editor = React.createClass({
                 this.setError("create", "Board title has been used.");
             } else {
                 this.refs.create.hide();
-                this.props.onEntityEdit();
+                this.props.onEntityEdit(data.result.id);
             }
         }).bind(this);
 
@@ -36178,7 +36178,11 @@ var ListPanel = React.createClass({
         this.list_size += 10;
         this.getList();
     },
-    handleOnEntityEdit: function handleOnEntityEdit() {
+    handleOnEntityEdit: function handleOnEntityEdit(e) {
+        if (e) {
+            console.log(e);
+            this.created = e;
+        }
         this.getList();
     },
     getEventHandlers: function getEventHandlers() {
@@ -36228,6 +36232,13 @@ var ListPanel = React.createClass({
                 }
             }
 
+            if (this.created) {
+                console.log(this.created);
+                if (entity.id == this.created) {
+                    entity.created = true;
+                    this.created = null;
+                }
+            }
             entity.show = true;
         }
         return entities;
@@ -36368,9 +36379,11 @@ var Entity = React.createClass({
                 )
             );
         }
+        var className = entity.created ? "animated flipInX Board box-shadow--3dp" : "Board box-shadow--3dp";
+        console.log(className);
         return React.createElement(
             'div',
-            { className: 'Board box-shadow--3dp' },
+            { className: className },
             React.createElement(
                 'div',
                 { className: 'panel panel-primary' },

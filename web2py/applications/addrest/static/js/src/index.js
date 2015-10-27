@@ -143,7 +143,7 @@ var Editor = React.createClass({
                 this.setError("create", "Board title has been used.");
             } else {
                 this.refs.create.hide();
-                this.props.onEntityEdit();
+                this.props.onEntityEdit(data.result.id);
             }
         }.bind(this);
 
@@ -296,7 +296,11 @@ var ListPanel = React.createClass({
         this.list_size += 10;
         this.getList();
     },
-    handleOnEntityEdit: function() {
+    handleOnEntityEdit: function(e) {
+        if (e) {
+            console.log(e);
+            this.created = e;
+        }
         this.getList();
     },
     getEventHandlers: function() {
@@ -346,6 +350,13 @@ var ListPanel = React.createClass({
                 }
             }
 
+            if (this.created) {
+                console.log(this.created);
+                if (entity.id == this.created) {
+                    entity.created = true;
+                    this.created = null;
+                }
+            }
             entity.show = true;
         }
         return entities;
@@ -450,9 +461,11 @@ var Entity = React.createClass({
                     </div>
             );
         }
+        var className = entity.created ? "animated flipInX Board box-shadow--3dp" : "Board box-shadow--3dp";
+        console.log(className);
         return (
-            <div className="Board box-shadow--3dp">
-				<div className="panel panel-primary">
+            <div className={className}>
+                <div className="panel panel-primary">
                     <div className="panel-heading">
                         <Toolbar entity={entity} user={this.props.user} onEntityEvents={this.props.onEntityEvents} />
                     </div>
@@ -474,7 +487,7 @@ var Entity = React.createClass({
                     <div className="panel-footer">
                         <button type="button" className="btn btn-info btn-xs" onClick={this.handleOnClick}>Open</button>
                     </div>
-				</div>
+                </div>
             </div>
         );
     }

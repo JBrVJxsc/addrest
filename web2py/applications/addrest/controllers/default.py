@@ -151,17 +151,16 @@ def create_board():
     }
     board_id = db.board.insert(**b)
     b = {
-        'title': "Welcome!",
-        'post_content': "Hello, %s!\n"
-                        "You are the creator of this board!\n"
-                        "Now create your first post :)" % auth.user.email,
+        'title': "Welcome, %s!" % auth.user.first_name,
+        'post_content': "You are the creator of this board!\n"
+                        "Now create your first post :)",
         'email': auth.user.email,
         'board': board_id,
     }
     db.post.insert(**b)
     return {
         'result': {
-            'state': True,
+            'id': board_id,
         }
     }
 
