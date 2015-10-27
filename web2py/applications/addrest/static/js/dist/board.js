@@ -35630,6 +35630,7 @@ var PostListPanel = React.createClass({
 
             if (this.state.keyword.trim() !== "") {
                 var content = post.title + " ";
+                content += post.post_content + " ";
                 content += post.email;
                 if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
                     continue;
@@ -35752,7 +35753,6 @@ var PostList = React.createClass({
 var Post = React.createClass({
     displayName: 'Post',
 
-    handleOnClick: function handleOnClick() {},
     render: function render() {
         var post = this.props.post;
         return React.createElement(
