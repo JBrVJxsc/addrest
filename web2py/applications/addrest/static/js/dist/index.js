@@ -36017,7 +36017,10 @@ var Editor = React.createClass({
                 this.setError("create", "Board title has been used.");
             } else {
                 this.refs.create.hide();
-                this.props.onEntityEdit(data.result.id);
+                this.props.onEntityEdit({
+                    type: 'create',
+                    id: data.result.id
+                });
             }
         }).bind(this);
 
@@ -36050,7 +36053,10 @@ var Editor = React.createClass({
                 this.setError("edit", "Board title has been used.");
             } else {
                 this.refs.edit.hide();
-                this.props.onEntityEdit();
+                this.props.onEntityEdit({
+                    type: 'edit',
+                    id: this.state.editing.id
+                });
             }
         }).bind(this);
 
@@ -36180,7 +36186,11 @@ var ListPanel = React.createClass({
     },
     handleOnEntityEdit: function handleOnEntityEdit(e) {
         if (e) {
-            this.created = e;
+            if (e.type == "create") {
+                this.created = e.id;
+            } else if (e.type == "edit") {
+                this.edited = e.id;
+            }
         }
         this.getList();
     },
@@ -36241,6 +36251,11 @@ var ListPanel = React.createClass({
                 if (entity.id == this.created) {
                     entity.created = true;
                     this.created = null;
+                }
+            } else if (this.edited) {
+                if (entity.id == this.edited) {
+                    entity.edited = true;
+                    this.edited = null;
                 }
             }
             entity.show = true;
@@ -36391,7 +36406,12 @@ var Entity = React.createClass({
                 )
             );
         }
-        var className = entity.created ? "animated flipInX Board box-shadow--3dp" : "Board box-shadow--3dp";
+        var className = "Board box-shadow--3dp";
+        if (entity.edited) {
+            className = "animated pulse Board box-shadow--3dp";
+        } else if (entity.created) {
+            className = "animated flipInX Board box-shadow--3dp";
+        }
         return React.createElement(
             'div',
             { className: className },
