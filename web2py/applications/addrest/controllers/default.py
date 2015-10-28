@@ -83,25 +83,6 @@ def board():
         redirect(URL('default', 'index'))
 
 
-def create_demo():
-    boards_number = 1
-    posts_number = 50
-    for i in xrange(boards_number):
-        db.board.insert(title="Demo Board for Pagination")
-    rows = db().select(db.board.ALL, orderby=~db.board.last_active_time)
-    for row in rows:
-        for i in xrange(posts_number):
-            db.post.insert(
-                title="Demo Post for Pagination #%d" % i,
-                post_content='These posts are for demonstrating pagination, '
-                             'please click "Show more" at bottom :)\n'
-                             'You cannot modify these demo posts since you are not author, '
-                             'please sign up and create yours :)',
-                board=row.id
-            )
-    redirect(URL('default', 'index'))
-
-
 def get_boards():
     rows = db().select(db.board.ALL, limitby=(0, int(request.vars.number)), orderby=~db.board.last_active_time)
     boards = []
@@ -272,3 +253,25 @@ def get_board_api():
     edit = URL('default', 'edit_board.json', user_signature=True)
     delete = URL('default', 'delete_board.json', user_signature=True)
     return locals()
+
+
+def create_demo():
+    boards_number = 1
+    posts_number = 50
+    for i in xrange(boards_number):
+        if boards_number == 1:
+            db.board.insert(title="Pagination Demo")
+        else:
+            db.board.insert(title="Pagination Demo #%d" % i)
+    rows = db().select(db.board.ALL, orderby=~db.board.last_active_time)
+    for row in rows:
+        for i in xrange(posts_number):
+            db.post.insert(
+                title="Demo Post #%d" % i,
+                post_content='These posts are for pagination demo, '
+                             'please click "Show more" at bottom :)\n'
+                             'You cannot modify these demo posts since you are not author, '
+                             'please sign up and create yours :)',
+                board=row.id
+            )
+    redirect(URL('default', 'index'))
