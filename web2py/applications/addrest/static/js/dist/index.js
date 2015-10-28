@@ -36039,7 +36039,7 @@ var Editor = React.createClass({
             });
         }).bind(this);
 
-        setTimeout(delay, 800);
+        setTimeout(delay, 1300);
     },
     _edit: function _edit(title) {
         this.work("edit", true, "Saving...");
@@ -36075,7 +36075,7 @@ var Editor = React.createClass({
             });
         }).bind(this);
 
-        setTimeout(delay, 800);
+        setTimeout(delay, 1300);
     },
     _delete: function _delete(entity) {
         this.work("delete", true, "Deleting...");
@@ -36106,7 +36106,7 @@ var Editor = React.createClass({
             });
         }).bind(this);
 
-        setTimeout(delay, 800);
+        setTimeout(delay, 1300);
     },
     work: function work(worker, working, message) {
         var info = {};
