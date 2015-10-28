@@ -234,11 +234,11 @@ var NavbarButton = React.createClass({
     getButton: function() {
         if (this.props.workInfo && this.props.workInfo.working) {
             return (
-                <button type="button" className="animated pulse btn btn-info disabled" onClick={this.props.onClick}>{this.props.workInfo.message}</button>
+                <button type="button" className="animated bounceIn btn btn-info disabled" onClick={this.props.onClick}>{this.props.workInfo.message}</button>
             );
         }
         return (
-            <button type="button" className="animated pulse btn btn-info" onClick={this.props.onClick}>{this.props.children}</button>
+            <button type="button" className="animated bounceIn btn btn-info" onClick={this.props.onClick}>{this.props.children}</button>
         );
     },
     render: function() {
