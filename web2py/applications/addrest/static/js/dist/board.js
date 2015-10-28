@@ -38882,7 +38882,7 @@ var ListToolbar = React.createClass({
                         'div',
                         { className: 'inner-addon left-addon' },
                         React.createElement('i', { className: 'glyphicon glyphicon-search' }),
-                        React.createElement(Input, { placeholder: 'Search Boards', onChange: this.handleOnChange })
+                        React.createElement(Input, { placeholder: 'Search Posts', onChange: this.handleOnChange })
                     )
                 )
             )

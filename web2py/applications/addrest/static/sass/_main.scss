@@ -225,7 +225,7 @@ body {
 }
 
 .ParagraphOverflow {
-  max-height: 150.5px;
+  height: 150px;
   overflow: scroll;
   max-width: 100%;
   overflow-x: hidden;
@@ -237,7 +237,7 @@ body {
 
 p {
   word-break: normal;
-  line-height: 160%;
+  line-height: 165%;
 }
 
 a:hover, a:active, a:focus {

@@ -428,7 +428,7 @@ var ListToolbar = React.createClass({
                     <div className="col-xs-4">
                         <div className="inner-addon left-addon">
                             <i className="glyphicon glyphicon-search"></i>
-                            <Input placeholder="Search Boards" onChange={this.handleOnChange}></Input>
+                            <Input placeholder="Search Posts" onChange={this.handleOnChange}></Input>
                         </div>
                     </div>
                 </div>

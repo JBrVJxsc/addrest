@@ -273,7 +273,7 @@ body {
 
 /* line 227, ../sass/_main.scss */
 .ParagraphOverflow {
-  max-height: 150.5px;
+  height: 150px;
   overflow: scroll;
   max-width: 100%;
   overflow-x: hidden;
@@ -287,7 +287,7 @@ body {
 /* line 238, ../sass/_main.scss */
 p {
   word-break: normal;
-  line-height: 160%;
+  line-height: 165%;
 }
 
 /* line 243, ../sass/_main.scss */
