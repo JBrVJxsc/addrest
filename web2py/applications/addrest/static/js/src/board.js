@@ -204,6 +204,7 @@ var Editor = React.createClass({
             id: this.state.editing.id,
             title: title,
             post_content: content,
+            board: this.props.boardID
         };
 
         var delay = function() {

@@ -38628,7 +38628,8 @@ var Editor = React.createClass({
         var data = {
             id: this.state.editing.id,
             title: title,
-            post_content: content
+            post_content: content,
+            board: this.props.boardID
         };
 
         var delay = (function () {

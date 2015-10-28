@@ -88,7 +88,7 @@ def get_boards():
     boards = []
     today = date.today()
     for row in rows:
-        all_posts = db(db.post.board == row.id).select(orderby=~db.post.create_time)
+        all_posts = db(db.post.board == row.id).select(orderby=~db.post.last_active_time)
         today_posts = db(
             (db.post.board == row.id) &
             (db.post.create_time.year() == today.year) &
@@ -220,6 +220,7 @@ def edit_post():
         'post_content': request.vars.post_content,
         'last_active_time': request.now
     }
+    print request.vars
     db(db.post.id == request.vars.id).update(**p)
     db(db.board.id == request.vars.board).update(last_active_time=request.now)
     return {
