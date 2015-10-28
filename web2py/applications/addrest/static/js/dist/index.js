@@ -35489,13 +35489,13 @@ var NavbarButton = React.createClass({
         if (this.props.workInfo && this.props.workInfo.working) {
             return React.createElement(
                 'button',
-                { type: 'button', className: 'btn btn-info disabled', onClick: this.props.onClick },
+                { type: 'button', className: 'animated pulse btn btn-info disabled', onClick: this.props.onClick },
                 this.props.workInfo.message
             );
         }
         return React.createElement(
             'button',
-            { type: 'button', className: 'btn btn-info', onClick: this.props.onClick },
+            { type: 'button', className: 'animated pulse btn btn-info', onClick: this.props.onClick },
             this.props.children
         );
     },
