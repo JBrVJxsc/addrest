@@ -10,7 +10,10 @@
     <link rel="stylesheet" href="{{=URL('static','css/animate.css')}}"/>
     <script type="text/javascript" src="{{=URL('static','js/jquery.js')}}"></script>
     <script type="text/javascript" src="{{=URL('static','js/bootstrap.min.js')}}"></script>
-    <script type="text/javascript" src="{{=URL('static','js/bootstrap-notify.js')}}"></script>
 </head>
+<body>
+    <div id="body"></div>
+    <div id="APPLICATION" hidden>{{=request.application}}</div>
+    <div id="CONTROLLER" hidden>{{=request.controller}}</div>
 {{include}}
 </html>
