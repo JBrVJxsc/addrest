@@ -84,19 +84,19 @@ def board():
 
 
 def create_demo():
-    boards_number = 50
+    boards_number = 1
     posts_number = 50
     for i in xrange(boards_number):
-        db.board.insert(title="Pagination Demo #%d" % i)
+        db.board.insert(title="Demo Board for Pagination")
     rows = db().select(db.board.ALL, orderby=~db.board.last_active_time)
     for row in rows:
         for i in xrange(posts_number):
             db.post.insert(
                 title="Demo Post for Pagination #%d" % i,
-                post_content='These posts are for demonstrating pagination.\n'
-                             'Please click "Show more" at bottom :)\n'
-                             'You cannot modify these demo posts since you are not author. '
-                             'Please sign up and create yours :)',
+                post_content='These posts are for demonstrating pagination, '
+                             'please click "Show more" at bottom :)\n'
+                             'You cannot modify these demo posts since you are not author, '
+                             'please sign up and create yours :)',
                 board=row.id
             )
     redirect(URL('default', 'index'))

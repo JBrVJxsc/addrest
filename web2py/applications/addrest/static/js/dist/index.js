@@ -36242,7 +36242,7 @@ var ListPanel = React.createClass({
         return entities;
     },
     componentDidMount: function componentDidMount() {
-        this.list_size = 20;
+        this.list_size = 10;
         this.getList();
         this.interval = setInterval(this.getList, this.props.pollInterval);
     },
