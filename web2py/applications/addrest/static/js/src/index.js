@@ -383,7 +383,7 @@ var ListPanel = React.createClass({
                         <List baseLink={this.props.baseLink} user={this.state.user} entities={this.getFilteredList()} onEntityEvents={handlers} />
                     </div>
                     <div className="panel-footer">
-                        <button type="button" className="btn btn-info btn-xs" onClick={this.handleOnClick}>Show more</button>
+                        <button type="button" className="ShowMoreButton btn btn-info btn-sm" onClick={this.handleOnClick}>Show more</button>
                     </div>
                 </div>
             </div>

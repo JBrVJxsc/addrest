@@ -285,12 +285,17 @@ body {
 }
 
 /* line 238, ../sass/_main.scss */
+.ShowMoreButton {
+  width: 100%;
+}
+
+/* line 242, ../sass/_main.scss */
 p {
   word-break: normal;
   line-height: 165%;
 }
 
-/* line 243, ../sass/_main.scss */
+/* line 247, ../sass/_main.scss */
 a:hover, a:active, a:focus {
   color: #3498DB;
 }

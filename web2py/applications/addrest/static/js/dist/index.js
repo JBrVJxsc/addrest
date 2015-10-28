@@ -36276,7 +36276,7 @@ var ListPanel = React.createClass({
                     { className: 'panel-footer' },
                     React.createElement(
                         'button',
-                        { type: 'button', className: 'btn btn-info btn-xs', onClick: this.handleOnClick },
+                        { type: 'button', className: 'ShowMoreButton btn btn-info btn-sm', onClick: this.handleOnClick },
                         'Show more'
                     )
                 )
