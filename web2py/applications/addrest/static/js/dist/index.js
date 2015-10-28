@@ -36017,10 +36017,7 @@ var Editor = React.createClass({
                 this.setError("create", "Board title has been used.");
             } else {
                 this.refs.create.hide();
-                var callback = (function () {
-                    this.props.onEntityEdit(data.result.id);
-                }).bind(this);
-                setTimeout(callback, 200);
+                this.props.onEntityEdit(data.result.id);
             }
         }).bind(this);
 
@@ -36203,6 +36200,10 @@ var ListPanel = React.createClass({
         };
     },
     getList: function getList() {
+        if (this.busy) {
+            return;
+        }
+
         $.ajax({
             type: 'POST',
             url: this.state.get_list_api,
@@ -36221,6 +36222,8 @@ var ListPanel = React.createClass({
         });
     },
     getFilteredList: function getFilteredList() {
+        this.busy = true;
+
         var entities = this.state.entities;
         for (var i in entities) {
             var entity = entities[i];
@@ -36245,12 +36248,16 @@ var ListPanel = React.createClass({
         return entities;
     },
     componentDidMount: function componentDidMount() {
+        this.busy = false;
         this.list_size = 12;
         this.getList();
         this.interval = setInterval(this.getList, this.props.pollInterval);
     },
     componentWillUnmount: function componentWillUnmount() {
         clearInterval(this.interval);
+    },
+    componentDidUpdate: function componentDidUpdate() {
+        this.busy = false;
     },
     render: function render() {
         var handlers = this.getEventHandlers();
@@ -36325,7 +36332,7 @@ var List = React.createClass({
             if (entities[i].show) {
                 rows.push(React.createElement(
                     'div',
-                    { key: i, className: 'col-xs-4' },
+                    { key: entities[i].id, className: 'col-xs-4' },
                     React.createElement(Entity, { baseLink: this.props.baseLink, user: this.props.user, entity: entities[i], onEntityEvents: this.props.onEntityEvents })
                 ));
             }

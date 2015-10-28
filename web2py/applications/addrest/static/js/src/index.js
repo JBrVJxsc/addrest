@@ -143,10 +143,7 @@ var Editor = React.createClass({
                 this.setError("create", "Board title has been used.");
             } else {
                 this.refs.create.hide();
-                var callback = function() {
-                    this.props.onEntityEdit(data.result.id);
-                }.bind(this);
-                setTimeout(callback, 200);
+                this.props.onEntityEdit(data.result.id);
             }
         }.bind(this);
 
@@ -321,6 +318,10 @@ var ListPanel = React.createClass({
         };
     },
     getList: function() {
+        if (this.busy) {
+            return;
+        }
+
         $.ajax({
             type: 'POST',
             url: this.state.get_list_api,
@@ -339,6 +340,8 @@ var ListPanel = React.createClass({
         });
     },
     getFilteredList: function() {
+        this.busy = true;
+
         var entities = this.state.entities;
         for (var i in entities) {
             var entity = entities[i];
@@ -363,12 +366,16 @@ var ListPanel = React.createClass({
         return entities;
     },
 	componentDidMount: function() {
+        this.busy = false;
         this.list_size = 12;
         this.getList();
         this.interval = setInterval(this.getList, this.props.pollInterval);
 	},
     componentWillUnmount: function() {
         clearInterval(this.interval);
+    },
+    componentDidUpdate: function() {
+        this.busy = false;
     },
     render: function() {
         var handlers = this.getEventHandlers();
@@ -420,7 +427,7 @@ var List = React.createClass({
         for (var i in entities) {
             if (entities[i].show) {
                 rows.push(
-                    <div key={i} className="col-xs-4">
+                    <div key={entities[i].id} className="col-xs-4">
                         <Entity baseLink={this.props.baseLink} user={this.props.user} entity={entities[i]} onEntityEvents={this.props.onEntityEvents} />
                     </div>
                 );
