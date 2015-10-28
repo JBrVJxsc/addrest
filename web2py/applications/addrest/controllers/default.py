@@ -108,7 +108,7 @@ def get_boards():
     today = date.today()
     for row in rows:
         all_posts = db(db.post.board == row.id).select(orderby=~db.post.create_time)
-        today_post = db(
+        today_posts = db(
             (db.post.board == row.id) &
             (db.post.create_time.year() == today.year) &
             (db.post.create_time.month() == today.month) &
@@ -124,7 +124,7 @@ def get_boards():
             'last_post_id': last_post.id if last_post else '',
             'last_post_title': last_post.title if last_post else '',
             'all_posts_number': len(all_posts),
-            'today_posts_number': len(today_post),
+            'today_posts_number': len(today_posts),
             'show': True
         }
         boards.append(b)
@@ -151,9 +151,9 @@ def create_board():
     }
     board_id = db.board.insert(**b)
     b = {
-        'title': "Welcome, %s!" % auth.user.first_name,
+        'title': "Welcome to %s!" % request.vars.title,
         'post_content': "You are the creator of this board!\n"
-                        "Now create your first post :)",
+                        "Now create your first post here :)",
         'email': auth.user.email,
         'board': board_id,
     }
@@ -223,11 +223,11 @@ def create_post():
         'email': auth.user.email,
         'board': request.vars.board,
     }
-    db.post.insert(**p)
+    post_id = db.post.insert(**p)
     db(db.board.id == request.vars.board).update(last_active_time=request.now)
     return {
         'result': {
-            'state': True,
+            'id': post_id,
         },
     }
 

@@ -38581,7 +38581,7 @@ var Editor = React.createClass({
                 this.setError("create", "Something was wrong...");
             } else {
                 this.refs.create.hide();
-                this.props.onEntityEdit();
+                this.props.onEntityEdit(data.result.id);
             }
         }).bind(this);
 
@@ -38747,7 +38747,10 @@ var ListPanel = React.createClass({
         this.list_size += 10;
         this.getList();
     },
-    handleOnEntityEdit: function handleOnEntityEdit() {
+    handleOnEntityEdit: function handleOnEntityEdit(e) {
+        if (e) {
+            this.created = e;
+        }
         this.getList();
     },
     getEventHandlers: function getEventHandlers() {
@@ -38803,6 +38806,13 @@ var ListPanel = React.createClass({
                 if (entity.id == this.state.post_id) {
                     entity.highlight = true;
                     this.highlighted = true;
+                }
+            }
+
+            if (this.created) {
+                if (entity.id == this.created) {
+                    entity.created = true;
+                    this.created = null;
                 }
             }
             entity.show = true;
@@ -38900,11 +38910,15 @@ var List = React.createClass({
     render: function render() {
         return React.createElement(
             'div',
-            { className: 'container-fluid' },
+            { className: 'ListContainer' },
             React.createElement(
                 'div',
-                { className: 'row' },
-                this.getEntities()
+                { className: 'container-fluid' },
+                React.createElement(
+                    'div',
+                    { className: 'row' },
+                    this.getEntities()
+                )
             )
         );
     }
@@ -38916,7 +38930,12 @@ var Entity = React.createClass({
     render: function render() {
         var entity = this.props.entity;
         var time = Moment(entity.create_time).fromNow();
-        var className = entity.highlight ? "animated shake Board box-shadow--3dp" : "Board box-shadow--3dp";
+        var className = "Board box-shadow--3dp";
+        if (entity.highlight) {
+            className = "animated shake Board box-shadow--3dp";
+        } else if (entity.created) {
+            className = "animated flipInX Board box-shadow--3dp";
+        }
         return React.createElement(
             'div',
             { className: className },

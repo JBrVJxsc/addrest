@@ -280,12 +280,17 @@ body {
 }
 
 /* line 234, ../sass/_main.scss */
+.ListContainer {
+  min-height: 254px;
+}
+
+/* line 238, ../sass/_main.scss */
 p {
   word-break: normal;
   line-height: 160%;
 }
 
-/* line 239, ../sass/_main.scss */
+/* line 243, ../sass/_main.scss */
 a:hover, a:active, a:focus {
   color: #3498DB;
 }

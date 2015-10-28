@@ -298,7 +298,6 @@ var ListPanel = React.createClass({
     },
     handleOnEntityEdit: function(e) {
         if (e) {
-            console.log(e);
             this.created = e;
         }
         this.getList();
@@ -351,7 +350,6 @@ var ListPanel = React.createClass({
             }
 
             if (this.created) {
-                console.log(this.created);
                 if (entity.id == this.created) {
                     entity.created = true;
                     this.created = null;
@@ -429,9 +427,11 @@ var List = React.createClass({
     },
     render: function() {
         return (
-            <div className="container-fluid">
-                <div className="row">
-                    {this.getEntities()}
+            <div className="ListContainer">
+                <div className="container-fluid">
+                    <div className="row">
+                        {this.getEntities()}
+                    </div>
                 </div>
             </div>
         );
@@ -462,7 +462,6 @@ var Entity = React.createClass({
             );
         }
         var className = entity.created ? "animated flipInX Board box-shadow--3dp" : "Board box-shadow--3dp";
-        console.log(className);
         return (
             <div className={className}>
                 <div className="panel panel-primary">

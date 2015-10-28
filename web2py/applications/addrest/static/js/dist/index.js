@@ -36180,7 +36180,6 @@ var ListPanel = React.createClass({
     },
     handleOnEntityEdit: function handleOnEntityEdit(e) {
         if (e) {
-            console.log(e);
             this.created = e;
         }
         this.getList();
@@ -36233,7 +36232,6 @@ var ListPanel = React.createClass({
             }
 
             if (this.created) {
-                console.log(this.created);
                 if (entity.id == this.created) {
                     entity.created = true;
                     this.created = null;
@@ -36334,11 +36332,15 @@ var List = React.createClass({
     render: function render() {
         return React.createElement(
             'div',
-            { className: 'container-fluid' },
+            { className: 'ListContainer' },
             React.createElement(
                 'div',
-                { className: 'row' },
-                this.getEntities()
+                { className: 'container-fluid' },
+                React.createElement(
+                    'div',
+                    { className: 'row' },
+                    this.getEntities()
+                )
             )
         );
     }
@@ -36380,7 +36382,6 @@ var Entity = React.createClass({
             );
         }
         var className = entity.created ? "animated flipInX Board box-shadow--3dp" : "Board box-shadow--3dp";
-        console.log(className);
         return React.createElement(
             'div',
             { className: className },
