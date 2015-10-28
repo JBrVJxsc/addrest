@@ -153,7 +153,7 @@ def create_board():
     b = {
         'title': "Welcome to %s!" % request.vars.title,
         'post_content': "You are the creator of this board!\n"
-                        "Now create your first post here :)",
+                        "Now create your first post :)",
         'email': auth.user.email,
         'board': board_id,
     }

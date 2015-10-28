@@ -143,7 +143,10 @@ var Editor = React.createClass({
                 this.setError("create", "Board title has been used.");
             } else {
                 this.refs.create.hide();
-                this.props.onEntityEdit(data.result.id);
+                var callback = function() {
+                    this.props.onEntityEdit(data.result.id);
+                }.bind(this);
+                setTimeout(callback, 200);
             }
         }.bind(this);
 
@@ -293,7 +296,7 @@ var ListPanel = React.createClass({
         this.refs.editor.create();
     },
     handleOnClick: function() {
-        this.list_size += 10;
+        this.list_size += 12;
         this.getList();
     },
     handleOnEntityEdit: function(e) {
@@ -360,7 +363,7 @@ var ListPanel = React.createClass({
         return entities;
     },
 	componentDidMount: function() {
-        this.list_size = 10;
+        this.list_size = 12;
         this.getList();
         this.interval = setInterval(this.getList, this.props.pollInterval);
 	},

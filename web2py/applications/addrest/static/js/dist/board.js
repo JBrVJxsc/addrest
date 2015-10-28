@@ -38581,7 +38581,10 @@ var Editor = React.createClass({
                 this.setError("create", "Something was wrong...");
             } else {
                 this.refs.create.hide();
-                this.props.onEntityEdit(data.result.id);
+                var callback = (function () {
+                    this.props.onEntityEdit(data.result.id);
+                }).bind(this);
+                setTimeout(callback, 200);
             }
         }).bind(this);
 
@@ -38744,7 +38747,7 @@ var ListPanel = React.createClass({
         this.refs.editor.create();
     },
     handleOnClick: function handleOnClick() {
-        this.list_size += 10;
+        this.list_size += 12;
         this.getList();
     },
     handleOnEntityEdit: function handleOnEntityEdit(e) {
@@ -38820,7 +38823,7 @@ var ListPanel = React.createClass({
         return entities;
     },
     componentDidMount: function componentDidMount() {
-        this.list_size = 10;
+        this.list_size = 12;
         this.getList();
         this.interval = setInterval(this.getList, this.props.pollInterval);
     },
