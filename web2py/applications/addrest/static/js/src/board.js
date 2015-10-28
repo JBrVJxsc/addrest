@@ -482,7 +482,7 @@ var Entity = React.createClass({
         var time = Moment(entity.create_time).fromNow();
         var className = "Board box-shadow--3dp";
         if (entity.highlight) {
-            className = "animated shake Board box-shadow--3dp";
+            className = "animated pulse Board box-shadow--3dp";
         } else if (entity.created) {
             className = "animated flipInX Board box-shadow--3dp";
         }

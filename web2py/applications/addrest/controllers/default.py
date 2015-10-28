@@ -132,10 +132,9 @@ def create_board():
     }
     board_id = db.board.insert(**b)
     b = {
-        'title': "Welcome to %s!" % request.vars.title,
-        'post_content': "You are the creator of this board!\n"
-                        "Now create your first post :)",
-        'email': auth.user.email,
+        'title': "Greeting!",
+        'post_content': "Congratulations, %s is the creator of this board!\n"
+                        "Now create your own posts :)" % auth.user.email,
         'board': board_id,
     }
     db.post.insert(**b)
@@ -268,11 +267,11 @@ def create_demo():
     for row in rows:
         for i in xrange(posts_number):
             db.post.insert(
-                title="Demo Post #%d" % i,
+                title="Try pagination here!" if i == 0 else "Demo Post #%d" % i,
                 post_content='These posts are for pagination demo, '
-                             'please click "Show more" at bottom :)\n'
-                             'You cannot modify these demo posts since you are not author, '
-                             'please sign up and create yours :)',
+                             'please click "Show more" at bottom and get more posts.\n'
+                             'You cannot modify these posts since you are not author, '
+                             'please sign up and create yours :)' if i == 0 else "#%d" % i,
                 board=row.id
             )
     redirect(URL('default', 'index'))
