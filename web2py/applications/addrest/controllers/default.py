@@ -133,7 +133,8 @@ def create_board():
     board_id = db.board.insert(**b)
     b = {
         'title': "Greeting!",
-        'post_content': "Congratulations, %s is the creator of this board!\n"
+        'post_content': "Welcome, %s!\n"
+                        "You are the creator of this board!\n"
                         "Now create your own posts :)" % auth.user.email,
         'board': board_id,
     }
@@ -268,8 +269,7 @@ def create_demo():
         for i in xrange(posts_number):
             db.post.insert(
                 title="Try pagination here!" if i == 0 else "Demo Post #%d" % i,
-                post_content='These posts are for pagination demo, '
-                             'please click "Show more" at bottom and get more posts.\n'
+                post_content='Please click "Show more" at bottom to get more posts.\n'
                              'You cannot modify these posts since you are not author, '
                              'please sign up and create yours :)' if i == 0 else "#%d" % i,
                 board=row.id

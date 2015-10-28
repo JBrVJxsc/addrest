@@ -479,11 +479,11 @@ var Entity = React.createClass({
         } else {
             link = (
                 <div>
-                <b>
-                    Recent Post
-                    <span className="label label-info LabelFont pull-right">None</span>
-                </b>
-                    </div>
+                    <b>
+                        Recent Post
+                        <span className="label label-info LabelFont pull-right">None</span>
+                    </b>
+                </div>
             );
         }
         var className = "Board box-shadow--3dp";
