@@ -192,9 +192,9 @@ var Navbar = React.createClass({
             var button = buttons[i];
             var navbarButton;
             if (button.worker) {
-                navbarButton = <NavbarButton key={i} workInfo={this.state.work_info.logout} onClick={button.onClick}>{button.text}</NavbarButton>;
+                navbarButton = <NavbarButton key={button.text} workInfo={this.state.work_info.logout} onClick={button.onClick}>{button.text}</NavbarButton>;
             } else {
-                navbarButton = <NavbarButton key={i} onClick={button.onClick}>{button.text}</NavbarButton>
+                navbarButton = <NavbarButton key={button.text} onClick={button.onClick}>{button.text}</NavbarButton>
             }
             buttonList.push(navbarButton);
         }

@@ -35418,13 +35418,13 @@ var Navbar = React.createClass({
             if (button.worker) {
                 navbarButton = React.createElement(
                     NavbarButton,
-                    { key: i, workInfo: this.state.work_info.logout, onClick: button.onClick },
+                    { key: button.text, workInfo: this.state.work_info.logout, onClick: button.onClick },
                     button.text
                 );
             } else {
                 navbarButton = React.createElement(
                     NavbarButton,
-                    { key: i, onClick: button.onClick },
+                    { key: button.text, onClick: button.onClick },
                     button.text
                 );
             }
@@ -35739,7 +35739,7 @@ var DismissibleAlert = React.createClass({
     render: function render() {
         return React.createElement(
             'div',
-            { ref: 'box', className: 'animated shake' },
+            { className: 'animated shake' },
             React.createElement(
                 Alert,
                 { bsStyle: this.props.style, onDismiss: this.props.onDismiss },
