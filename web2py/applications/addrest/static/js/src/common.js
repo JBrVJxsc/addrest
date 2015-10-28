@@ -440,7 +440,7 @@ var DismissibleAlert = React.createClass({
     },
     render: function() {
         return (
-            <div ref="box" className="animated shake">
+            <div className="animated shake">
                 <Alert bsStyle={this.props.style} onDismiss={this.props.onDismiss}>
                     {this.getTitle()}
                     <p>{this.props.message}</p>
