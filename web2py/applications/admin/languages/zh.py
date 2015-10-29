@@ -236,6 +236,7 @@
 'previous 100 rows': '前100行',
 'Private files': 'Private files',
 'private files': 'private files',
+'Project Progress': 'Project Progress',
 'Query:': '查询',
 'record': 'record',
 'record does not exist': '记录并不存在',
