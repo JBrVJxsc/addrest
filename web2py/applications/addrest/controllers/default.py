@@ -7,17 +7,76 @@
 ## - user is required for authentication and authorization
 ## - download is for downloading files uploaded in the db (does streaming)
 #########################################################################
+from datetime import date
+
 
 def index():
-    """
-    example action using the internationalization operator T and flash
-    rendered by views/default/index.html or views/generic.html
+    if auth.user:
+        redirect('dashboard')
+    return dict()
 
-    if you need a simple wiki simply replace the two lines below with:
-    return auth.wiki()
-    """
-    response.flash = T("Hello World")
-    return dict(message=T('Welcome to web2py!'))
+
+def dashboard():
+    if not auth.user:
+        redirect('/')
+    return dict()
+
+
+def get_user():
+    return {
+        'result': {
+            'user': auth.user,
+        }
+    }
+
+
+def get_addresses():
+    return {
+        'addresses': [
+            {
+                'show': True,
+                'id': 0,
+                'first_name': "Xu",
+                'last_name': "ZHANG",
+                'company': "",
+                'area': "831",
+                'phone': "2950944",
+                'street': "700 Koshland Way",
+                'apt': "A",
+                'city': "Santa Cruz",
+                'state': "CA",
+                'zip': "95060"
+            },
+            {
+                'show': True,
+                'id': 1,
+                'first_name': "Han",
+                'last_name': "Bai",
+                'company': "Zenefits",
+                'area': "831",
+                'phone': "2950944",
+                'street': "701 Koshland Way",
+                'apt': "B",
+                'city': "Santa Cruz",
+                'state': "CA",
+                'zip': "95061"
+            },
+            {
+                'show': True,
+                'id': 2,
+                'first_name': "Yue",
+                'last_name': "Tian",
+                'company': "Zenefits",
+                'area': "831",
+                'phone': "2950944",
+                'street': "702 Koshland Way",
+                'apt': "C",
+                'city': "Santa Cruz",
+                'state': "CA",
+                'zip': "95062"
+            }
+        ],
+    }
 
 
 def user():
@@ -58,5 +117,218 @@ def call():
     return service()
 
 
-def dashboard():
-    return dict()
+def login():
+    result = Auth(db=db).login_bare(request.vars.email, request.vars.password)
+    return locals()
+
+
+def signup():
+    result = Auth(db=db).register_bare(**request.vars)
+    return locals()
+
+
+def logout():
+    result = Auth(db=db).logout(next=None)
+    return locals()
+
+
+def board():
+    b = db(db.board.id == request.args(0)).select().first()
+    if b:
+        return dict(board_title=b.title)
+    else:
+        redirect(URL('default', 'index'))
+
+
+def get_boards():
+    rows = db().select(db.board.ALL, limitby=(0, int(request.vars.number)), orderby=~db.board.last_active_time)
+    boards = []
+    today = date.today()
+    for row in rows:
+        all_posts = db(db.post.board == row.id).select(orderby=~db.post.last_active_time)
+        today_posts = db(
+            (db.post.board == row.id) &
+            (db.post.create_time.year() == today.year) &
+            (db.post.create_time.month() == today.month) &
+            (db.post.create_time.day() == today.day)
+        ).select(orderby=~db.post.create_time)
+        last_post = all_posts.first()
+        b = {
+            'id': row.id,
+            'title': row.title,
+            'email': row.email,
+            'create_time': row.create_time,
+            'last_active_time': row.last_active_time,
+            'last_post_id': last_post.id if last_post else '',
+            'last_post_title': last_post.title if last_post else '',
+            'all_posts_number': len(all_posts),
+            'today_posts_number': len(today_posts),
+            'show': True
+        }
+        boards.append(b)
+    return {
+        'result': {
+            'boards': boards,
+            'user': auth.user,
+        }
+    }
+
+
+@auth.requires_signature()
+def create_board():
+    rows = db(db.board.title == request.vars.title).select()
+    if len(rows) > 0:
+        return {
+            'result': {
+                'state': False,
+            }
+        }
+    b = {
+        'title': request.vars.title,
+        'email': auth.user.email
+    }
+    board_id = db.board.insert(**b)
+    b = {
+        'title': "Greeting!",
+        'post_content': "Welcome, %s!\n"
+                        "You are the creator of this board!\n"
+                        "Now create your own posts :)" % auth.user.email,
+        'board': board_id,
+    }
+    db.post.insert(**b)
+    return {
+        'result': {
+            'id': board_id,
+        }
+    }
+
+
+@auth.requires_signature()
+def edit_board():
+    rows = db(db.board.title == request.vars.title).select()
+    if len(rows) > 0:
+        return {
+            'result': {
+                'state': False,
+            }
+        }
+    db(db.board.id == request.vars.id).update(title=request.vars.title)
+    return {
+        'result': {
+            'state': True,
+        }
+    }
+
+
+@auth.requires_signature()
+def delete_board():
+    db(db.board.id == request.vars.id).delete()
+    return {
+        'result': {
+            'state': True,
+        },
+    }
+
+
+def get_posts():
+    rows = db(db.post.board == request.vars.board).select(db.post.ALL, limitby=(0, int(request.vars.number)), orderby=~db.post.last_active_time)
+    posts = []
+    for row in rows:
+        p = {
+            'id': row.id,
+            'title': row.title,
+            'post_content': row.post_content,
+            'email': row.email,
+            'board': row.board,
+            'create_time': row.create_time,
+            'last_active_time': row.last_active_time,
+            'show': True
+        }
+        posts.append(p)
+    return {
+        'result': {
+            'posts': posts,
+            'user': auth.user,
+        }
+    }
+
+
+@auth.requires_signature()
+def create_post():
+    p = {
+        'title': request.vars.title,
+        'post_content': request.vars.post_content,
+        'email': auth.user.email,
+        'board': request.vars.board,
+    }
+    post_id = db.post.insert(**p)
+    db(db.board.id == request.vars.board).update(last_active_time=request.now)
+    return {
+        'result': {
+            'id': post_id,
+        },
+    }
+
+
+@auth.requires_signature()
+def edit_post():
+    p = {
+        'title': request.vars.title,
+        'post_content': request.vars.post_content,
+        'last_active_time': request.now
+    }
+    print request.vars
+    db(db.post.id == request.vars.id).update(**p)
+    db(db.board.id == request.vars.board).update(last_active_time=request.now)
+    return {
+        'result': {
+            'state': True,
+        },
+    }
+
+
+@auth.requires_signature()
+def delete_post():
+    db(db.post.id == request.vars.id).delete()
+    return {
+        'result': {
+            'state': True,
+        },
+    }
+
+
+@auth.requires_login()
+def get_post_api():
+    create = URL('default', 'create_post.json', user_signature=True)
+    edit = URL('default', 'edit_post.json', user_signature=True)
+    delete = URL('default', 'delete_post.json', user_signature=True)
+    return locals()
+
+
+@auth.requires_login()
+def get_board_api():
+    create = URL('default', 'create_board.json', user_signature=True)
+    edit = URL('default', 'edit_board.json', user_signature=True)
+    delete = URL('default', 'delete_board.json', user_signature=True)
+    return locals()
+
+
+def create_demo():
+    boards_number = 1
+    posts_number = 50
+    for i in xrange(boards_number):
+        if boards_number == 1:
+            db.board.insert(title="Pagination Demo")
+        else:
+            db.board.insert(title="Pagination Demo #%d" % i)
+    rows = db().select(db.board.ALL, orderby=~db.board.last_active_time)
+    for row in rows:
+        for i in xrange(posts_number):
+            db.post.insert(
+                title="Try pagination here!" if i == 0 else "Demo Post #%d" % i,
+                post_content='Please click "Show more" at bottom to get more posts.\n'
+                             'You cannot modify these posts since you are not author, '
+                             'please sign up and create yours :)' if i == 0 else "#%d" % i,
+                board=row.id
+            )
+    redirect(URL('default', 'index'))

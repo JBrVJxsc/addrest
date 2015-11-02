@@ -1,42 +1,27 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
+var Utils = require('./common').Utils;
 var Navbar = require('./common').Navbar;
 var Modal = require('./common').Modal;
 var Input = require('./common').Input;
+var Alert = require('./common').Alert;
+var ConfirmWindow = require('./common').ConfirmWindow;
 
 var Index = React.createClass({
-    getButtons: function() {
+    getInitialState: function() {
         return {
-            left: null,
-            right: [
-                {
-                    onClick: function() {
-                        this.refs.signup.toggle();
-                    }.bind(this),
-                    text: "Sign up"
-                },
-                {
-                    onClick: function() {
-                        this.refs.login.toggle();
-                    }.bind(this),
-                    text: "Log In"
-                }
-            ]
+            navbar_api: {
+                login: "login",
+                signup: "signup",
+                logout: "logout",
+                get_user: "get_user"
+            }
         };
     },
-	componentDidMount: function() {
-
-	},
 	render: function() {
 		return (
 			<div>
-				<Modal ref="login" type="WaveModal">
-                    <Login />
-                </Modal>
-				<Modal ref="signup" type="WaveModal">
-                    <Signup />
-                </Modal>
-				<Navbar ref="navbar" buttons={this.getButtons()} />
+				<Navbar ref="navbar" APIs={this.state.navbar_api} title="Addrest" />
                 <IndexBackground />
 			</div>
 		);
@@ -53,50 +38,7 @@ var IndexBackground = React.createClass({
     }
 });
 
-var UserInfoForm = React.createClass({
-	render: function() {
-		return (
-			<div className="UserInfoModal">
-				<div className="panel panel-primary">
-                    <div className="panel-heading">
-                        <h3 className="panel-title">{this.props.title}</h3>
-                    </div>
-                    <div className="panel-body">
-                        <form className="form center-block">
-                            <div className="form-group">
-                                <Input placeholder="Email" size="input-md"></Input>
-                            </div>
-                            <div className="form-group">
-                                <Input placeholder="Password" type="password" size="input-md"></Input>
-                            </div>
-                            <div className="form-group">
-                                <button className="btn btn-warning btn-block">{this.props.button}</button>
-                            </div>
-                        </form>
-                    </div>
-				</div>
-			</div>
-		);
-	}
-});
-
-var Login = React.createClass({
-	render: function() {
-		return (
-            <UserInfoForm title="Log In" button="Log In" />
-		);
-	}
-});
-
-var Signup = React.createClass({
-	render: function() {
-		return (
-            <UserInfoForm title="Sign up" button="Sign up" />
-		);
-	}
-});
-
 ReactDOM.render(
-    <Index />,
+    <Index pollInterval={3500} />,
     document.getElementById("body")
 );

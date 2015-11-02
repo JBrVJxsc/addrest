@@ -154,3 +154,26 @@ body {
   width: 80%;
   margin: 5px auto;
 }
+
+.ConfirmWindow {
+  position: relative;
+  width: $userInfoModalWidth;
+  right: $userInfoModalWidth / 2;
+}
+
+.ConfirmWindow .panel .panel-body {
+  position: relative;
+  top: 6px;
+}
+
+.UserInfoFormButton .form-group {
+  margin-bottom: 8px;
+}
+
+.Right {
+  float: right;
+}
+
+.Left {
+  float: left;
+}

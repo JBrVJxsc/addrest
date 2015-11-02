@@ -190,3 +190,31 @@ body {
   width: 80%;
   margin: 5px auto;
 }
+
+/* line 158, ../sass/_main.scss */
+.ConfirmWindow {
+  position: relative;
+  width: 325px;
+  right: 162.5px;
+}
+
+/* line 164, ../sass/_main.scss */
+.ConfirmWindow .panel .panel-body {
+  position: relative;
+  top: 6px;
+}
+
+/* line 169, ../sass/_main.scss */
+.UserInfoFormButton .form-group {
+  margin-bottom: 8px;
+}
+
+/* line 173, ../sass/_main.scss */
+.Right {
+  float: right;
+}
+
+/* line 177, ../sass/_main.scss */
+.Left {
+  float: left;
+}
