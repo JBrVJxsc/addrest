@@ -6,12 +6,13 @@ var Navbar = require('./common').Navbar;
 var Modal = require('./common').Modal;
 var Input = require('./common').Input;
 var Alert = require('./common').Alert;
+var Switch = require('./common').Switch;
 var ConfirmWindow = require('./common').ConfirmWindow;
 
 var Index = React.createClass({
     getInitialState: function() {
         return {
-            get_api_api: "get_api_api",
+            get_api_api: "get_api",
             navbar_api: {
                 login: "login",
                 signup: "signup",
@@ -158,8 +159,7 @@ var Editor = React.createClass({
                 url: this.props.APIs.create,
                 data: {
                     title: title,
-                    post_content: content,
-                    board: this.props.boardID
+                    post_content: content
                 },
                 error: error,
                 success: callback,
@@ -193,8 +193,7 @@ var Editor = React.createClass({
         var data = {
             id: this.state.editing.id,
             title: title,
-            post_content: content,
-            board: this.props.boardID
+            post_content: content
         };
 
         var delay = function() {
@@ -292,17 +291,11 @@ var ListPanel = React.createClass({
         return {
             entities: [],
             keyword: "",
-            get_list_api: "get_addresses",
-            board_id: document.getElementById("BOARD_ID").textContent,
-            post_id: document.getElementById("POST_ID").textContent
+            get_list_api: "get_addresses"
         };
     },
     create: function() {
         this.refs.editor.create();
-    },
-    handleOnClick: function() {
-        this.list_size += 12;
-        this.getList();
     },
     handleOnEntityEdit: function(e) {
         if (e) {
@@ -337,14 +330,10 @@ var ListPanel = React.createClass({
         $.ajax({
             type: 'POST',
             url: this.state.get_list_api,
-            data: {
-                board: this.state.board_id,
-                number: this.list_size
-            },
             success: function(data) {
                 if (this.isMounted()) {
                     this.setState({
-                        entities: data.result.posts,
+                        entities: data.addresses
                     });
                 }
             }.bind(this)
@@ -359,18 +348,18 @@ var ListPanel = React.createClass({
             entity.show = false;
 
             if (this.state.keyword.trim() !== "") {
-                var content = entity.title + " ";
-                content += entity.email + " ";
-                content += entity.post_content;
+                var content = entity.first_name + " ";
+                content += entity.last_name + " ";
+                content += entity.company + " ";
+                content += entity.area + " ";
+                content += entity.phone + " ";
+                content += entity.street + " ";
+                content += entity.apt + " ";
+                content += entity.city + " ";
+                content += entity.state + " ";
+                content += entity.zip + " ";
                 if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
                     continue;
-                }
-            }
-
-            if (!this.highlighted) {
-                if (entity.id == this.state.post_id) {
-                    entity.highlight = true;
-                    this.highlighted = true;
                 }
             }
 
@@ -391,9 +380,8 @@ var ListPanel = React.createClass({
     },
 	componentDidMount: function() {
         this.busy = false;
-        this.list_size = 12;
         this.getList();
-        this.interval = setInterval(this.getList, this.props.pollInterval);
+        this.interval = setInterval(this.getList, 5000);
 	},
     componentWillUnmount: function() {
         clearInterval(this.interval);
@@ -404,17 +392,14 @@ var ListPanel = React.createClass({
     render: function() {
         var handlers = this.getEventHandlers();
         return (
-            <div className="BoardListPanel box-shadow--3dp">
-                <Editor boardID={this.state.board_id} APIs={this.props.APIs} ref="editor" onEntityEdit={this.handleOnEntityEdit} />
+            <div className="AddressListPanel box-shadow--3dp">
+                <Editor ref="editor" APIs={this.props.APIs} onEntityEdit={this.handleOnEntityEdit} />
                 <div className="panel panel-primary">
                     <div className="panel-heading">
                         <ListToolbar onSearch={handlers.handleOnSearch} />
                     </div>
                     <div className="panel-body">
                         <List entities={this.getFilteredList()} onEntityEvents={handlers} />
-                    </div>
-                    <div className="panel-footer">
-                        <button type="button" className="ShowMoreButton btn btn-info btn-sm" onClick={this.handleOnClick}>Show more</button>
                     </div>
                 </div>
             </div>
@@ -432,10 +417,10 @@ var ListToolbar = React.createClass({
         return (
             <div className="container-fluid">
                 <div className="row">
-                    <div className="col-xs-4">
+                    <div className="col-xs-12">
                         <div className="inner-addon left-addon">
                             <i className="glyphicon glyphicon-search"></i>
-                            <Input placeholder="Search Posts" onChange={this.handleOnChange}></Input>
+                            <Input placeholder="Search Addresses" onChange={this.handleOnChange}></Input>
                         </div>
                     </div>
                 </div>
@@ -451,7 +436,7 @@ var List = React.createClass({
         for (var i in entities) {
             if (entities[i].show) {
                 rows.push(
-                    <div key={entities[i].id} className="col-xs-4">
+                    <div key={entities[i].id} className="col-xs-12">
                         <Entity entity={entities[i]} onEntityEvents={this.props.onEntityEvents} />
                     </div>
                 );
@@ -473,14 +458,23 @@ var List = React.createClass({
 });
 
 var Entity = React.createClass({
+    getCompany: function() {
+        var company = this.props.entity.company;
+        if (company) {
+            return (
+                <div>
+                    <hr className="Separator" />
+                    {company}
+                </div>
+            );
+        }
+        return null;
+    },
     render: function() {
         var entity = this.props.entity;
-        var time = Moment(entity.create_time).fromNow();
-        var className = "Board box-shadow--3dp";
-        if (entity.highlight || entity.edited) {
-            className = "animated pulse Board box-shadow--3dp";
-        } else if (entity.created) {
-            className = "animated flipInX Board box-shadow--3dp";
+        var className = "Address box-shadow--2dp";
+        if (entity.created) {
+            className = "animated flipInX Address box-shadow--2dp";
         }
         return (
             <div className={className}>
@@ -489,14 +483,15 @@ var Entity = React.createClass({
                         <Toolbar entity={entity} onEntityEvents={this.props.onEntityEvents} />
                     </div>
                     <div className="panel-body">
-                        <div className="ParagraphOverflow">
-                            <p className="PreLine">{entity.post_content}</p>
-                        </div>
-                    </div>
-                    <div className="panel-footer">
-                        <div>
-                            <span className="LabelFont label label-info">Posted on {time}</span>
-                        </div>
+                        <b>
+                            {entity.first_name + " " + entity.last_name}
+                            <span className="pull-right">{entity.area + entity.phone}</span>
+                        </b>
+                        {this.getCompany()}
+                        <hr className="Separator" />
+                        {entity.street + ", " + entity.apt}
+                        <hr className="Separator" />
+                        {entity.city + ", " + entity.state + ", " + entity.zip}
                     </div>
 				</div>
             </div>
@@ -511,47 +506,16 @@ var Toolbar = React.createClass({
     handleOnDelete: function() {
         this.props.onEntityEvents.handleOnDelete(this.props.entity);
     },
-    getTitle: function() {
-        if (this.props.user) {
-            if (this.props.entity.email) {
-                if (this.props.user.email === this.props.entity.email) {
-                    return (
-                        <div className="HalfTitle">
-                            {this.props.entity.title}
-                        </div>
-                    );
-                }
-            }
-        }
-        return (
-            <div className="FullTitle">
-                {this.props.entity.title}
-            </div>
-        );
-    },
-    getButtons: function() {
-        if (this.props.user) {
-            if (this.props.entity.email) {
-                if (this.props.user.email === this.props.entity.email) {
-                    return (
-                        <div className="pull-right">
-                            <button ref="edit" type="button" className="btn btn-info btn-xs" onClick={this.handleOnEdit}>
-                                <span className="glyphicon glyphicon-pencil" />
-                            </button>
-                            <button ref="delete" type="button" className="btn btn-info btn-xs" onClick={this.handleOnDelete}>
-                                <span className="glyphicon glyphicon-trash" />
-                            </button>
-                        </div>
-                    );
-                }
-            }
-        }
+    handleOnSwitch: function() {
+
     },
     render: function() {
         return (
-            <div className="BoardToolbar">
-                {this.getTitle()}
-                {this.getButtons()}
+            <div>
+                <button type="button" className="btn btn-warning btn-xs" onClick={this.handleOnEdit}>Edit</button>
+                <div className="pull-right">
+                    <Switch address={this.props.address} state={true} onSwitch={this.handleOnSwitch} />
+                </div>
             </div>
         );
     }
@@ -590,350 +554,15 @@ var Form = React.createClass({
             );
         }
     },
-    getButton: function() {
+    getSaveButton: function() {
         if (this.props.workInfo && this.props.workInfo.working) {
             return (
-                <button className="btn btn-info btn-block disabled" onClick={this.handleOnClick}>{this.props.workInfo.message}</button>
+                <button className="btn btn-warning btn-block disabled" onClick={this.handleOnClick}>{this.props.workInfo.message}</button>
             );
         }
         return (
-            <button className="btn btn-info btn-block" onClick={this.handleOnClick}>{this.props.button}</button>
+            <button className="btn btn-warning btn-block" onClick={this.handleOnClick}>{this.props.button}</button>
         );
-    },
-    render: function() {
-        var entity = {};
-        if (this.props.entity) {
-            entity = this.props.entity;
-        }
-        return (
-			<div className="UserInfoModal">
-				<div className="panel panel-primary">
-                    <div className="panel-heading">
-                        <h3 className="panel-title"><div className="Overflow">{this.props.title}</div></h3>
-                    </div>
-                    <div className="panel-body">
-                        <div className="form center-block">
-                            {this.getError()}
-                            <div className="form-group">
-                                <Input ref="title" placeholder="Post Title" size="input-md" onKeyDown={this.handleOnKeyDown}>{entity.title}</Input>
-                            </div>
-                            <div className="form-group">
-                                <textarea ref="content" className="form-control" placeholder="Write something..." rows="5" defaultValue={entity.post_content}></textarea>
-                            </div>
-                            <div className="UserInfoFormButton">
-                                <div className="form-group">
-                                    {this.getButton()}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-				</div>
-			</div>
-        );
-    }
-});
-
-var Create = React.createClass({
-    render: function() {
-        return (
-            <Form title="Create Post" workInfo={this.props.workInfo} button="Create" error={this.props.error} onClick={this.props.onCreate} onAlertDismiss={this.props.onAlertDismiss} />
-        );
-    }
-});
-
-var Edit = React.createClass({
-    render: function() {
-        return (
-            <Form entity={this.props.entity} title="Edit" workInfo={this.props.workInfo} button="Save" error={this.props.error} onClick={this.props.onEdit} onAlertDismiss={this.props.onAlertDismiss} />
-        );
-    }
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-var Dashboard = React.createClass({
-    getInitialState: function() {
-        return {
-            addresses: [
-                {
-                    show: true,
-                    id: 0,
-                    first_name: "Xu",
-                    last_name: "ZHANG",
-                    company: "",
-                    area: "831",
-                    phone: "2950944",
-                    street: "700 Koshland Way",
-                    apt: "A",
-                    city: "Santa Cruz",
-                    state: "CA",
-                    zip: "95060"
-                },
-                {
-                    show: true,
-                    id: 1,
-                    first_name: "Han",
-                    last_name: "Bai",
-                    company: "Zenefits",
-                    area: "831",
-                    phone: "2950944",
-                    street: "701 Koshland Way",
-                    apt: "B",
-                    city: "Santa Cruz",
-                    state: "CA",
-                    zip: "95061"
-                },
-                {
-                    show: true,
-                    id: 2,
-                    first_name: "Yue",
-                    last_name: "Tian",
-                    company: "Zenefits",
-                    area: "831",
-                    phone: "2950944",
-                    street: "702 Koshland Way",
-                    apt: "C",
-                    city: "Santa Cruz",
-                    state: "CA",
-                    zip: "95062"
-                }
-            ],
-            editing: null,
-            keyword: ""
-        };
-    },
-    getButtons: function() {
-        return {
-            left: [
-                {
-                    onClick: function() {
-                        this.refs.create.toggle();
-                    }.bind(this),
-                    text: "Create"
-                },
-                {
-                    onClick: function() {
-                        console.log("Settings.");
-                    }.bind(this),
-                    text: "Settings"
-                }
-            ],
-            right: [
-                {
-                    onClick: function() {
-                        console.log("Logging out.");
-                    }.bind(this),
-                    text: "Log out"
-                }
-            ]
-        };
-    },
-    getEventHandlers: function() {
-        return {
-            handleSearch: function(e) {
-                this.setState(e);
-            }.bind(this),
-            handleEdit: function(e) {
-                this.setState({
-                    editing: e
-                });
-                this.refs.edit.toggle();
-            }.bind(this)
-        };
-    },
-    handleOnSave: function(e) {
-
-    },
-    handleOnDelete: function(e) {
-
-    },
-    getAddresses: function() {
-        var addresses = this.state.addresses;
-        for (var i in addresses) {
-            var address = addresses[i];
-            address.show = false;
-
-            if (this.state.keyword.trim() !== "") {
-                var content = address.first_name + " ";
-                content += address.last_name + " ";
-                content += address.company + " ";
-                content += address.area + " ";
-                content += address.phone + " ";
-                content += address.street + " ";
-                content += address.apt + " ";
-                content += address.city + " ";
-                content += address.state + " ";
-                content += address.zip + " ";
-                if (content.toLowerCase().indexOf(this.state.keyword.toLowerCase()) === -1) {
-                    continue;
-                }
-            }
-
-            address.show = true;
-        }
-        return addresses;
-    },
-    render: function() {
-        return (
-			<div>
-				<Modal ref="create" type="WaveModal">
-                    <Create onSave={this.handleOnSave} />
-                </Modal>
-                <Modal ref="edit" type="WaveModal" >
-                    <Edit onSave={this.handleOnSave} onDelete={this.handleOnDelete} address={this.state.editing} />
-                </Modal>
-				<Navbar ref="navbar" buttons={this.getButtons()} />
-                <AddressListPanel addresses={this.getAddresses()} eventHandlers={this.getEventHandlers()} />
-			</div>
-        );
-    }
-});
-
-var AddressListPanel = React.createClass({
-    render: function() {
-        return (
-            <div>
-                <div className="AddressListPanel box-shadow--3dp">
-                    <div className="panel panel-primary">
-                        <div className="panel-heading">
-                            <AddressListToolbar onSearch={this.props.eventHandlers.handleSearch} />
-                        </div>
-                        <div className="panel-body">
-                            <AddressList addresses={this.props.addresses} onEdit={this.props.eventHandlers.handleEdit} />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-});
-
-var AddressListToolbar = React.createClass({
-    handleOnChange: function(e) {
-        this.props.onSearch({
-            keyword: e
-        });
-    },
-    render: function() {
-        return (
-            <div>
-                <SearchTextBox onChange={this.handleOnChange}/>
-            </div>
-        );
-    }
-});
-
-var SearchTextBox = React.createClass({
-    render: function() {
-        return (
-            <div className="inner-addon left-addon">
-                <i className="glyphicon glyphicon-search"></i>
-                <Input placeholder="Search Addresses" onChange={this.props.onChange}></Input>
-            </div>
-        );
-    }
-});
-
-var AddressList = React.createClass({
-    getAddresses: function() {
-        var rows = [];
-        var addresses = this.props.addresses;
-        for (var i in addresses) {
-            if (addresses[i].show) {
-                rows.push(<Address key={i} address={addresses[i]} onEdit={this.props.onEdit} />);
-            }
-        }
-        return rows;
-    },
-    render: function() {
-        return (
-            <div>
-                {this.getAddresses()}
-            </div>
-        );
-    }
-});
-
-var Address = React.createClass({
-    getCompany: function() {
-        var company = this.props.address.company;
-        if (company) {
-            return (
-                <div>
-                    <hr className="Separator" />
-                    {company}
-                </div>
-            );
-        }
-        return null;
-    },
-    render: function() {
-        var address = this.props.address;
-        var company = "";
-        if (address.company) {
-            company = address.company + ", ";
-        }
-        return (
-            <div className="Address box-shadow--2dp">
-				<div className="panel panel-primary">
-                    <div className="panel-heading">
-                        <AddressToolbar address={this.props.address} onEdit={this.props.onEdit} />
-                    </div>
-                    <div className="panel-body">
-                        <b>
-                            {address.first_name + " " + address.last_name}
-                            <span className="pull-right">{address.area + address.phone}</span>
-                        </b>
-                        {this.getCompany()}
-                        <hr className="Separator" />
-                        {address.street + ", " + address.apt}
-                        <hr className="Separator" />
-                        {address.city + ", " + address.state + ", " + address.zip}
-                    </div>
-				</div>
-            </div>
-        );
-    }
-});
-
-var AddressToolbar = React.createClass({
-    handleOnClick: function() {
-        this.props.onEdit(this.props.address);
-    },
-    handleOnSwitch: function() {
-
-    },
-    render: function() {
-        return (
-            <div>
-                <button type="button" className="btn btn-warning btn-xs" onClick={this.handleOnClick}>Edit</button>
-                <div className="pull-right">
-                    <Switch address={this.props.address} state={true} onSwitch={this.handleOnSwitch} />
-                </div>
-            </div>
-        );
-    }
-});
-
-var AddressEditModal = React.createClass({
-    handleOnSave: function() {
-        this.props.onSave(this.getAddress());
-    },
-    handleOnDelete: function() {
-        this.props.onDelete(this.props.address);
-    },
-    getAddress: function() {
-        return null;
     },
     getButtons: function() {
         if (this.props.delete) {
@@ -943,20 +572,18 @@ var AddressEditModal = React.createClass({
                         <button className="btn btn-danger btn-block" onClick={this.props.handleOnDelete}>Delete</button>
                     </div>
                     <div className="col-xs-6 LeftExtend">
-                        <button className="btn btn-warning btn-block" onClick={this.props.handleOnSave}>Save</button>
+                        {this.getSaveButton()}
                     </div>
                 </div>
             );
         } else {
-            return (
-                <button className="btn btn-warning btn-block" onClick={this.props.handleOnSave}>Save</button>
-            );
+            return this.getSaveButton();
         }
     },
 	render: function() {
-        var address = {};
-        if (this.props.address) {
-            address = this.props.address;
+        var entity = {};
+        if (this.props.entity) {
+            entity = this.props.entity;
         }
 		return (
 			<div className="AddressEditModal">
@@ -971,42 +598,42 @@ var AddressEditModal = React.createClass({
                             <div className="form-group">
                                 <div className="row">
                                     <div className="col-xs-6 RightExtend">
-                                        <Input placeholder="First Name">{address.first_name}</Input>
+                                        <Input placeholder="First Name">{entity.first_name}</Input>
                                     </div>
                                     <div className="col-xs-6 LeftExtend">
-                                        <Input placeholder="Last Name">{address.last_name}</Input>
+                                        <Input placeholder="Last Name">{entity.last_name}</Input>
                                     </div>
                                 </div>
                             </div>
                             <div className="form-group">
-                                <Input placeholder="Company Name (optional)">{address.company}</Input>
+                                <Input placeholder="Company Name (optional)">{entity.company}</Input>
                             </div>
                             <div className="form-group">
                                 <div className="row">
                                     <div className="col-xs-6 RightExtend">
-                                        <Input placeholder="Area Code">{address.area}</Input>
+                                        <Input placeholder="Area Code">{entity.area}</Input>
                                     </div>
                                     <div className="col-xs-6 LeftExtend">
-                                        <Input placeholder="Primary Phone">{address.phone}</Input>
+                                        <Input placeholder="Primary Phone">{entity.phone}</Input>
                                     </div>
                                 </div>
                             </div>
                             <div className="form-group">
-                                <Input placeholder="Street Address">{address.street}</Input>
+                                <Input placeholder="Street Address">{entity.street}</Input>
                             </div>
                             <div className="form-group">
-                                <Input placeholder="Apt, Suite, Bldg. (optional)">{address.apt}</Input>
+                                <Input placeholder="Apt, Suite, Bldg. (optional)">{entity.apt}</Input>
                             </div>
                             <div className="form-group">
                                 <div className="row">
                                     <div className="col-xs-4 RightExtend">
-                                        <Input placeholder="City">{address.city}</Input>
+                                        <Input placeholder="City">{entity.city}</Input>
                                     </div>
                                     <div className="col-xs-4 Extend">
-                                        <Input placeholder="State">{address.state}</Input>
+                                        <Input placeholder="State">{entity.state}</Input>
                                     </div>
                                     <div className="col-xs-4 LeftExtend">
-                                        <Input placeholder="ZIP Code">{address.zip}</Input>
+                                        <Input placeholder="ZIP Code">{entity.zip}</Input>
                                     </div>
                                 </div>
                             </div>
@@ -1019,6 +646,22 @@ var AddressEditModal = React.createClass({
 			</div>
 		);
 	}
+});
+
+var Create = React.createClass({
+    render: function() {
+        return (
+            <Form title="Create Post" workInfo={this.props.workInfo} button="Create" error={this.props.error} onClick={this.props.onCreate} onAlertDismiss={this.props.onAlertDismiss} />
+        );
+    }
+});
+
+var Edit = React.createClass({
+    render: function() {
+        return (
+            <Form entity={this.props.entity} delete={true} title="Edit" workInfo={this.props.workInfo} button="Save" error={this.props.error} onClick={this.props.onEdit} onAlertDismiss={this.props.onAlertDismiss} />
+        );
+    }
 });
 
 ReactDOM.render(

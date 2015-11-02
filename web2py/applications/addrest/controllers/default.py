@@ -30,6 +30,10 @@ def get_user():
     }
 
 
+def get_api():
+    return dict()
+
+
 def get_addresses():
     return {
         'addresses': [
