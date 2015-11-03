@@ -8,7 +8,13 @@ var Navbar = React.createClass({
         return {
             user: null,
             error: {},
-            work_info: {}
+            work_info: {},
+            APIs: {
+                login: "login",
+                signup: "signup",
+                logout: "logout",
+                get_user: "get_user"
+            }
         };
     },
     handleOnAlertDismiss: function() {
@@ -38,19 +44,6 @@ var Navbar = React.createClass({
         }
 
         this.signup(email, password);
-    },
-    setUser: function(user) {
-        if (user === null && this.state.user === null || user !== null && this.state.user !== null) {
-            return;
-        }
-        if (user !== null || this.state.user !== null) {
-            this.setState({
-                user: user
-            });
-            if (this.props.onUserChanged) {
-                this.props.onUserChanged(user);
-            }
-        }
     },
     setError: function(worker, message) {
         var error = {};
@@ -101,14 +94,13 @@ var Navbar = React.createClass({
                 this.refs.signup.hide();
                 this.refs.login.hide();
                 this.getUser();
-                this.props.onNavbarEvents("login");
             }
         }.bind(this);
 
         var delay = function() {
             $.ajax({
                 type: 'POST',
-                url: this.props.APIs.login,
+                url: this.state.APIs.login,
                 data: data,
                 success: callback
             });
@@ -136,7 +128,7 @@ var Navbar = React.createClass({
         var delay = function() {
             $.ajax({
                 type: 'POST',
-                url: this.props.APIs.signup,
+                url: this.state.APIs.signup,
                 data: data,
                 success: callback
             });
@@ -147,16 +139,15 @@ var Navbar = React.createClass({
     logout: function() {
         this.work("logout", true, "Goodbye...");
 
-        var callback = function(data) {
+        var callback = function() {
             this.stopWork();
             this.getUser();
-            this.props.onNavbarEvents("logout");
         }.bind(this);
 
         var delay = function() {
             $.ajax({
                 type: 'POST',
-                url: this.props.APIs.logout,
+                url: this.state.APIs.logout,
                 success: callback
             });
         }.bind(this);
@@ -166,12 +157,27 @@ var Navbar = React.createClass({
     getUser: function() {
         $.ajax({
             type: 'POST',
-            url: this.props.APIs.get_user,
+            url: this.state.APIs.get_user,
             success: function(data) {
-                if (this.props.actionIfUserIsNull) {
-                    this.props.actionIfUserIsNull();
+                if (data.result.user === null) {
+                    if (this.props.nullUserAction) {
+                        this.props.nullUserAction();
+                    }
+                    return;
                 }
-                this.setUser(data.result.user);
+                // We only set user's state when user is null.
+                if (this.state.user === null) {
+                    if (this.props.onUserLoggedIn) {
+                        this.props.onUserLoggedIn(data.result.user);
+                    }
+                    this.setState({
+                        user: data.result.user
+                    });
+                }
+                // If user changes, then we refresh page.
+                if (data.result.user.id !== this.state.user.id) {
+                    location.reload();
+                }
             }.bind(this)
         });
     },
@@ -255,7 +261,7 @@ var NavbarButton = React.createClass({
     getButton: function() {
         if (this.props.workInfo && this.props.workInfo.working) {
             return (
-                <button type="button" className="animated bounceIn btn btn-warning disabled" onClick={this.props.onClick}>{this.props.workInfo.message}</button>
+                <button type="button" className="animated bounceIn btn btn-warning disabled">{this.props.workInfo.message}</button>
             );
         }
         return (
@@ -300,7 +306,7 @@ var UserInfoForm = React.createClass({
     getButton: function() {
         if (this.props.workInfo && this.props.workInfo.working) {
             return (
-                <button className="btn btn-warning btn-block disabled" onClick={this.handleOnClick}>{this.props.workInfo.message}</button>
+                <button className="btn btn-warning btn-block disabled">{this.props.workInfo.message}</button>
             );
         }
         return (
@@ -361,11 +367,11 @@ var Modal = React.createClass({
         var callback = function() {
             var input = $('#Modal-Content').find('input[type=text]');
             if (input.length > 0) {
-                input.focus();
+                input[0].focus();
             } else {
                 var button = $('#Modal-Content').find('button');
                 if (button.length > 0) {
-                    button.focus();
+                    button[0].focus();
                 }
             }
         };
@@ -473,9 +479,6 @@ var DismissibleAlert = React.createClass({
 
 var ConfirmWindow = React.createClass({
     handleOnClick: function(e) {
-        if (this.props.workInfo && this.props.workInfo.working) {
-            return;
-        }
         var yes = ReactDOM.findDOMNode(this.refs.yes);
         var no = ReactDOM.findDOMNode(this.refs.no);
         if (e.target === yes) {
@@ -494,7 +497,7 @@ var ConfirmWindow = React.createClass({
     getButton: function() {
         if (this.props.workInfo && this.props.workInfo.working) {
             return (
-                <button ref="yes" className="btn btn-warning btn-block disabled" onClick={this.handleOnClick}>{this.props.workInfo.message}</button>
+                <button ref="yes" className="btn btn-warning btn-block disabled">{this.props.workInfo.message}</button>
             );
         }
         return (

@@ -13,20 +13,15 @@ var Index = React.createClass({
     getInitialState: function() {
         return {
             get_api_api: "get_api",
-            navbar_api: {
-                login: "login",
-                signup: "signup",
-                logout: "logout",
-                get_user: "get_user"
-            },
             APIs: {}
         };
     },
-    handleNavbarEvents: function(type) {
+    handleOnUserLoggedIn: function(user) {
+        this.getAPIs();
         this.refs.listPanel.getList();
     },
-    handleOnUserChanged: function(user) {
-        this.getAPIs();
+    handleNullUserAction: function() {
+        window.location.replace("/");
     },
     getAPIs: function() {
         $.ajax({
@@ -53,8 +48,8 @@ var Index = React.createClass({
 	render: function() {
 		return (
 			<div>
-				<Navbar ref="navbar" APIs={this.state.navbar_api} title="Addrest" buttons={this.getButtons()} onNavbarEvents={this.handleNavbarEvents} onUserChanged={this.handleOnUserChanged} />
-                <ListPanel ref="listPanel" pollInterval={this.props.pollInterval} APIs={this.state.APIs} />
+				<Navbar ref="navbar" title="Addrest" buttons={this.getButtons()} onUserLoggedIn={this.handleOnUserLoggedIn} nullUserAction={this.handleNullUserAction} />
+                <ListPanel ref="listPanel" APIs={this.state.APIs} />
 			</div>
 		);
 	}
@@ -514,7 +509,7 @@ var Toolbar = React.createClass({
             <div>
                 <button type="button" className="btn btn-warning btn-xs" onClick={this.handleOnEdit}>Edit</button>
                 <div className="pull-right">
-                    <Switch address={this.props.address} state={true} onSwitch={this.handleOnSwitch} />
+                    <Switch entity={this.props.entity} state={true} onSwitch={this.handleOnSwitch} />
                 </div>
             </div>
         );
@@ -524,11 +519,26 @@ var Toolbar = React.createClass({
 var Form = React.createClass({
     handleOnKeyDown: function(e) {
         if (e.keyCode === 13) {
-            var title = ReactDOM.findDOMNode(this.refs.title);
-            if (e.target === title) {
-                var content = ReactDOM.findDOMNode(this.refs.content);
-                content.focus();
-                e.preventDefault();
+            if (e.target === ReactDOM.findDOMNode(this.refs.firstName)) {
+                ReactDOM.findDOMNode(this.refs.lastName).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.lastName)) {
+                ReactDOM.findDOMNode(this.refs.company).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.company)) {
+                ReactDOM.findDOMNode(this.refs.area).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.area)) {
+                ReactDOM.findDOMNode(this.refs.phone).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.phone)) {
+                ReactDOM.findDOMNode(this.refs.street).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.street)) {
+                ReactDOM.findDOMNode(this.refs.apt).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.apt)) {
+                ReactDOM.findDOMNode(this.refs.city).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.city)) {
+                ReactDOM.findDOMNode(this.refs.state).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.state)) {
+                ReactDOM.findDOMNode(this.refs.zip).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.zip)) {
+                this.submit();
             }
         }
     },
@@ -557,7 +567,7 @@ var Form = React.createClass({
     getSaveButton: function() {
         if (this.props.workInfo && this.props.workInfo.working) {
             return (
-                <button className="btn btn-warning btn-block disabled" onClick={this.handleOnClick}>{this.props.workInfo.message}</button>
+                <button className="btn btn-warning btn-block disabled">{this.props.workInfo.message}</button>
             );
         }
         return (
@@ -594,53 +604,53 @@ var Form = React.createClass({
                         </div>
                     </div>
                     <div className="panel-body">
-                        <form className="form center-block">
+                        <div className="form center-block">
                             <div className="form-group">
                                 <div className="row">
                                     <div className="col-xs-6 RightExtend">
-                                        <Input placeholder="First Name">{entity.first_name}</Input>
+                                        <Input ref="firstName" placeholder="First Name" onKeyDown={this.handleOnKeyDown}>{entity.first_name}</Input>
                                     </div>
                                     <div className="col-xs-6 LeftExtend">
-                                        <Input placeholder="Last Name">{entity.last_name}</Input>
+                                        <Input ref="lastName" placeholder="Last Name" onKeyDown={this.handleOnKeyDown}>{entity.last_name}</Input>
                                     </div>
                                 </div>
                             </div>
                             <div className="form-group">
-                                <Input placeholder="Company Name (optional)">{entity.company}</Input>
+                                <Input ref="company" placeholder="Company Name (optional)" onKeyDown={this.handleOnKeyDown}>{entity.company}</Input>
                             </div>
                             <div className="form-group">
                                 <div className="row">
                                     <div className="col-xs-6 RightExtend">
-                                        <Input placeholder="Area Code">{entity.area}</Input>
+                                        <Input ref="area" placeholder="Area Code" onKeyDown={this.handleOnKeyDown}>{entity.area}</Input>
                                     </div>
                                     <div className="col-xs-6 LeftExtend">
-                                        <Input placeholder="Primary Phone">{entity.phone}</Input>
+                                        <Input ref="phone" placeholder="Primary Phone" onKeyDown={this.handleOnKeyDown}>{entity.phone}</Input>
                                     </div>
                                 </div>
                             </div>
                             <div className="form-group">
-                                <Input placeholder="Street Address">{entity.street}</Input>
+                                <Input ref="street" placeholder="Street Address" onKeyDown={this.handleOnKeyDown}>{entity.street}</Input>
                             </div>
                             <div className="form-group">
-                                <Input placeholder="Apt, Suite, Bldg. (optional)">{entity.apt}</Input>
+                                <Input ref="apt" placeholder="Apt, Suite, Bldg. (optional)" onKeyDown={this.handleOnKeyDown}>{entity.apt}</Input>
                             </div>
                             <div className="form-group">
                                 <div className="row">
                                     <div className="col-xs-4 RightExtend">
-                                        <Input placeholder="City">{entity.city}</Input>
+                                        <Input ref="city" placeholder="City" onKeyDown={this.handleOnKeyDown}>{entity.city}</Input>
                                     </div>
                                     <div className="col-xs-4 Extend">
-                                        <Input placeholder="State">{entity.state}</Input>
+                                        <Input ref="state" placeholder="State" onKeyDown={this.handleOnKeyDown}>{entity.state}</Input>
                                     </div>
                                     <div className="col-xs-4 LeftExtend">
-                                        <Input placeholder="ZIP Code">{entity.zip}</Input>
+                                        <Input ref="zip" placeholder="ZIP Code" onKeyDown={this.handleOnKeyDown}>{entity.zip}</Input>
                                     </div>
                                 </div>
                             </div>
                             <div className="form-group">
                                 {this.getButtons()}
                             </div>
-                        </form>
+                        </div>
                     </div>
 				</div>
 			</div>

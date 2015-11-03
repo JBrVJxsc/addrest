@@ -38431,7 +38431,13 @@ var Navbar = React.createClass({
         return {
             user: null,
             error: {},
-            work_info: {}
+            work_info: {},
+            APIs: {
+                login: "login",
+                signup: "signup",
+                logout: "logout",
+                get_user: "get_user"
+            }
         };
     },
     handleOnAlertDismiss: function handleOnAlertDismiss() {
@@ -38461,19 +38467,6 @@ var Navbar = React.createClass({
         }
 
         this.signup(email, password);
-    },
-    setUser: function setUser(user) {
-        if (user === null && this.state.user === null || user !== null && this.state.user !== null) {
-            return;
-        }
-        if (user !== null || this.state.user !== null) {
-            this.setState({
-                user: user
-            });
-            if (this.props.onUserChanged) {
-                this.props.onUserChanged(user);
-            }
-        }
     },
     setError: function setError(worker, message) {
         var error = {};
@@ -38524,14 +38517,13 @@ var Navbar = React.createClass({
                 this.refs.signup.hide();
                 this.refs.login.hide();
                 this.getUser();
-                this.props.onNavbarEvents("login");
             }
         }).bind(this);
 
         var delay = (function () {
             $.ajax({
                 type: 'POST',
-                url: this.props.APIs.login,
+                url: this.state.APIs.login,
                 data: data,
                 success: callback
             });
@@ -38559,7 +38551,7 @@ var Navbar = React.createClass({
         var delay = (function () {
             $.ajax({
                 type: 'POST',
-                url: this.props.APIs.signup,
+                url: this.state.APIs.signup,
                 data: data,
                 success: callback
             });
@@ -38570,16 +38562,15 @@ var Navbar = React.createClass({
     logout: function logout() {
         this.work("logout", true, "Goodbye...");
 
-        var callback = (function (data) {
+        var callback = (function () {
             this.stopWork();
             this.getUser();
-            this.props.onNavbarEvents("logout");
         }).bind(this);
 
         var delay = (function () {
             $.ajax({
                 type: 'POST',
-                url: this.props.APIs.logout,
+                url: this.state.APIs.logout,
                 success: callback
             });
         }).bind(this);
@@ -38589,12 +38580,27 @@ var Navbar = React.createClass({
     getUser: function getUser() {
         $.ajax({
             type: 'POST',
-            url: this.props.APIs.get_user,
+            url: this.state.APIs.get_user,
             success: (function (data) {
-                if (this.props.actionIfUserIsNull) {
-                    this.props.actionIfUserIsNull();
+                if (data.result.user === null) {
+                    if (this.props.nullUserAction) {
+                        this.props.nullUserAction();
+                    }
+                    return;
                 }
-                this.setUser(data.result.user);
+                // We only set user's state when user is null.
+                if (this.state.user === null) {
+                    if (this.props.onUserLoggedIn) {
+                        this.props.onUserLoggedIn(data.result.user);
+                    }
+                    this.setState({
+                        user: data.result.user
+                    });
+                }
+                // If user changes, then we refresh page.
+                if (data.result.user.id !== this.state.user.id) {
+                    location.reload();
+                }
             }).bind(this)
         });
     },
@@ -38706,7 +38712,7 @@ var NavbarButton = React.createClass({
         if (this.props.workInfo && this.props.workInfo.working) {
             return React.createElement(
                 'button',
-                { type: 'button', className: 'animated bounceIn btn btn-warning disabled', onClick: this.props.onClick },
+                { type: 'button', className: 'animated bounceIn btn btn-warning disabled' },
                 this.props.workInfo.message
             );
         }
@@ -38755,7 +38761,7 @@ var UserInfoForm = React.createClass({
         if (this.props.workInfo && this.props.workInfo.working) {
             return React.createElement(
                 'button',
-                { className: 'btn btn-warning btn-block disabled', onClick: this.handleOnClick },
+                { className: 'btn btn-warning btn-block disabled' },
                 this.props.workInfo.message
             );
         }
@@ -38841,11 +38847,11 @@ var Modal = React.createClass({
         var callback = function callback() {
             var input = $('#Modal-Content').find('input[type=text]');
             if (input.length > 0) {
-                input.focus();
+                input[0].focus();
             } else {
                 var button = $('#Modal-Content').find('button');
                 if (button.length > 0) {
-                    button.focus();
+                    button[0].focus();
                 }
             }
         };
@@ -38975,9 +38981,6 @@ var ConfirmWindow = React.createClass({
     displayName: 'ConfirmWindow',
 
     handleOnClick: function handleOnClick(e) {
-        if (this.props.workInfo && this.props.workInfo.working) {
-            return;
-        }
         var yes = ReactDOM.findDOMNode(this.refs.yes);
         var no = ReactDOM.findDOMNode(this.refs.no);
         if (e.target === yes) {
@@ -38995,7 +38998,7 @@ var ConfirmWindow = React.createClass({
         if (this.props.workInfo && this.props.workInfo.working) {
             return React.createElement(
                 'button',
-                { ref: 'yes', className: 'btn btn-warning btn-block disabled', onClick: this.handleOnClick },
+                { ref: 'yes', className: 'btn btn-warning btn-block disabled' },
                 this.props.workInfo.message
             );
         }
@@ -39102,20 +39105,15 @@ var Index = React.createClass({
     getInitialState: function getInitialState() {
         return {
             get_api_api: "get_api",
-            navbar_api: {
-                login: "login",
-                signup: "signup",
-                logout: "logout",
-                get_user: "get_user"
-            },
             APIs: {}
         };
     },
-    handleNavbarEvents: function handleNavbarEvents(type) {
+    handleOnUserLoggedIn: function handleOnUserLoggedIn(user) {
+        this.getAPIs();
         this.refs.listPanel.getList();
     },
-    handleOnUserChanged: function handleOnUserChanged(user) {
-        this.getAPIs();
+    handleNullUserAction: function handleNullUserAction() {
+        window.location.replace("/");
     },
     getAPIs: function getAPIs() {
         $.ajax({
@@ -39143,8 +39141,8 @@ var Index = React.createClass({
         return React.createElement(
             'div',
             null,
-            React.createElement(Navbar, { ref: 'navbar', APIs: this.state.navbar_api, title: 'Addrest', buttons: this.getButtons(), onNavbarEvents: this.handleNavbarEvents, onUserChanged: this.handleOnUserChanged }),
-            React.createElement(ListPanel, { ref: 'listPanel', pollInterval: this.props.pollInterval, APIs: this.state.APIs })
+            React.createElement(Navbar, { ref: 'navbar', title: 'Addrest', buttons: this.getButtons(), onUserLoggedIn: this.handleOnUserLoggedIn, nullUserAction: this.handleNullUserAction }),
+            React.createElement(ListPanel, { ref: 'listPanel', APIs: this.state.APIs })
         );
     }
 });
@@ -39654,7 +39652,7 @@ var Toolbar = React.createClass({
             React.createElement(
                 'div',
                 { className: 'pull-right' },
-                React.createElement(Switch, { address: this.props.address, state: true, onSwitch: this.handleOnSwitch })
+                React.createElement(Switch, { entity: this.props.entity, state: true, onSwitch: this.handleOnSwitch })
             )
         );
     }
@@ -39665,11 +39663,26 @@ var Form = React.createClass({
 
     handleOnKeyDown: function handleOnKeyDown(e) {
         if (e.keyCode === 13) {
-            var title = ReactDOM.findDOMNode(this.refs.title);
-            if (e.target === title) {
-                var content = ReactDOM.findDOMNode(this.refs.content);
-                content.focus();
-                e.preventDefault();
+            if (e.target === ReactDOM.findDOMNode(this.refs.firstName)) {
+                ReactDOM.findDOMNode(this.refs.lastName).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.lastName)) {
+                ReactDOM.findDOMNode(this.refs.company).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.company)) {
+                ReactDOM.findDOMNode(this.refs.area).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.area)) {
+                ReactDOM.findDOMNode(this.refs.phone).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.phone)) {
+                ReactDOM.findDOMNode(this.refs.street).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.street)) {
+                ReactDOM.findDOMNode(this.refs.apt).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.apt)) {
+                ReactDOM.findDOMNode(this.refs.city).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.city)) {
+                ReactDOM.findDOMNode(this.refs.state).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.state)) {
+                ReactDOM.findDOMNode(this.refs.zip).focus();
+            } else if (e.target === ReactDOM.findDOMNode(this.refs.zip)) {
+                this.submit();
             }
         }
     },
@@ -39697,7 +39710,7 @@ var Form = React.createClass({
         if (this.props.workInfo && this.props.workInfo.working) {
             return React.createElement(
                 'button',
-                { className: 'btn btn-warning btn-block disabled', onClick: this.handleOnClick },
+                { className: 'btn btn-warning btn-block disabled' },
                 this.props.workInfo.message
             );
         }
@@ -39759,7 +39772,7 @@ var Form = React.createClass({
                     'div',
                     { className: 'panel-body' },
                     React.createElement(
-                        'form',
+                        'div',
                         { className: 'form center-block' },
                         React.createElement(
                             'div',
@@ -39772,7 +39785,7 @@ var Form = React.createClass({
                                     { className: 'col-xs-6 RightExtend' },
                                     React.createElement(
                                         Input,
-                                        { placeholder: 'First Name' },
+                                        { ref: 'firstName', placeholder: 'First Name', onKeyDown: this.handleOnKeyDown },
                                         entity.first_name
                                     )
                                 ),
@@ -39781,7 +39794,7 @@ var Form = React.createClass({
                                     { className: 'col-xs-6 LeftExtend' },
                                     React.createElement(
                                         Input,
-                                        { placeholder: 'Last Name' },
+                                        { ref: 'lastName', placeholder: 'Last Name', onKeyDown: this.handleOnKeyDown },
                                         entity.last_name
                                     )
                                 )
@@ -39792,7 +39805,7 @@ var Form = React.createClass({
                             { className: 'form-group' },
                             React.createElement(
                                 Input,
-                                { placeholder: 'Company Name (optional)' },
+                                { ref: 'company', placeholder: 'Company Name (optional)', onKeyDown: this.handleOnKeyDown },
                                 entity.company
                             )
                         ),
@@ -39807,7 +39820,7 @@ var Form = React.createClass({
                                     { className: 'col-xs-6 RightExtend' },
                                     React.createElement(
                                         Input,
-                                        { placeholder: 'Area Code' },
+                                        { ref: 'area', placeholder: 'Area Code', onKeyDown: this.handleOnKeyDown },
                                         entity.area
                                     )
                                 ),
@@ -39816,7 +39829,7 @@ var Form = React.createClass({
                                     { className: 'col-xs-6 LeftExtend' },
                                     React.createElement(
                                         Input,
-                                        { placeholder: 'Primary Phone' },
+                                        { ref: 'phone', placeholder: 'Primary Phone', onKeyDown: this.handleOnKeyDown },
                                         entity.phone
                                     )
                                 )
@@ -39827,7 +39840,7 @@ var Form = React.createClass({
                             { className: 'form-group' },
                             React.createElement(
                                 Input,
-                                { placeholder: 'Street Address' },
+                                { ref: 'street', placeholder: 'Street Address', onKeyDown: this.handleOnKeyDown },
                                 entity.street
                             )
                         ),
@@ -39836,7 +39849,7 @@ var Form = React.createClass({
                             { className: 'form-group' },
                             React.createElement(
                                 Input,
-                                { placeholder: 'Apt, Suite, Bldg. (optional)' },
+                                { ref: 'apt', placeholder: 'Apt, Suite, Bldg. (optional)', onKeyDown: this.handleOnKeyDown },
                                 entity.apt
                             )
                         ),
@@ -39851,7 +39864,7 @@ var Form = React.createClass({
                                     { className: 'col-xs-4 RightExtend' },
                                     React.createElement(
                                         Input,
-                                        { placeholder: 'City' },
+                                        { ref: 'city', placeholder: 'City', onKeyDown: this.handleOnKeyDown },
                                         entity.city
                                     )
                                 ),
@@ -39860,7 +39873,7 @@ var Form = React.createClass({
                                     { className: 'col-xs-4 Extend' },
                                     React.createElement(
                                         Input,
-                                        { placeholder: 'State' },
+                                        { ref: 'state', placeholder: 'State', onKeyDown: this.handleOnKeyDown },
                                         entity.state
                                     )
                                 ),
@@ -39869,7 +39882,7 @@ var Form = React.createClass({
                                     { className: 'col-xs-4 LeftExtend' },
                                     React.createElement(
                                         Input,
-                                        { placeholder: 'ZIP Code' },
+                                        { ref: 'zip', placeholder: 'ZIP Code', onKeyDown: this.handleOnKeyDown },
                                         entity.zip
                                     )
                                 )

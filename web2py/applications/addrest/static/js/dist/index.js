@@ -35235,7 +35235,13 @@ var Navbar = React.createClass({
         return {
             user: null,
             error: {},
-            work_info: {}
+            work_info: {},
+            APIs: {
+                login: "login",
+                signup: "signup",
+                logout: "logout",
+                get_user: "get_user"
+            }
         };
     },
     handleOnAlertDismiss: function handleOnAlertDismiss() {
@@ -35265,19 +35271,6 @@ var Navbar = React.createClass({
         }
 
         this.signup(email, password);
-    },
-    setUser: function setUser(user) {
-        if (user === null && this.state.user === null || user !== null && this.state.user !== null) {
-            return;
-        }
-        if (user !== null || this.state.user !== null) {
-            this.setState({
-                user: user
-            });
-            if (this.props.onUserChanged) {
-                this.props.onUserChanged(user);
-            }
-        }
     },
     setError: function setError(worker, message) {
         var error = {};
@@ -35328,14 +35321,13 @@ var Navbar = React.createClass({
                 this.refs.signup.hide();
                 this.refs.login.hide();
                 this.getUser();
-                this.props.onNavbarEvents("login");
             }
         }).bind(this);
 
         var delay = (function () {
             $.ajax({
                 type: 'POST',
-                url: this.props.APIs.login,
+                url: this.state.APIs.login,
                 data: data,
                 success: callback
             });
@@ -35363,7 +35355,7 @@ var Navbar = React.createClass({
         var delay = (function () {
             $.ajax({
                 type: 'POST',
-                url: this.props.APIs.signup,
+                url: this.state.APIs.signup,
                 data: data,
                 success: callback
             });
@@ -35374,16 +35366,15 @@ var Navbar = React.createClass({
     logout: function logout() {
         this.work("logout", true, "Goodbye...");
 
-        var callback = (function (data) {
+        var callback = (function () {
             this.stopWork();
             this.getUser();
-            this.props.onNavbarEvents("logout");
         }).bind(this);
 
         var delay = (function () {
             $.ajax({
                 type: 'POST',
-                url: this.props.APIs.logout,
+                url: this.state.APIs.logout,
                 success: callback
             });
         }).bind(this);
@@ -35393,12 +35384,27 @@ var Navbar = React.createClass({
     getUser: function getUser() {
         $.ajax({
             type: 'POST',
-            url: this.props.APIs.get_user,
+            url: this.state.APIs.get_user,
             success: (function (data) {
-                if (this.props.actionIfUserIsNull) {
-                    this.props.actionIfUserIsNull();
+                if (data.result.user === null) {
+                    if (this.props.nullUserAction) {
+                        this.props.nullUserAction();
+                    }
+                    return;
                 }
-                this.setUser(data.result.user);
+                // We only set user's state when user is null.
+                if (this.state.user === null) {
+                    if (this.props.onUserLoggedIn) {
+                        this.props.onUserLoggedIn(data.result.user);
+                    }
+                    this.setState({
+                        user: data.result.user
+                    });
+                }
+                // If user changes, then we refresh page.
+                if (data.result.user.id !== this.state.user.id) {
+                    location.reload();
+                }
             }).bind(this)
         });
     },
@@ -35510,7 +35516,7 @@ var NavbarButton = React.createClass({
         if (this.props.workInfo && this.props.workInfo.working) {
             return React.createElement(
                 'button',
-                { type: 'button', className: 'animated bounceIn btn btn-warning disabled', onClick: this.props.onClick },
+                { type: 'button', className: 'animated bounceIn btn btn-warning disabled' },
                 this.props.workInfo.message
             );
         }
@@ -35559,7 +35565,7 @@ var UserInfoForm = React.createClass({
         if (this.props.workInfo && this.props.workInfo.working) {
             return React.createElement(
                 'button',
-                { className: 'btn btn-warning btn-block disabled', onClick: this.handleOnClick },
+                { className: 'btn btn-warning btn-block disabled' },
                 this.props.workInfo.message
             );
         }
@@ -35645,11 +35651,11 @@ var Modal = React.createClass({
         var callback = function callback() {
             var input = $('#Modal-Content').find('input[type=text]');
             if (input.length > 0) {
-                input.focus();
+                input[0].focus();
             } else {
                 var button = $('#Modal-Content').find('button');
                 if (button.length > 0) {
-                    button.focus();
+                    button[0].focus();
                 }
             }
         };
@@ -35779,9 +35785,6 @@ var ConfirmWindow = React.createClass({
     displayName: 'ConfirmWindow',
 
     handleOnClick: function handleOnClick(e) {
-        if (this.props.workInfo && this.props.workInfo.working) {
-            return;
-        }
         var yes = ReactDOM.findDOMNode(this.refs.yes);
         var no = ReactDOM.findDOMNode(this.refs.no);
         if (e.target === yes) {
@@ -35799,7 +35802,7 @@ var ConfirmWindow = React.createClass({
         if (this.props.workInfo && this.props.workInfo.working) {
             return React.createElement(
                 'button',
-                { ref: 'yes', className: 'btn btn-warning btn-block disabled', onClick: this.handleOnClick },
+                { ref: 'yes', className: 'btn btn-warning btn-block disabled' },
                 this.props.workInfo.message
             );
         }
@@ -35891,31 +35894,20 @@ module.exports = {
 
 var React = require('react');
 var ReactDOM = require('react-dom');
-var Utils = require('./common').Utils;
 var Navbar = require('./common').Navbar;
-var Modal = require('./common').Modal;
-var Input = require('./common').Input;
-var Alert = require('./common').Alert;
-var ConfirmWindow = require('./common').ConfirmWindow;
 
 var Index = React.createClass({
     displayName: 'Index',
 
-    getInitialState: function getInitialState() {
-        return {
-            navbar_api: {
-                login: "login",
-                signup: "signup",
-                logout: "logout",
-                get_user: "get_user"
-            }
-        };
+    handleOnUserLoggedIn: function handleOnUserLoggedIn() {
+        // If user logged in, then we redirect to dashboard.
+        window.location.replace("dashboard");
     },
     render: function render() {
         return React.createElement(
             'div',
             null,
-            React.createElement(Navbar, { ref: 'navbar', APIs: this.state.navbar_api, title: 'Addrest' }),
+            React.createElement(Navbar, { ref: 'navbar', title: 'Addrest', onUserLoggedIn: this.handleOnUserLoggedIn }),
             React.createElement(IndexBackground, null)
         );
     }
@@ -35933,7 +35925,7 @@ var IndexBackground = React.createClass({
     }
 });
 
-ReactDOM.render(React.createElement(Index, { pollInterval: 3500 }), document.getElementById("body"));
+ReactDOM.render(React.createElement(Index, null), document.getElementById("body"));
 
 },{"./common":408,"react":407,"react-dom":252}],410:[function(require,module,exports){
 // shim for using process in browser

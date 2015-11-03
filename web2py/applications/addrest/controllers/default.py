@@ -1,22 +1,17 @@
-# -*- coding: utf-8 -*-
-# this file is released under public domain and you can use without limitations
-
-#########################################################################
-## This is a sample controller
-## - index is the default action of any application
-## - user is required for authentication and authorization
-## - download is for downloading files uploaded in the db (does streaming)
-#########################################################################
 from datetime import date
 
 
 def index():
+    # If user has been logged in already, then
+    # redirect to dashboard.
     if auth.user:
         redirect('dashboard')
     return dict()
 
 
 def dashboard():
+    # If user has not been logged in, then
+    # redirect to index.
     if not auth.user:
         redirect('/')
     return dict()
