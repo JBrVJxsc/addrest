@@ -1,6 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Moment = require('moment');
+var UUID = require('uuid');
 var Utils = require('./common').Utils;
 var Navbar = require('./common').Navbar;
 var Modal = require('./common').Modal;
@@ -12,13 +13,12 @@ var ConfirmWindow = require('./common').ConfirmWindow;
 var Index = React.createClass({
     getInitialState: function() {
         return {
-            get_api_api: "get_api",
+            get_api_api: "/get_api",
             APIs: {}
         };
     },
     handleOnUserLoggedIn: function(user) {
         this.getAPIs();
-        this.refs.listPanel.getList();
     },
     handleNullUserAction: function() {
         window.location.replace("/");
@@ -34,6 +34,7 @@ var Index = React.createClass({
                 this.setState({
                     APIs: data
                 });
+                this.refs.listPanel.getList();
             }.bind(this)
         });
     },
@@ -67,46 +68,53 @@ var Editor = React.createClass({
     handleOnAlertDismiss: function() {
         this.clearError();
     },
-    handleOnCreate: function(title, content) {
+    handleOnCreate: function(entity) {
         this.clearError();
 
-        if (title.trim().length === 0) {
-            this.setError("create", "Please enter a valid title.");
-            return;
+        if (this.checkEntity(entity, "create")) {
+            this._create(entity);
         }
-
-        if (content.trim().length === 0) {
-            this.setError("create", "Please write something...");
-            return;
-        }
-
-        this._create(title, content);
     },
-    handleOnEdit: function(title, content) {
+    handleOnEdit: function(entity) {
         this.clearError();
 
-        if (title === null) {
+        // Entity did not change.
+        if (entity === null) {
             this.refs.edit.hide();
             return;
         }
 
-        if (title.trim().length === 0) {
-            this.setError("edit", "Please enter a valid title.");
-            return;
+        if (this.checkEntity(entity, "edit")) {
+            this._edit(entity);
         }
-
-        if (content.trim().length === 0) {
-            this.setError("create", "Please write something...");
-            return;
-        }
-
-        this._edit(title, content);
     },
     handleOnDelete: function(e) {
         if (e) {
             this._delete(this.state.deleting);
         } else {
             this.refs.delete.hide();
+            this.refs.edit.show();
+        }
+    },
+    checkEntity: function(entity, worker) {
+        if (entity.first_name.length === 0) {
+            this.setError(worker, "Please enter a valid first name.");
+        } else if (entity.last_name.length === 0) {
+            this.setError(worker, "Please enter a valid last name.");
+        } else if (entity.area.length === 0) {
+            this.setError(worker, "Please enter a valid area code.");
+        } else if (entity.phone.length === 0) {
+            this.setError(worker, "Please enter a valid phone number.");
+        } else if (entity.street.length === 0) {
+            this.setError(worker, "Please enter a valid street.");
+        } else if (entity.city.length === 0) {
+            this.setError(worker, "Please enter a valid city.");
+        } else if (entity.state.length === 0) {
+            this.setError(worker, "Please enter a valid state.");
+        } else if (entity.zip.length === 0) {
+            this.setError(worker, "Please enter a valid zip.");
+        } else {
+            return true;
         }
     },
     create: function() {
@@ -125,9 +133,13 @@ var Editor = React.createClass({
             deleting: entity
         });
         this.clearError();
+        this.refs.edit.hide();
         this.refs.delete.show();
     },
-    _create: function(title, content) {
+    switch: function(entity) {
+
+    },
+    _create: function(entity) {
         this.work("create", true, "Creating...");
 
         var callback = function(data) {
@@ -152,10 +164,7 @@ var Editor = React.createClass({
             $.ajax({
                 type: 'POST',
                 url: this.props.APIs.create,
-                data: {
-                    title: title,
-                    post_content: content
-                },
+                data: entity,
                 error: error,
                 success: callback,
                 timeout: 3000
@@ -164,7 +173,7 @@ var Editor = React.createClass({
 
         setTimeout(delay, 1300);
     },
-    _edit: function(title, content) {
+    _edit: function(entity) {
         this.work("edit", true, "Saving...");
 
         var callback = function(data) {
@@ -185,17 +194,11 @@ var Editor = React.createClass({
             this.setError("edit", "Something was wrong...");
         }.bind(this);
 
-        var data = {
-            id: this.state.editing.id,
-            title: title,
-            post_content: content
-        };
-
         var delay = function() {
             $.ajax({
                 type: 'POST',
                 url: this.props.APIs.edit,
-                data: data,
+                data: entity,
                 error: error,
                 success: callback,
                 timeout: 3000
@@ -206,6 +209,9 @@ var Editor = React.createClass({
     },
     _delete: function(entity) {
         this.work("delete", true, "Deleting...");
+
+        console.log("deleting");
+        console.log(entity);
 
         var callback = function(data) {
             this.stopWork();
@@ -271,7 +277,7 @@ var Editor = React.createClass({
                     <Create workInfo={this.state.work_info.create} error={this.state.error.create} onCreate={this.handleOnCreate} onAlertDismiss={this.handleOnAlertDismiss} />
                 </Modal>
 				<Modal ref="edit" type="WaveModal">
-                    <Edit entity={this.state.editing} workInfo={this.state.work_info.edit} error={this.state.error.edit} onEdit={this.handleOnEdit} onAlertDismiss={this.handleOnAlertDismiss} />
+                    <Edit entity={this.state.editing} workInfo={this.state.work_info.edit} error={this.state.error.edit} onEdit={this.handleOnEdit} onDelete={this.delete} onAlertDismiss={this.handleOnAlertDismiss} />
                 </Modal>
 				<Modal ref="delete" type="WaveModal">
                     <ConfirmWindow workInfo={this.state.work_info.delete} error={this.state.error.delete} title="Are you sure?" onConfirm={this.handleOnDelete} onAlertDismiss={this.handleOnAlertDismiss} />
@@ -307,8 +313,8 @@ var ListPanel = React.createClass({
             handleOnEdit: function(e) {
                 this.refs.editor.edit(e);
             }.bind(this),
-            handleOnDelete: function(e) {
-                this.refs.editor.delete(e);
+            handleOnSwitch: function(e) {
+                this.refs.editor.switch(e);
             }.bind(this),
             handleOnSearch: function(e) {
                 this.setState({
@@ -324,11 +330,11 @@ var ListPanel = React.createClass({
 
         $.ajax({
             type: 'POST',
-            url: this.state.get_list_api,
+            url: this.props.APIs.get_list_api,
             success: function(data) {
                 if (this.isMounted()) {
                     this.setState({
-                        entities: data.addresses
+                        entities: data.result.addresses
                     });
                 }
             }.bind(this)
@@ -375,7 +381,6 @@ var ListPanel = React.createClass({
     },
 	componentDidMount: function() {
         this.busy = false;
-        this.getList();
         this.interval = setInterval(this.getList, 5000);
 	},
     componentWillUnmount: function() {
@@ -465,6 +470,12 @@ var Entity = React.createClass({
         }
         return null;
     },
+    getStreet: function() {
+        if (this.props.entity.apt) {
+            return this.props.entity.street + ", " + this.props.entity.apt;
+        }
+        return this.props.entity.street;
+    },
     render: function() {
         var entity = this.props.entity;
         var className = "Address box-shadow--2dp";
@@ -484,7 +495,7 @@ var Entity = React.createClass({
                         </b>
                         {this.getCompany()}
                         <hr className="Separator" />
-                        {entity.street + ", " + entity.apt}
+                        {this.getStreet()}
                         <hr className="Separator" />
                         {entity.city + ", " + entity.state + ", " + entity.zip}
                     </div>
@@ -498,11 +509,8 @@ var Toolbar = React.createClass({
     handleOnEdit: function() {
         this.props.onEntityEvents.handleOnEdit(this.props.entity);
     },
-    handleOnDelete: function() {
-        this.props.onEntityEvents.handleOnDelete(this.props.entity);
-    },
     handleOnSwitch: function() {
-
+        this.props.onEntityEvents.handleOnSwitch(this.props.entity);
     },
     render: function() {
         return (
@@ -520,6 +528,19 @@ var Form = React.createClass({
     handleOnKeyDown: function(e) {
         if (e.keyCode === 13) {
             if (e.target === ReactDOM.findDOMNode(this.refs.firstName)) {
+                if (ReactDOM.findDOMNode(this.refs.firstName).value === "dm") {
+                    ReactDOM.findDOMNode(this.refs.firstName).value = "firstName " + UUID.v4().substring(0, 4);
+                    ReactDOM.findDOMNode(this.refs.lastName).value = "lastName " + UUID.v4().substring(0, 4);
+                    ReactDOM.findDOMNode(this.refs.company).value = "company " + UUID.v4().substring(0, 4);
+                    ReactDOM.findDOMNode(this.refs.area).value = "area " + UUID.v4().substring(0, 4);
+                    ReactDOM.findDOMNode(this.refs.phone).value = "phone " + UUID.v4().substring(0, 4);
+                    ReactDOM.findDOMNode(this.refs.street).value = "street " + UUID.v4().substring(0, 4);
+                    ReactDOM.findDOMNode(this.refs.apt).value = "apt " + UUID.v4().substring(0, 4);
+                    ReactDOM.findDOMNode(this.refs.city).value = "city " + UUID.v4().substring(0, 4);
+                    ReactDOM.findDOMNode(this.refs.state).value = "state " + UUID.v4().substring(0, 4);
+                    ReactDOM.findDOMNode(this.refs.zip).value = "zip " + UUID.v4().substring(0, 4);
+                    return;
+                }
                 ReactDOM.findDOMNode(this.refs.lastName).focus();
             } else if (e.target === ReactDOM.findDOMNode(this.refs.lastName)) {
                 ReactDOM.findDOMNode(this.refs.company).focus();
@@ -545,17 +566,75 @@ var Form = React.createClass({
     handleOnClick: function() {
         this.submit();
     },
+    handleOnDelete: function() {
+        this.props.onDelete(this.props.entity);
+    },
+    isSameEntity: function(e1, e2) {
+        if (e1.first_name !== e2.first_name) {
+            return false;
+        }
+        if (e1.last_name !== e2.last_name) {
+            return false;
+        }
+        if (e1.company !== e2.company) {
+            return false;
+        }
+        if (e1.area !== e2.area) {
+            return false;
+        }
+        if (e1.phone !== e2.phone) {
+            return false;
+        }
+        if (e1.street !== e2.street) {
+            return false;
+        }
+        if (e1.apt !== e2.apt) {
+            return false;
+        }
+        if (e1.city !== e2.city) {
+            return false;
+        }
+        if (e1.state !== e2.state) {
+            return false;
+        }
+        return e1.zip === e2.zip;
+    },
     submit: function() {
         if (this.props.workInfo && this.props.workInfo.working) {
             return;
         }
-        var title = ReactDOM.findDOMNode(this.refs.title).value;
-        var content = ReactDOM.findDOMNode(this.refs.content).value;
-        if (this.props.entity && this.props.entity.title === title && this.props.entity.post_content === content) {
-            this.props.onClick(null);
-            return;
+
+        var id = "";
+        if (this.props.entity) {
+            id = this.props.entity.id;
         }
-        this.props.onClick(title, content);
+        var available = true;
+        if (this.props.entity) {
+            available = this.props.entity.available;
+        }
+        var entity = {
+            id: id,
+            available: available,
+            first_name: ReactDOM.findDOMNode(this.refs.firstName).value.trim(),
+            last_name: ReactDOM.findDOMNode(this.refs.lastName).value.trim(),
+            company: ReactDOM.findDOMNode(this.refs.company).value.trim(),
+            area: ReactDOM.findDOMNode(this.refs.area).value.trim(),
+            phone: ReactDOM.findDOMNode(this.refs.phone).value.trim(),
+            street: ReactDOM.findDOMNode(this.refs.street).value.trim(),
+            apt: ReactDOM.findDOMNode(this.refs.apt).value.trim(),
+            city: ReactDOM.findDOMNode(this.refs.city).value.trim(),
+            state: ReactDOM.findDOMNode(this.refs.state).value.trim(),
+            zip: ReactDOM.findDOMNode(this.refs.zip).value.trim()
+        };
+
+        // If this is creating new address.
+        if (!this.props.entity) {
+            this.props.onClick(entity);
+        } else if (this.isSameEntity(entity, this.props.entity)) {
+            this.props.onClick(null);
+        } else {
+            this.props.onClick(entity);
+        }
     },
     getError: function() {
         if (this.props.error) {
@@ -579,7 +658,7 @@ var Form = React.createClass({
             return (
                 <div className="row">
                     <div className="col-xs-6 RightExtend">
-                        <button className="btn btn-danger btn-block" onClick={this.props.handleOnDelete}>Delete</button>
+                        <button className="btn btn-danger btn-block" onClick={this.handleOnDelete}>Delete</button>
                     </div>
                     <div className="col-xs-6 LeftExtend">
                         {this.getSaveButton()}
@@ -669,7 +748,7 @@ var Create = React.createClass({
 var Edit = React.createClass({
     render: function() {
         return (
-            <Form entity={this.props.entity} delete={true} title="Edit" workInfo={this.props.workInfo} button="Save" error={this.props.error} onClick={this.props.onEdit} onAlertDismiss={this.props.onAlertDismiss} />
+            <Form entity={this.props.entity} delete={true} title="Edit" workInfo={this.props.workInfo} button="Save" error={this.props.error} onClick={this.props.onEdit} onDelete={this.props.onDelete} onAlertDismiss={this.props.onAlertDismiss} />
         );
     }
 });

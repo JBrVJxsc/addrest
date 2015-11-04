@@ -35649,13 +35649,13 @@ var Modal = React.createClass({
     show: function show() {
         this.refs.dialog.show();
         var callback = function callback() {
-            var input = $('#Modal-Content').find('input[type=text]');
-            if (input.length > 0) {
-                input[0].focus();
+            var inputs = $('#Modal-Content').find('input[type=text]');
+            if (inputs.length > 0) {
+                inputs[0].focus();
             } else {
-                var button = $('#Modal-Content').find('button');
-                if (button.length > 0) {
-                    button[0].focus();
+                var buttons = $('#Modal-Content').find('button');
+                if (buttons.length > 0) {
+                    buttons[0].focus();
                 }
             }
         };
@@ -35818,7 +35818,7 @@ var ConfirmWindow = React.createClass({
             { className: 'ConfirmWindow' },
             React.createElement(
                 'div',
-                { className: 'panel panel-info' },
+                { className: 'panel panel-warning' },
                 React.createElement(
                     'div',
                     { className: 'panel-heading' },

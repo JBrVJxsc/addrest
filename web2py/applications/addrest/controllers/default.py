@@ -25,56 +25,110 @@ def get_user():
     }
 
 
+@auth.requires_login()
 def get_api():
-    return dict()
+    get_list_api = URL('default', 'get_addresses', user_signature=True)
+    create = URL('default', 'create_address', user_signature=True)
+    edit = URL('default', 'edit_address', user_signature=True)
+    delete = URL('default', 'delete_address', user_signature=True)
+    return locals()
 
 
+@auth.requires_signature()
 def get_addresses():
-    return {
-        'addresses': [
-            {
+    rows = db(db.address.user_id == auth.user.id).select(db.address.ALL, orderby=~db.address.create_time)
+    addresses = []
+    for row in rows:
+        info_rows = db(db.address_info.id == row.address_info_id).select()
+        for info in info_rows:
+            address = {
                 'show': True,
-                'id': 0,
-                'first_name': "Xu",
-                'last_name': "ZHANG",
-                'company': "",
-                'area': "831",
-                'phone': "2950944",
-                'street': "700 Koshland Way",
-                'apt': "A",
-                'city': "Santa Cruz",
-                'state': "CA",
-                'zip': "95060"
-            },
-            {
-                'show': True,
-                'id': 1,
-                'first_name': "Han",
-                'last_name': "Bai",
-                'company': "Zenefits",
-                'area': "831",
-                'phone': "2950944",
-                'street': "701 Koshland Way",
-                'apt': "B",
-                'city': "Santa Cruz",
-                'state': "CA",
-                'zip': "95061"
-            },
-            {
-                'show': True,
-                'id': 2,
-                'first_name': "Yue",
-                'last_name': "Tian",
-                'company': "Zenefits",
-                'area': "831",
-                'phone': "2950944",
-                'street': "702 Koshland Way",
-                'apt': "C",
-                'city': "Santa Cruz",
-                'state': "CA",
-                'zip': "95062"
+                'id': row.id,
+                'available': row.available,
+                'first_name': info.first_name,
+                'last_name': info.last_name,
+                'company': info.company,
+                'area': info.area,
+                'phone': info.phone,
+                'street': info.street,
+                'apt': info.apt,
+                'city': info.city,
+                'state': info.address_state,
+                'zip': info.zip
             }
-        ],
+            addresses.append(address)
+    return {
+        'result': {
+            'addresses': addresses,
+        }
+    }
+
+
+@auth.requires_signature()
+def create_address():
+    address_info = {
+        'first_name': request.vars.first_name,
+        'last_name': request.vars.last_name,
+        'company': request.vars.company,
+        'area': request.vars.area,
+        'phone': request.vars.phone,
+        'street': request.vars.street,
+        'apt': request.vars.apt,
+        'city': request.vars.city,
+        'address_state': request.vars.state,
+        'zip': request.vars.zip,
+    }
+    address_info_id = db.address_info.insert(**address_info)
+    address = {
+        'user_id': auth.user.id,
+        'email': auth.user.email,
+        'address_info_id': address_info_id,
+    }
+    address_id = db.address.insert(**address)
+    return {
+        'result': {
+            'id': address_id,
+        }
+    }
+
+
+@auth.requires_signature()
+def edit_address():
+    db(db.address.id == request.vars.id).update(available=request.vars.available)
+    rows = db(db.address.id == request.vars.id).select()
+    for row in rows:
+        address_info = {
+            'first_name': request.vars.first_name,
+            'last_name': request.vars.last_name,
+            'company': request.vars.company,
+            'area': request.vars.area,
+            'phone': request.vars.phone,
+            'street': request.vars.street,
+            'apt': request.vars.apt,
+            'city': request.vars.city,
+            'address_state': request.vars.state,
+            'zip': request.vars.zip,
+        }
+        db(db.address_info.id == row.address_info_id).update(**address_info)
+    return {
+        'result': {
+            'state': True,
+        }
+    }
+
+
+@auth.requires_signature()
+def delete_address():
+    print "deleting", request.vars
+    rows = db(db.address.id == request.vars.id).select()
+    print rows
+    for row in rows:
+        db(db.address_info.id == row.address_info_id).delete()
+    db(db.address.id == request.vars.id).delete()
+    return {
+        'result': {
+            'state': True,
+        },
     }
 
 
@@ -276,7 +330,6 @@ def edit_post():
         'post_content': request.vars.post_content,
         'last_active_time': request.now
     }
-    print request.vars
     db(db.post.id == request.vars.id).update(**p)
     db(db.board.id == request.vars.board).update(last_active_time=request.now)
     return {

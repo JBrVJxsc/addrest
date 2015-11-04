@@ -365,13 +365,13 @@ var Modal = React.createClass({
 	show: function() {
 		this.refs.dialog.show();
         var callback = function() {
-            var input = $('#Modal-Content').find('input[type=text]');
-            if (input.length > 0) {
-                input[0].focus();
+            var inputs = $('#Modal-Content').find('input[type=text]');
+            if (inputs.length > 0) {
+                inputs[0].focus();
             } else {
-                var button = $('#Modal-Content').find('button');
-                if (button.length > 0) {
-                    button[0].focus();
+                var buttons = $('#Modal-Content').find('button');
+                if (buttons.length > 0) {
+                    buttons[0].focus();
                 }
             }
         };
@@ -507,7 +507,7 @@ var ConfirmWindow = React.createClass({
     render: function() {
         return (
             <div className="ConfirmWindow">
-                <div className="panel panel-info">
+                <div className="panel panel-warning">
                     <div className="panel-heading">
                         <h3 className="panel-title">{this.props.title}</h3>
                     </div>

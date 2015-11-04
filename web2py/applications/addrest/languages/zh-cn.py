@@ -118,6 +118,7 @@
 'insert new': '插入新纪录',
 'insert new %s': '插入新纪录 %s',
 'Installed applications': '已安裝应用程序',
+'Insufficient privileges': 'Insufficient privileges',
 'Internal State': '內部状态',
 'Introduction': 'Introduction',
 'Invalid action': '非法操作(action)',
