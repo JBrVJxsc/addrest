@@ -39099,17 +39099,9 @@ var Switch = React.createClass({
 
     handleOnClick: function handleOnClick(e) {
         if (e.target.innerText == "On") {
-            console.log("On");
-            if (!this.props.state) {
-                this.props.onSwitch(true);
-            }
+            this.props.onSwitch(true);
         } else if (e.target.innerText == "Off") {
-            console.log("Off");
-            if (!this.props.state) {
-                this.props.onSwitch(false);
-            }
-        } else {
-            console.log(e);
+            this.props.onSwitch(false);
         }
     },
     render: function render() {
@@ -39450,7 +39442,18 @@ var Editor = React.createClass({
         this.refs.edit.hide();
         this.refs['delete'].show();
     },
-    'switch': function _switch(entity) {},
+    'switch': function _switch(entity) {
+        entity.available = !entity.available;
+        this._switch(entity);
+    },
+    _switch: function _switch(entity) {
+        $.ajax({
+            type: 'POST',
+            url: this.props.APIs.edit,
+            data: entity,
+            timeout: 3000
+        });
+    },
     _create: function _create(entity) {
         this.work("create", true, "Creating...");
 
@@ -39521,10 +39524,6 @@ var Editor = React.createClass({
     },
     _delete: function _delete(entity) {
         this.work("delete", true, "Deleting...");
-
-        console.log("deleting");
-        console.log(entity);
-
         var callback = (function (data) {
             this.stopWork();
             if (data.result.state === false) {
@@ -39778,21 +39777,21 @@ var List = React.createClass({
                 ));
             }
         }
-        return rows;
+        return React.createElement(
+            'div',
+            { className: 'container-fluid' },
+            React.createElement(
+                'div',
+                { className: 'row' },
+                rows
+            )
+        );
     },
     render: function render() {
         return React.createElement(
             'div',
             { className: 'ListContainer' },
-            React.createElement(
-                'div',
-                { className: 'container-fluid' },
-                React.createElement(
-                    'div',
-                    { className: 'row' },
-                    this.getEntities()
-                )
-            )
+            this.getEntities()
         );
     }
 });
@@ -39822,7 +39821,7 @@ var Entity = React.createClass({
         var entity = this.props.entity;
         var className = "Address box-shadow--2dp";
         if (entity.created) {
-            className = "animated flipInX Address box-shadow--2dp";
+            className = "animated flash Address box-shadow--2dp";
         }
         return React.createElement(
             'div',
@@ -39865,7 +39864,10 @@ var Toolbar = React.createClass({
     handleOnEdit: function handleOnEdit() {
         this.props.onEntityEvents.handleOnEdit(this.props.entity);
     },
-    handleOnSwitch: function handleOnSwitch() {
+    handleOnSwitch: function handleOnSwitch(e) {
+        if (e === this.props.entity.available) {
+            return;
+        }
         this.props.onEntityEvents.handleOnSwitch(this.props.entity);
     },
     render: function render() {
@@ -39880,7 +39882,7 @@ var Toolbar = React.createClass({
             React.createElement(
                 'div',
                 { className: 'pull-right' },
-                React.createElement(Switch, { entity: this.props.entity, state: true, onSwitch: this.handleOnSwitch })
+                React.createElement(Switch, { state: this.props.entity.available, onSwitch: this.handleOnSwitch })
             )
         );
     }
@@ -40002,7 +40004,7 @@ var Form = React.createClass({
     },
     getError: function getError() {
         if (this.props.error) {
-            return React.createElement(Alert, { style: 'warning', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
+            return React.createElement(Alert, { style: 'danger', onDismiss: this.props.onAlertDismiss, title: this.props.error.title, message: this.props.error.message });
         }
     },
     getSaveButton: function getSaveButton() {
@@ -40073,6 +40075,7 @@ var Form = React.createClass({
                     React.createElement(
                         'div',
                         { className: 'form center-block' },
+                        this.getError(),
                         React.createElement(
                             'div',
                             { className: 'form-group' },

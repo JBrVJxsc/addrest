@@ -137,7 +137,16 @@ var Editor = React.createClass({
         this.refs.delete.show();
     },
     switch: function(entity) {
-
+        entity.available = !entity.available;
+        this._switch(entity);
+    },
+    _switch: function(entity) {
+        $.ajax({
+            type: 'POST',
+            url: this.props.APIs.edit,
+            data: entity,
+            timeout: 3000
+        });
     },
     _create: function(entity) {
         this.work("create", true, "Creating...");
@@ -209,10 +218,6 @@ var Editor = React.createClass({
     },
     _delete: function(entity) {
         this.work("delete", true, "Deleting...");
-
-        console.log("deleting");
-        console.log(entity);
-
         var callback = function(data) {
             this.stopWork();
             if (data.result.state === false) {
@@ -442,16 +447,18 @@ var List = React.createClass({
                 );
             }
         }
-        return rows;
+        return (
+            <div className="container-fluid">
+                <div className="row">
+                    {rows}
+                </div>
+            </div>
+        );
     },
     render: function() {
         return (
             <div className="ListContainer">
-                <div className="container-fluid">
-                    <div className="row">
-                        {this.getEntities()}
-                    </div>
-                </div>
+                {this.getEntities()}
             </div>
         );
     }
@@ -480,7 +487,7 @@ var Entity = React.createClass({
         var entity = this.props.entity;
         var className = "Address box-shadow--2dp";
         if (entity.created) {
-            className = "animated flipInX Address box-shadow--2dp";
+            className = "animated flash Address box-shadow--2dp";
         }
         return (
             <div className={className}>
@@ -509,7 +516,10 @@ var Toolbar = React.createClass({
     handleOnEdit: function() {
         this.props.onEntityEvents.handleOnEdit(this.props.entity);
     },
-    handleOnSwitch: function() {
+    handleOnSwitch: function(e) {
+        if (e === this.props.entity.available) {
+            return;
+        }
         this.props.onEntityEvents.handleOnSwitch(this.props.entity);
     },
     render: function() {
@@ -517,7 +527,7 @@ var Toolbar = React.createClass({
             <div>
                 <button type="button" className="btn btn-warning btn-xs" onClick={this.handleOnEdit}>Edit</button>
                 <div className="pull-right">
-                    <Switch entity={this.props.entity} state={true} onSwitch={this.handleOnSwitch} />
+                    <Switch state={this.props.entity.available} onSwitch={this.handleOnSwitch} />
                 </div>
             </div>
         );
@@ -639,7 +649,7 @@ var Form = React.createClass({
     getError: function() {
         if (this.props.error) {
             return (
-                <Alert style="warning" onDismiss={this.props.onAlertDismiss} title={this.props.error.title} message={this.props.error.message} />
+                <Alert style="danger" onDismiss={this.props.onAlertDismiss} title={this.props.error.title} message={this.props.error.message} />
             );
         }
     },
@@ -684,6 +694,7 @@ var Form = React.createClass({
                     </div>
                     <div className="panel-body">
                         <div className="form center-block">
+                            {this.getError()}
                             <div className="form-group">
                                 <div className="row">
                                     <div className="col-xs-6 RightExtend">

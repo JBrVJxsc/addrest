@@ -395,17 +395,9 @@ var Modal = React.createClass({
 var Switch = React.createClass({
     handleOnClick: function(e) {
         if (e.target.innerText == "On") {
-            console.log("On");
-            if (!this.props.state) {
-                this.props.onSwitch(true);
-            }
+            this.props.onSwitch(true);
         } else if (e.target.innerText == "Off") {
-            console.log("Off");
-            if (!this.props.state) {
-                this.props.onSwitch(false);
-            }
-        } else {
-            console.log(e);
+            this.props.onSwitch(false);
         }
     },
     render: function() {
