@@ -1,6 +1,3 @@
-from datetime import date
-
-
 def index():
     # If user has been logged in already, then
     # redirect to dashboard.
