@@ -37,6 +37,40 @@ def logout():
     return locals()
 
 
+def query():
+    rows = db(db.address.email == request.vars.email).select(db.address.ALL, orderby=~db.address.create_time)
+    addresses = []
+    for row in rows:
+        info_rows = db(db.address_info.id == row.address_info_id).select()
+        for info in info_rows:
+            if row.available:
+                address = {
+                    'first_name': get_mask(info.first_name),
+                    'last_name': get_mask(info.last_name),
+                    'company': get_mask(info.company),
+                    'area': get_mask(info.area),
+                    'phone': info.phone[-4:].rjust(len(info.phone), "*"),
+                    'street': get_mask(info.street),
+                    'apt': get_mask(info.apt),
+                    'city': info.city,
+                    'state': info.address_state,
+                    'zip': info.zip
+                }
+                addresses.append(address)
+    return {
+        'result': {
+            'addresses': addresses,
+        }
+    }
+
+
+def get_mask(s):
+    l = len(s)
+    if l == 0:
+        return ''
+    return s[0] + '*' * (l - 1)
+
+
 @auth.requires_signature()
 def get_api():
     get_list_api = URL('default', 'get_addresses', user_signature=True)

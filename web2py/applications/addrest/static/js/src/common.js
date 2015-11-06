@@ -159,6 +159,10 @@ var Navbar = React.createClass({
             type: 'POST',
             url: this.state.APIs.get_user,
             success: function(data) {
+                if (!data.result) {
+                    return;
+                }
+
                 if (data.result.user === null) {
                     if (this.props.nullUserAction) {
                         this.props.nullUserAction();
