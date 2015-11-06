@@ -39316,8 +39316,9 @@ var Index = React.createClass({
     displayName: 'Index',
 
     getInitialState: function getInitialState() {
+        var api = window.location.origin + document.getElementById("API").textContent;
         return {
-            get_api_api: "/get_api",
+            get_api_api: api,
             APIs: {}
         };
     },
@@ -39652,9 +39653,11 @@ var ListPanel = React.createClass({
             url: this.props.APIs.get_list_api,
             success: (function (data) {
                 if (this.isMounted()) {
-                    this.setState({
-                        entities: data.result.addresses
-                    });
+                    if (data.result) {
+                        this.setState({
+                            entities: data.result.addresses
+                        });
+                    }
                 }
             }).bind(this)
         });
