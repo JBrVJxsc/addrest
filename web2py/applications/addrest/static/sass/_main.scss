@@ -179,3 +179,18 @@ body {
   color: #ACB6C0;
   margin: auto;
 }
+
+.Footer {
+  background-color: #FFEA9B;
+  height: 60px;
+}
+
+.Footer .navbar-brand {
+  color: $Warning;
+}
+
+.Center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

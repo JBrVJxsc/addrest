@@ -2,4 +2,42 @@
 <body>
     <div id="body"></div>
     <script type="text/javascript" src="{{=URL('static','js/dist/index.js')}}"></script>
+    <script id='template' type='text/ractive'>
+        <div class="Footer navbar-fixed-bottom">
+            <div class="Center">
+                <div class="navbar-brand">We are shipping [[addresses]] addresses for [[users]] users!</div>
+            </div>
+        </div>
+    </script>
+    <div id="footer"></div>
+    <script>
+        Ractive.defaults.delimiters = ['[[', ']]'];
+
+        var footer = new Ractive({
+            el: '#footer',
+            template: '#template',
+            data: {
+                users: 0,
+                addresses: 0
+            }
+        });
+
+        var callback = function(data) {
+            if (data) {
+                footer.set('users', data.users);
+                footer.set('addresses', data.addresses);
+            }
+        };
+
+        var update_info = function() {
+            $.ajax({
+                type: 'POST',
+                url: '{{=URL('default', 'get_info.json')}}',
+                success: callback
+            });
+        };
+
+        update_info();
+        setInterval(update_info, 3000);
+    </script>
 </body>

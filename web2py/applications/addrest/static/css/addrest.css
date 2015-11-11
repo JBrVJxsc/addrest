@@ -214,3 +214,21 @@ body {
   color: #ACB6C0;
   margin: auto;
 }
+
+/* line 183, ../sass/_main.scss */
+.Footer {
+  background-color: #FFEA9B;
+  height: 60px;
+}
+
+/* line 188, ../sass/_main.scss */
+.Footer .navbar-brand {
+  color: #F39C12;
+}
+
+/* line 192, ../sass/_main.scss */
+.Center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
