@@ -6,5 +6,4 @@ routes_in = [
 	('/logout', '/addrest/default/logout'),
 	('/get_user', '/addrest/default/get_user.json'),
 	('/query', '/addrest/default/query.json'),
-	('/get_info', '/addrest/default/get_info'),
 ]
