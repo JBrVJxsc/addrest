@@ -18,6 +18,7 @@ body {
 
 .navbar-default .navbar-brand {
   color: $Warning;
+  font-size: x-large;
 }
 
 .navbar-default {
@@ -187,10 +188,17 @@ body {
 
 .Footer .navbar-brand {
   color: $Warning;
+  font-size: larger;
+  font-weight: bold;
 }
 
 .Center {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.BoldFont {
+  font-weight: bold;
+  font-size: x-large;
 }

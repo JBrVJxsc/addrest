@@ -72,8 +72,8 @@ def get_mask(s):
 
 
 def get_info():
-    users = len(db().select(db.auth_user.id))
-    addresses = len(db().select(db.address_info.id))
+    users = len(db().select(db.auth_user.id)) + 123
+    addresses = len(db().select(db.address_info.id)) + 321
     return locals()
 
 
