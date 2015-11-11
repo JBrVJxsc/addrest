@@ -18,134 +18,135 @@ body {
 /* line 19, ../sass/_main.scss */
 .navbar-default .navbar-brand {
   color: #F39C12;
+  font-size: x-large;
 }
 
-/* line 23, ../sass/_main.scss */
+/* line 24, ../sass/_main.scss */
 .navbar-default {
   font-weight: bold;
 }
 
-/* line 27, ../sass/_main.scss */
+/* line 28, ../sass/_main.scss */
 .navbar-default .navbar-brand:hover {
   color: #F39C12;
 }
 
-/* line 31, ../sass/_main.scss */
+/* line 32, ../sass/_main.scss */
 .panel {
   border-style: none;
 }
 
-/* line 35, ../sass/_main.scss */
+/* line 36, ../sass/_main.scss */
 .form-control:focus {
   border-color: #F39C12;
 }
 
-/* line 39, ../sass/_main.scss */
+/* line 40, ../sass/_main.scss */
 .glyphicon-search {
   color: #ACB6C0;
 }
 
-/* line 43, ../sass/_main.scss */
+/* line 44, ../sass/_main.scss */
 .inner-addon {
   position: relative;
 }
 
-/* line 47, ../sass/_main.scss */
+/* line 48, ../sass/_main.scss */
 .inner-addon .glyphicon {
   position: absolute;
   padding: 10px;
   pointer-events: none;
 }
 
-/* line 53, ../sass/_main.scss */
+/* line 54, ../sass/_main.scss */
 .left-addon .glyphicon {
   left: 0;
 }
 
-/* line 57, ../sass/_main.scss */
+/* line 58, ../sass/_main.scss */
 .right-addon .glyphicon {
   right: 0;
 }
 
-/* line 61, ../sass/_main.scss */
+/* line 62, ../sass/_main.scss */
 .left-addon input {
   padding-left: 30px;
 }
 
-/* line 65, ../sass/_main.scss */
+/* line 66, ../sass/_main.scss */
 .right-addon input {
   padding-right: 30px;
 }
 
-/* line 69, ../sass/_main.scss */
+/* line 70, ../sass/_main.scss */
 .box-shadow--2dp {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
 
-/* line 73, ../sass/_main.scss */
+/* line 74, ../sass/_main.scss */
 .box-shadow--3dp {
   box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.14), 0 3px 3px -2px rgba(0, 0, 0, 0.2), 0 1px 8px 0 rgba(0, 0, 0, 0.12);
 }
 
-/* line 77, ../sass/_main.scss */
+/* line 78, ../sass/_main.scss */
 .box-shadow--4dp {
   box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
-/* line 81, ../sass/_main.scss */
+/* line 82, ../sass/_main.scss */
 .btn-group .active {
   box-shadow: none;
 }
 
-/* line 85, ../sass/_main.scss */
+/* line 86, ../sass/_main.scss */
 .RightExtend {
   padding-right: 5px;
 }
 
-/* line 89, ../sass/_main.scss */
+/* line 90, ../sass/_main.scss */
 .LeftExtend {
   padding-left: 5px;
 }
 
-/* line 93, ../sass/_main.scss */
+/* line 94, ../sass/_main.scss */
 .Extend {
   padding-right: 5px;
   padding-left: 5px;
 }
 
-/* line 98, ../sass/_main.scss */
+/* line 99, ../sass/_main.scss */
 .AddressListPanel > .panel-primary > .panel-heading {
   background-color: #F39C12;
   border-color: #F39C12;
 }
 
-/* line 103, ../sass/_main.scss */
+/* line 104, ../sass/_main.scss */
 .UserInfoModal > .panel-primary > .panel-heading {
   background-color: #F39C12;
   border-color: #F39C12;
 }
 
-/* line 108, ../sass/_main.scss */
+/* line 109, ../sass/_main.scss */
 .UserInfoModal .panel {
   position: relative;
   width: 325px;
   right: 162.5px;
 }
 
-/* line 114, ../sass/_main.scss */
+/* line 115, ../sass/_main.scss */
 .AddressEditModal > .panel-primary > .panel-heading {
   background-color: #F39C12;
   border-color: #F39C12;
 }
 
-/* line 119, ../sass/_main.scss */
+/* line 120, ../sass/_main.scss */
 .AddressEditModal .panel {
   position: relative;
   width: 400px;
   right: 200px;
 }
 
-/* line 125, ../sass/_main.scss */
+/* line 126, ../sass/_main.scss */
 .AddressListPanel {
   position: relative;
   top: 80px;
@@ -153,64 +154,90 @@ body {
   margin: 0 auto;
 }
 
-/* line 132, ../sass/_main.scss */
+/* line 133, ../sass/_main.scss */
 .AddressListPanel > .panel > .panel-body {
   background-color: #FFEA9B;
 }
 
-/* line 136, ../sass/_main.scss */
+/* line 137, ../sass/_main.scss */
 .Address > .panel-primary > .panel-heading {
   background-color: #FFE071;
   border-color: #FFE071;
 }
 
-/* line 141, ../sass/_main.scss */
+/* line 142, ../sass/_main.scss */
 .Separator {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-/* line 146, ../sass/_main.scss */
+/* line 147, ../sass/_main.scss */
 .Address {
   width: 80%;
   margin: 5px auto;
 }
 
-/* line 151, ../sass/_main.scss */
+/* line 152, ../sass/_main.scss */
 .ConfirmWindow {
   position: relative;
   width: 325px;
   right: 162.5px;
 }
 
-/* line 157, ../sass/_main.scss */
+/* line 158, ../sass/_main.scss */
 .ConfirmWindow .panel .panel-body {
   position: relative;
   top: 6px;
 }
 
-/* line 162, ../sass/_main.scss */
+/* line 163, ../sass/_main.scss */
 .UserInfoFormButton .form-group {
   margin-bottom: 8px;
 }
 
-/* line 166, ../sass/_main.scss */
+/* line 167, ../sass/_main.scss */
 .Right {
   float: right;
 }
 
-/* line 170, ../sass/_main.scss */
+/* line 171, ../sass/_main.scss */
 .Left {
   float: left;
 }
 
-/* line 174, ../sass/_main.scss */
+/* line 175, ../sass/_main.scss */
 .ListContainer {
   min-height: 500px;
 }
 
-/* line 178, ../sass/_main.scss */
+/* line 179, ../sass/_main.scss */
 .Notice {
   color: #ACB6C0;
   margin: auto;
+}
+
+/* line 184, ../sass/_main.scss */
+.Footer {
+  background-color: #FFEA9B;
+  height: 60px;
+}
+
+/* line 189, ../sass/_main.scss */
+.Footer .navbar-brand {
+  color: #F39C12;
+  font-size: larger;
+  font-weight: bold;
+}
+
+/* line 195, ../sass/_main.scss */
+.Center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* line 201, ../sass/_main.scss */
+.BoldFont {
+  font-weight: bold;
+  font-size: x-large;
 }

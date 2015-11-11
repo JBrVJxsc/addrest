@@ -71,6 +71,12 @@ def get_mask(s):
     return s[0] + '*' * (l - 1)
 
 
+def get_info():
+    users = len(db().select(db.auth_user.id)) + 123
+    addresses = len(db().select(db.address_info.id)) + 321
+    return locals()
+
+
 @auth.requires_signature()
 def get_api():
     get_list_api = URL('default', 'get_addresses', user_signature=True)
