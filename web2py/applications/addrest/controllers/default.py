@@ -171,9 +171,7 @@ def edit_address():
 
 @auth.requires_signature()
 def delete_address():
-    print "deleting", request.vars
     rows = db(db.address.id == request.vars.id).select()
-    print rows
     for row in rows:
         db(db.address_info.id == row.address_info_id).delete()
     db(db.address.id == request.vars.id).delete()
