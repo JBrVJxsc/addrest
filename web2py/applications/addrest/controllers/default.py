@@ -54,7 +54,8 @@ def query():
                     'apt': get_mask(info.apt),
                     'city': info.city,
                     'state': info.address_state,
-                    'zip': info.zip
+                    'zip': info.zip,
+                    'id': info.id
                 }
                 addresses.append(address)
     return {
@@ -180,6 +181,17 @@ def delete_address():
             'state': True,
         },
     }
+
+
+def merchant_address_api():
+    result = {}
+    if request.vars.token is not None and request.vars.token == "ZHANGXUBAIHANTIANYUE":
+        rows = db(db.address_info.id == request.vars.address_id).select()
+        if len(rows) > 0:
+            result['address'] = rows.first()
+        else:
+            result['address'] = 'None'
+    return dict(result=result)
 
 
 def user():

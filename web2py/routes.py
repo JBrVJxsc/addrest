@@ -6,4 +6,5 @@ routes_in = [
 	('/logout', '/addrest/default/logout'),
 	('/get_user', '/addrest/default/get_user.json'),
 	('/query', '/addrest/default/query.json'),
+	('/merchant_address_api', '/addrest/default/merchant_address_api.json')
 ]
